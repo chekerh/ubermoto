@@ -31,6 +31,10 @@ PORT=3000
 MONGODB_URI=mongodb://localhost:27017/ubermoto
 JWT_SECRET=your-super-secret-jwt-key-change-in-production
 JWT_EXPIRES_IN=1h
+
+# Cost Calculation
+FUEL_PRICE_PER_LITER=2.5
+BASE_DELIVERY_FEE=5.0
 ```
 
 ## Running the app
@@ -73,6 +77,56 @@ npm run start:prod
 ### Health Check
 
 - `GET /health` - Health check endpoint
+
+### Motorcycles
+
+- `GET /motorcycles` - Get all motorcycles
+- `GET /motorcycles/:id` - Get motorcycle by ID
+- `POST /motorcycles` - Register a new motorcycle
+  ```json
+  {
+    "model": "Forza",
+    "brand": "Honda",
+    "fuelConsumption": 3.5,
+    "engineType": "4-stroke",
+    "capacity": 300,
+    "year": 2020
+  }
+  ```
+- `PATCH /motorcycles/:id` - Update motorcycle
+- `DELETE /motorcycles/:id` - Delete motorcycle
+
+### Deliveries (Updated)
+
+- `GET /deliveries` - Get all deliveries for authenticated user
+- `POST /deliveries` - Create a new delivery
+  ```json
+  {
+    "pickupLocation": "Address 1",
+    "deliveryAddress": "Address 2",
+    "deliveryType": "Food",
+    "distance": 10.5,
+    "motorcycleId": "motorcycle_id_here"
+  }
+  ```
+- `POST /deliveries/:id/calculate-cost` - Calculate delivery cost
+  ```json
+  {
+    "distance": 10.5,
+    "motorcycleId": "motorcycle_id_here"
+  }
+  ```
+- `PATCH /deliveries/:id/status` - Update delivery status
+
+### Cost Calculation
+
+The system automatically calculates delivery costs based on:
+- **Distance** (in kilometers)
+- **Motorcycle fuel consumption** (liters per 100 km)
+- **Fuel price** (configurable via `FUEL_PRICE_PER_LITER`)
+- **Base delivery fee** (configurable via `BASE_DELIVERY_FEE`)
+
+Formula: `Cost = Base Fee + (Distance / 100) * Fuel Consumption * Fuel Price`
 
 ### Protected Routes
 
