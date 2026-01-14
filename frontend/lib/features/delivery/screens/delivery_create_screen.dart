@@ -6,6 +6,7 @@ import '../../../widgets/custom_button.dart';
 import '../../../widgets/error_message.dart';
 import '../../../features/motorcycles/providers/motorcycle_provider.dart';
 import '../../../models/motorcycle_model.dart';
+import '../../../core/utils/distance_calculator.dart';
 import 'delivery_list_screen.dart';
 
 class DeliveryCreateScreen extends ConsumerStatefulWidget {
@@ -24,6 +25,7 @@ class _DeliveryCreateScreenState extends ConsumerState<DeliveryCreateScreen> {
   final _distanceController = TextEditingController();
   String? _selectedMotorcycleId;
   double? _estimatedCost;
+  bool _isCalculatingDistance = false;
 
   @override
   void dispose() {
@@ -32,6 +34,51 @@ class _DeliveryCreateScreenState extends ConsumerState<DeliveryCreateScreen> {
     _deliveryTypeController.dispose();
     _distanceController.dispose();
     super.dispose();
+  }
+
+  Future<void> _calculateDistance() async {
+    if (_pickupLocationController.text.isEmpty ||
+        _deliveryAddressController.text.isEmpty) {
+      return;
+    }
+
+    setState(() {
+      _isCalculatingDistance = true;
+    });
+
+    try {
+      final distance = await DistanceCalculator.calculateDistanceBetweenAddresses(
+        _pickupLocationController.text.trim(),
+        _deliveryAddressController.text.trim(),
+      );
+
+      if (distance != null) {
+        _distanceController.text = distance.toStringAsFixed(2);
+        _calculateCost();
+      } else {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Could not calculate distance. Please enter it manually.'),
+            ),
+          );
+        }
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Error calculating distance: ${e.toString()}'),
+          ),
+        );
+      }
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isCalculatingDistance = false;
+        });
+      }
+    }
   }
 
   void _calculateCost() {
@@ -147,21 +194,42 @@ class _DeliveryCreateScreenState extends ConsumerState<DeliveryCreateScreen> {
                   },
                 ),
                 const SizedBox(height: 16),
-                CustomTextField(
-                  label: 'Distance (km)',
-                  hint: 'Enter distance in kilometers',
-                  controller: _distanceController,
-                  keyboardType: TextInputType.number,
-                  onChanged: (_) => _calculateCost(),
-                  validator: (value) {
-                    if (value != null && value.isNotEmpty) {
-                      final distance = double.tryParse(value);
-                      if (distance == null || distance <= 0) {
-                        return 'Please enter a valid distance';
-                      }
-                    }
-                    return null;
-                  },
+                Row(
+                  children: [
+                    Expanded(
+                      child: CustomTextField(
+                        label: 'Distance (km)',
+                        hint: 'Enter distance or use auto-calculate',
+                        controller: _distanceController,
+                        keyboardType: TextInputType.number,
+                        onChanged: (_) => _calculateCost(),
+                        validator: (value) {
+                          if (value != null && value.isNotEmpty) {
+                            final distance = double.tryParse(value);
+                            if (distance == null || distance <= 0) {
+                              return 'Please enter a valid distance';
+                            }
+                          }
+                          return null;
+                        },
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    ElevatedButton.icon(
+                      onPressed: _isCalculatingDistance ? null : _calculateDistance,
+                      icon: _isCalculatingDistance
+                          ? const SizedBox(
+                              width: 16,
+                              height: 16,
+                              child: CircularProgressIndicator(strokeWidth: 2),
+                            )
+                          : const Icon(Icons.location_searching),
+                      label: const Text('Auto'),
+                      style: ElevatedButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(horizontal: 16),
+                      ),
+                    ),
+                  ],
                 ),
                 const SizedBox(height: 16),
                 motorcyclesAsync.when(
