@@ -1,6 +1,5 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document, Types } from 'mongoose';
-import { Motorcycle, MotorcycleDocument } from '../../motorcycles/schemas/motorcycle.schema';
 
 export type DriverDocument = Driver & Document;
 

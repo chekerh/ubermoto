@@ -29,10 +29,7 @@ export class MotorcyclesService {
     return motorcycle;
   }
 
-  async update(
-    id: string,
-    updateMotorcycleDto: UpdateMotorcycleDto,
-  ): Promise<MotorcycleDocument> {
+  async update(id: string, updateMotorcycleDto: UpdateMotorcycleDto): Promise<MotorcycleDocument> {
     const motorcycle = await this.motorcycleModel
       .findByIdAndUpdate(id, updateMotorcycleDto, { new: true })
       .exec();

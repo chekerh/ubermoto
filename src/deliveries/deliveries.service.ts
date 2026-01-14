@@ -15,19 +15,14 @@ export class DeliveriesService {
     private costCalculatorService: CostCalculatorService,
   ) {}
 
-  async create(
-    createDeliveryDto: CreateDeliveryDto,
-    userId: string,
-  ): Promise<DeliveryDocument> {
+  async create(createDeliveryDto: CreateDeliveryDto, userId: string): Promise<DeliveryDocument> {
     let estimatedCost: number | undefined;
-    let distance = createDeliveryDto.distance;
+    const distance = createDeliveryDto.distance;
 
     // If motorcycle is specified, calculate cost based on fuel consumption
     if (createDeliveryDto.motorcycleId && distance) {
       try {
-        const motorcycle = await this.motorcyclesService.findOne(
-          createDeliveryDto.motorcycleId,
-        );
+        const motorcycle = await this.motorcyclesService.findOne(createDeliveryDto.motorcycleId);
         estimatedCost = this.costCalculatorService.calculateDeliveryCost({
           distance,
           fuelConsumption: motorcycle.fuelConsumption,
@@ -58,10 +53,7 @@ export class DeliveriesService {
   }
 
   async findOne(id: string): Promise<DeliveryDocument> {
-    const delivery = await this.deliveryModel
-      .findById(id)
-      .populate('motorcycleId')
-      .exec();
+    const delivery = await this.deliveryModel.findById(id).populate('motorcycleId').exec();
     if (!delivery) {
       throw new NotFoundException(`Delivery with ID ${id} not found`);
     }
@@ -79,11 +71,7 @@ export class DeliveriesService {
     return delivery;
   }
 
-  async calculateCost(
-    deliveryId: string,
-    distance: number,
-    motorcycleId: string,
-  ): Promise<number> {
+  async calculateCost(deliveryId: string, distance: number, motorcycleId: string): Promise<number> {
     const motorcycle = await this.motorcyclesService.findOne(motorcycleId);
     const cost = this.costCalculatorService.calculateDeliveryCost({
       distance,

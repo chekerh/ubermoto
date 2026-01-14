@@ -1,7 +1,8 @@
 import { IsString, IsNumber, IsOptional, Min, Max } from 'class-validator';
+import { PartialType } from '@nestjs/mapped-types';
 import { CreateMotorcycleDto } from './create-motorcycle.dto';
 
-export class UpdateMotorcycleDto {
+export class UpdateMotorcycleDto extends PartialType(CreateMotorcycleDto) {
   @IsString()
   @IsOptional()
   model?: string;

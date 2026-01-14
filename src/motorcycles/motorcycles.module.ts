@@ -5,11 +5,7 @@ import { MotorcyclesController } from './motorcycles.controller';
 import { Motorcycle, MotorcycleSchema } from './schemas/motorcycle.schema';
 
 @Module({
-  imports: [
-    MongooseModule.forFeature([
-      { name: Motorcycle.name, schema: MotorcycleSchema },
-    ]),
-  ],
+  imports: [MongooseModule.forFeature([{ name: Motorcycle.name, schema: MotorcycleSchema }])],
   controllers: [MotorcyclesController],
   providers: [MotorcyclesService],
   exports: [MotorcyclesService],
