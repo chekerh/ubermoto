@@ -1,0 +1,40 @@
+name: Frontend CI
+
+on:
+  push:
+    branches: [frontend]
+    paths:
+      - 'frontend/**'
+  pull_request:
+    branches: [frontend]
+    paths:
+      - 'frontend/**'
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.24.0'
+          channel: 'stable'
+
+      - name: Install dependencies
+        working-directory: ./frontend
+        run: flutter pub get
+
+      - name: Analyze code
+        working-directory: ./frontend
+        run: flutter analyze
+
+      - name: Run tests
+        working-directory: ./frontend
+        run: flutter test
+
+      - name: Build
+        working-directory: ./frontend
+        run: flutter build apk --debug
