@@ -62,6 +62,8 @@ Update the API base URL in `frontend/lib/config/app_config.dart`:
 - ✅ Global Exception Handling
 - ✅ TypeScript Strict Mode
 - ✅ Unit Tests
+- ✅ Swagger API Documentation
+- ✅ Postman Collection
 
 ### Frontend
 - ✅ JWT Authentication (Login/Register)
