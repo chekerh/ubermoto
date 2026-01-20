@@ -1,0 +1,348 @@
+{
+	"info": {
+		"_postman_id": "ubermoto-api-collection",
+		"name": "UberMoto API",
+		"description": "Complete API collection for UberMoto - Motorcycle delivery platform",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"auth": {
+		"type": "bearer",
+		"bearer": [
+			{
+				"key": "token",
+				"value": "{{access_token}}",
+				"type": "string"
+			}
+		]
+	},
+	"item": [
+		{
+			"name": "Authentication",
+			"item": [
+				{
+					"name": "Register",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 201) {",
+									"    const response = pm.response.json();",
+									"    pm.environment.set('access_token', response.access_token);",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"test@example.com\",\n    \"password\": \"password123\",\n    \"name\": \"Test User\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/auth/register",
+							"host": ["{{base_url}}"],
+							"path": ["auth", "register"]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Login",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"    const response = pm.response.json();",
+									"    pm.environment.set('access_token', response.access_token);",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"test@example.com\",\n    \"password\": \"password123\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/auth/login",
+							"host": ["{{base_url}}"],
+							"path": ["auth", "login"]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Motorcycles",
+			"item": [
+				{
+					"name": "Create Motorcycle",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"model\": \"Forza\",\n    \"brand\": \"Honda\",\n    \"fuelConsumption\": 3.5,\n    \"engineType\": \"4-stroke\",\n    \"capacity\": 300,\n    \"year\": 2020\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/motorcycles",
+							"host": ["{{base_url}}"],
+							"path": ["motorcycles"]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get All Motorcycles",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/motorcycles",
+							"host": ["{{base_url}}"],
+							"path": ["motorcycles"]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Motorcycle by ID",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/motorcycles/:id",
+							"host": ["{{base_url}}"],
+							"path": ["motorcycles", ":id"],
+							"variable": [
+								{
+									"key": "id",
+									"value": "motorcycle_id_here"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Motorcycle",
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"fuelConsumption\": 4.0\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/motorcycles/:id",
+							"host": ["{{base_url}}"],
+							"path": ["motorcycles", ":id"],
+							"variable": [
+								{
+									"key": "id",
+									"value": "motorcycle_id_here"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Motorcycle",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/motorcycles/:id",
+							"host": ["{{base_url}}"],
+							"path": ["motorcycles", ":id"],
+							"variable": [
+								{
+									"key": "id",
+									"value": "motorcycle_id_here"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Deliveries",
+			"item": [
+				{
+					"name": "Create Delivery",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"pickupLocation\": \"123 Main St, Tunis\",\n    \"deliveryAddress\": \"456 Avenue Habib Bourguiba, Tunis\",\n    \"deliveryType\": \"Food\",\n    \"distance\": 10.5,\n    \"motorcycleId\": \"motorcycle_id_here\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/deliveries",
+							"host": ["{{base_url}}"],
+							"path": ["deliveries"]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get All Deliveries",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/deliveries",
+							"host": ["{{base_url}}"],
+							"path": ["deliveries"]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Delivery by ID",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/deliveries/:id",
+							"host": ["{{base_url}}"],
+							"path": ["deliveries", ":id"],
+							"variable": [
+								{
+									"key": "id",
+									"value": "delivery_id_here"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Delivery Status",
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"status\": \"in_progress\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/deliveries/:id/status",
+							"host": ["{{base_url}}"],
+							"path": ["deliveries", ":id", "status"],
+							"variable": [
+								{
+									"key": "id",
+									"value": "delivery_id_here"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Calculate Delivery Cost",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"distance\": 15.5,\n    \"motorcycleId\": \"motorcycle_id_here\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/deliveries/:id/calculate-cost",
+							"host": ["{{base_url}}"],
+							"path": ["deliveries", ":id", "calculate-cost"],
+							"variable": [
+								{
+									"key": "id",
+									"value": "delivery_id_here"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Health",
+			"item": [
+				{
+					"name": "Health Check",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/health",
+							"host": ["{{base_url}}"],
+							"path": ["health"]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	],
+	"variable": [
+		{
+			"key": "base_url",
+			"value": "http://localhost:3000/api",
+			"type": "string"
+		},
+		{
+			"key": "access_token",
+			"value": "",
+			"type": "string"
+		}
+	]
+}
