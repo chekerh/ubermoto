@@ -5,6 +5,7 @@ import { Delivery, DeliveryDocument, DeliveryStatus } from './schemas/delivery.s
 import { CreateDeliveryDto } from './dto/create-delivery.dto';
 import { MotorcyclesService } from '../motorcycles/motorcycles.service';
 import { CostCalculatorService } from '../core/utils/cost-calculator.service';
+import { DeliveryMatchingService } from './delivery-matching.service';
 
 @Injectable()
 export class DeliveriesService {
@@ -13,6 +14,7 @@ export class DeliveriesService {
     private deliveryModel: Model<DeliveryDocument>,
     private motorcyclesService: MotorcyclesService,
     private costCalculatorService: CostCalculatorService,
+    private deliveryMatchingService: DeliveryMatchingService,
   ) {}
 
   async create(createDeliveryDto: CreateDeliveryDto, userId: string): Promise<DeliveryDocument> {
@@ -44,7 +46,14 @@ export class DeliveriesService {
       status: DeliveryStatus.PENDING,
     });
 
-    return delivery.save();
+    const savedDelivery = await delivery.save();
+
+    // Notify available drivers of new delivery
+    setImmediate(() => {
+      this.deliveryMatchingService.notifyDriversOfNewDelivery(savedDelivery._id.toString());
+    });
+
+    return savedDelivery;
   }
 
   async findAll(userId?: string): Promise<DeliveryDocument[]> {
@@ -86,5 +95,61 @@ export class DeliveriesService {
     });
 
     return cost;
+  }
+
+  async acceptDelivery(deliveryId: string, driverId: string): Promise<DeliveryDocument> {
+    return this.deliveryMatchingService.assignDeliveryToDriver(deliveryId, driverId);
+  }
+
+  async startDelivery(deliveryId: string, driverId: string): Promise<DeliveryDocument> {
+    const delivery = await this.deliveryModel
+      .findOneAndUpdate(
+        { _id: deliveryId, driverId, status: DeliveryStatus.ACCEPTED },
+        { status: DeliveryStatus.PICKED_UP },
+        { new: true }
+      )
+      .populate('driverId')
+      .populate('motorcycleId')
+      .exec();
+
+    if (!delivery) {
+      throw new NotFoundException('Delivery not found or not in accepted status');
+    }
+
+    return delivery;
+  }
+
+  async completeDelivery(deliveryId: string, driverId: string, actualCost?: number): Promise<DeliveryDocument> {
+    const updateData: any = { status: DeliveryStatus.COMPLETED };
+    if (actualCost !== undefined) {
+      updateData.actualCost = actualCost;
+    }
+
+    const delivery = await this.deliveryModel
+      .findOneAndUpdate(
+        { _id: deliveryId, driverId },
+        updateData,
+        { new: true }
+      )
+      .populate('driverId')
+      .populate('motorcycleId')
+      .exec();
+
+    if (!delivery) {
+      throw new NotFoundException('Delivery not found');
+    }
+
+    // Make driver available again and increment delivery count
+    await this.deliveryMatchingService.completeDelivery(deliveryId);
+
+    return delivery;
+  }
+
+  async getDriverDeliveries(driverId: string): Promise<DeliveryDocument[]> {
+    return this.deliveryMatchingService.getDriverDeliveries(driverId);
+  }
+
+  async getAvailableDeliveries(): Promise<DeliveryDocument[]> {
+    return this.deliveryMatchingService.getAvailableDeliveries();
   }
 }

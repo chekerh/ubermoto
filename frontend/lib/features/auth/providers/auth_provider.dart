@@ -77,11 +77,11 @@ class AuthNotifier extends StateNotifier<AuthState> {
     }
   }
 
-  Future<void> register(String email, String password, String name) async {
+  Future<void> registerCustomer(String email, String password, String name) async {
     state = state.copyWith(isLoading: true, error: null);
 
     try {
-      final response = await _authService.register(email, password, name);
+      final response = await _authService.registerCustomer(email, password, name);
       state = state.copyWith(
         isLoading: false,
         isAuthenticated: true,
@@ -98,6 +98,40 @@ class AuthNotifier extends StateNotifier<AuthState> {
         error: 'An unexpected error occurred',
       );
     }
+  }
+
+  Future<void> registerDriver(
+    String email,
+    String password,
+    String name,
+    String phoneNumber,
+    String licenseNumber,
+  ) async {
+    state = state.copyWith(isLoading: true, error: null);
+
+    try {
+      final response = await _authService.registerDriver(email, password, name, phoneNumber, licenseNumber);
+      state = state.copyWith(
+        isLoading: false,
+        isAuthenticated: true,
+        authResponse: response,
+      );
+    } on AppException catch (e) {
+      state = state.copyWith(
+        isLoading: false,
+        error: e.message,
+      );
+    } catch (e) {
+      state = state.copyWith(
+        isLoading: false,
+        error: 'An unexpected error occurred',
+      );
+    }
+  }
+
+  // Keep backward compatibility (deprecated)
+  Future<void> register(String email, String password, String name) async {
+    await registerCustomer(email, password, name);
   }
 
   Future<void> logout() async {

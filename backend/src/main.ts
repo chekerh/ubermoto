@@ -7,6 +7,13 @@ import { AllExceptionsFilter } from './common/filters/all-exceptions.filter';
 async function bootstrap(): Promise<void> {
   const app = await NestFactory.create(AppModule);
 
+  // Enable CORS for Flutter frontend
+  app.enableCors({
+    origin: true, // Allow all origins in development
+    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
+    credentials: true,
+  });
+
   app.useGlobalPipes(
     new ValidationPipe({
       whitelist: true,
@@ -47,10 +54,19 @@ async function bootstrap(): Promise<void> {
     },
   });
 
-  const port = process.env.PORT || 3000;
+  // Try to use PORT from environment, otherwise try available ports
+  let port = process.env.PORT ? parseInt(process.env.PORT, 10) : null;
+  
+  if (!port) {
+    // Try ports 3001-3004 in order
+    const availablePorts = [3001, 3002, 3003, 3004];
+    port = availablePorts[0]; // Default to 3001, can be changed via PORT env var
+  }
+  
   await app.listen(port);
   console.log(`🚀 Application is running on: http://localhost:${port}`);
   console.log(`📚 Swagger documentation: http://localhost:${port}/api`);
+  console.log(`💡 Available ports for other projects: 3002, 3003, 3004`);
 }
 
 bootstrap();

@@ -49,3 +49,10 @@ coverage/
 
 # Debug logs
 .cursor/
+
+# Project specific
+backend/.env.bak
+backend/port-config.json
+backend/uploads/
+frontend/.dart_tool/
+frontend/.flutter-plugins*

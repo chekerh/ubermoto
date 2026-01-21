@@ -15,15 +15,19 @@ import { MotorcyclesService } from './motorcycles.service';
 import { CreateMotorcycleDto } from './dto/create-motorcycle.dto';
 import { UpdateMotorcycleDto } from './dto/update-motorcycle.dto';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+import { RolesGuard } from '../auth/guards/roles.guard';
+import { Roles } from '../auth/decorators/roles.decorator';
+import { UserRole } from '../users/schemas/user.schema';
 
 @ApiTags('motorcycles')
 @Controller('motorcycles')
-@UseGuards(JwtAuthGuard)
+@UseGuards(JwtAuthGuard, RolesGuard)
 export class MotorcyclesController {
   constructor(private readonly motorcyclesService: MotorcyclesService) {}
 
   @Post()
   @HttpCode(HttpStatus.CREATED)
+  @Roles(UserRole.ADMIN)
   create(@Body() createMotorcycleDto: CreateMotorcycleDto) {
     return this.motorcyclesService.create(createMotorcycleDto);
   }
@@ -39,12 +43,14 @@ export class MotorcyclesController {
   }
 
   @Patch(':id')
+  @Roles(UserRole.ADMIN)
   update(@Param('id') id: string, @Body() updateMotorcycleDto: UpdateMotorcycleDto) {
     return this.motorcyclesService.update(id, updateMotorcycleDto);
   }
 
   @Delete(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
+  @Roles(UserRole.ADMIN)
   remove(@Param('id') id: string) {
     return this.motorcyclesService.remove(id);
   }

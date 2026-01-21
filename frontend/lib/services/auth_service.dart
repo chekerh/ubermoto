@@ -32,14 +32,14 @@ class AuthService {
     }
   }
 
-  Future<AuthResponseModel> register(
+  Future<AuthResponseModel> registerCustomer(
     String email,
     String password,
     String name,
   ) async {
     try {
       final response = await ApiService.post(
-        AppConfig.registerEndpoint,
+        AppConfig.customerRegisterEndpoint,
         {
           'email': email,
           'password': password,
@@ -58,8 +58,51 @@ class AuthService {
     } on AppException {
       rethrow;
     } catch (e) {
-      throw NetworkException('Registration failed: ${e.toString()}');
+      throw NetworkException('Customer registration failed: ${e.toString()}');
     }
+  }
+
+  Future<AuthResponseModel> registerDriver(
+    String email,
+    String password,
+    String name,
+    String phoneNumber,
+    String licenseNumber,
+  ) async {
+    try {
+      final response = await ApiService.post(
+        AppConfig.driverRegisterEndpoint,
+        {
+          'email': email,
+          'password': password,
+          'name': name,
+          'phoneNumber': phoneNumber,
+          'licenseNumber': licenseNumber,
+        },
+      );
+
+      final json = jsonDecode(response.body) as Map<String, dynamic>;
+      final authResponse = AuthResponseModel.fromJson(json);
+
+      // Save token securely
+      await StorageService.saveToken(authResponse.accessToken);
+      await StorageService.saveUserEmail(email);
+
+      return authResponse;
+    } on AppException {
+      rethrow;
+    } catch (e) {
+      throw NetworkException('Driver registration failed: ${e.toString()}');
+    }
+  }
+
+  // Keep backward compatibility (deprecated)
+  Future<AuthResponseModel> register(
+    String email,
+    String password,
+    String name,
+  ) async {
+    return registerCustomer(email, password, name);
   }
 
   Future<void> logout() async {

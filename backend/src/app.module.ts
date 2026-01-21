@@ -6,6 +6,10 @@ import { AuthModule } from './auth/auth.module';
 import { UsersModule } from './users/users.module';
 import { MotorcyclesModule } from './motorcycles/motorcycles.module';
 import { DeliveriesModule } from './deliveries/deliveries.module';
+import { DriversModule } from './drivers/drivers.module';
+import { DocumentsModule } from './documents/documents.module';
+import { AdminModule } from './admin/admin.module';
+import { WebSocketModule } from './websocket/websocket.module';
 import { CoreModule } from './core/core.module';
 import { DatabaseConfigService } from './config/database-config.service';
 
@@ -25,6 +29,10 @@ import { DatabaseConfigService } from './config/database-config.service';
     AuthModule,
     MotorcyclesModule,
     DeliveriesModule,
+    DriversModule,
+    DocumentsModule,
+    AdminModule,
+    WebSocketModule,
   ],
   providers: [DatabaseConfigService],
 })

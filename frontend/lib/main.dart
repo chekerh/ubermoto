@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'features/auth/providers/auth_provider.dart';
-import 'features/auth/screens/login_screen.dart';
-import 'features/delivery/screens/delivery_list_screen.dart';
+import 'features/auth/screens/home_screen.dart';
 import 'core/utils/storage_service.dart';
 
 void main() async {
@@ -32,9 +31,7 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue),
         useMaterial3: true,
       ),
-      home: isAuthenticated
-          ? const DeliveryListScreen()
-          : const LoginScreen(),
+      home: const HomeScreen(),
     );
   }
 }

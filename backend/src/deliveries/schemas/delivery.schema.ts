@@ -5,6 +5,8 @@ export type DeliveryDocument = Delivery & Document;
 
 export enum DeliveryStatus {
   PENDING = 'pending',
+  ACCEPTED = 'accepted',
+  PICKED_UP = 'picked_up',
   IN_PROGRESS = 'in_progress',
   COMPLETED = 'completed',
   CANCELLED = 'cancelled',
