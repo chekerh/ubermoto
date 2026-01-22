@@ -41,7 +41,7 @@ class GeolocationService {
     ) / 1000; // Convert meters to kilometers
   }
 
-  static Future<List<Location>> locationFromAddress(String address) async {
+  static Future<List<Location>> getLocationsFromAddress(String address) async {
     return await locationFromAddress(address);
   }
 

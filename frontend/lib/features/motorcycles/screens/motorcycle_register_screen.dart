@@ -43,6 +43,7 @@ class _MotorcycleRegisterScreenState
         'fuelConsumption': double.parse(_fuelConsumptionController.text),
       };
 
+
       if (_engineTypeController.text.isNotEmpty) {
         data['engineType'] = _engineTypeController.text.trim();
       }

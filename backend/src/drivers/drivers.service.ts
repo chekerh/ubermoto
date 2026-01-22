@@ -4,6 +4,8 @@ import { Model } from 'mongoose';
 import { Driver, DriverDocument } from './schemas/driver.schema';
 import { UsersService } from '../users/users.service';
 import { UserRole } from '../users/schemas/user.schema';
+import { UploadDocumentsDto, UpdateDriverDocumentsDto } from './dto/upload-documents.dto';
+import { DeliveryGateway } from '../websocket/delivery.gateway';
 
 export interface CreateDriverDto {
   userId: string;
@@ -17,6 +19,7 @@ export class DriversService {
   constructor(
     @InjectModel(Driver.name) private driverModel: Model<DriverDocument>,
     private readonly usersService: UsersService,
+    private readonly deliveryGateway: DeliveryGateway,
   ) {}
 
   async create(createDriverDto: CreateDriverDto): Promise<DriverDocument> {
@@ -62,19 +65,6 @@ export class DriversService {
     return this.driverModel.findOne({ userId }).populate('userId').populate('motorcycleId').exec();
   }
 
-  async updateAvailability(id: string, isAvailable: boolean): Promise<DriverDocument> {
-    const driver = await this.driverModel
-      .findByIdAndUpdate(id, { isAvailable }, { new: true })
-      .populate('userId')
-      .populate('motorcycleId')
-      .exec();
-
-    if (!driver) {
-      throw new NotFoundException(`Driver with ID ${id} not found`);
-    }
-
-    return driver;
-  }
 
   async updateMotorcycle(id: string, motorcycleId: string): Promise<DriverDocument> {
     const driver = await this.driverModel
@@ -113,6 +103,75 @@ export class DriversService {
 
     if (!driver) {
       throw new NotFoundException(`Driver with ID ${id} not found`);
+    }
+
+    return driver;
+  }
+
+  async uploadDocuments(
+    id: string,
+    uploadDocumentsDto: UploadDocumentsDto,
+  ): Promise<DriverDocument> {
+    const driver = await this.driverModel
+      .findByIdAndUpdate(id, uploadDocumentsDto, { new: true })
+      .populate('userId')
+      .populate('motorcycleId')
+      .exec();
+
+    if (!driver) {
+      throw new NotFoundException(`Driver with ID ${id} not found`);
+    }
+
+    return driver;
+  }
+
+  async updateDocuments(
+    id: string,
+    updateDocumentsDto: UpdateDriverDocumentsDto,
+  ): Promise<DriverDocument> {
+    const driver = await this.driverModel
+      .findByIdAndUpdate(id, updateDocumentsDto, { new: true })
+      .populate('userId')
+      .populate('motorcycleId')
+      .exec();
+
+    if (!driver) {
+      throw new NotFoundException(`Driver with ID ${id} not found`);
+    }
+
+    return driver;
+  }
+
+  async updateVerificationStatus(id: string, isVerified: boolean): Promise<DriverDocument> {
+    const driver = await this.driverModel
+      .findByIdAndUpdate(id, { isVerified }, { new: true })
+      .populate('userId')
+      .populate('motorcycleId')
+      .exec();
+
+    if (!driver) {
+      throw new NotFoundException(`Driver with ID ${id} not found`);
+    }
+
+    return driver;
+  }
+
+  async updateAvailability(id: string, isAvailable: boolean): Promise<DriverDocument> {
+    const driver = await this.driverModel
+      .findByIdAndUpdate(id, { isAvailable }, { new: true })
+      .populate('userId')
+      .populate('motorcycleId')
+      .exec();
+
+    if (!driver) {
+      throw new NotFoundException(`Driver with ID ${id} not found`);
+    }
+
+    // Emit real-time availability update
+    if (isAvailable) {
+      this.deliveryGateway.emitDriverAvailable(id);
+    } else {
+      this.deliveryGateway.emitDriverUnavailable(id);
     }
 
     return driver;
