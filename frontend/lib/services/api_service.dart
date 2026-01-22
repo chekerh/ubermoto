@@ -3,6 +3,7 @@ import 'package:http/http.dart' as http;
 import '../config/app_config.dart';
 import '../core/errors/app_exception.dart';
 import '../core/utils/storage_service.dart';
+import '../core/utils/retry_helper.dart';
 
 class ApiService {
   static Future<Map<String, String>> _getHeaders({
@@ -15,7 +16,8 @@ class ApiService {
 
     if (requiresAuth) {
       final token = await StorageService.getToken();
-      if (token != null) {
+      print('API Service - Token for auth: ${token != null ? 'present (${token.length} chars)' : 'null'}');
+      if (token != null && token.isNotEmpty) {
         headers['Authorization'] = 'Bearer $token';
       }
     }
@@ -27,23 +29,30 @@ class ApiService {
     String endpoint, {
     bool requiresAuth = false,
   }) async {
-    try {
-      final uri = Uri.parse('${AppConfig.baseUrl}$endpoint');
-      final headers = await _getHeaders(requiresAuth: requiresAuth);
+    return RetryHelper.withTimeout(
+      () => RetryHelper.retry(
+        () async {
+          try {
+            final uri = Uri.parse('${AppConfig.baseUrl}$endpoint');
+            final headers = await _getHeaders(requiresAuth: requiresAuth);
 
-      final response = await http.get(uri, headers: headers);
+            final response = await http.get(uri, headers: headers);
 
-      if (response.statusCode >= 200 && response.statusCode < 300) {
-        return response;
-      } else {
-        throw _handleError(response);
-      }
-    } catch (e) {
-      if (e is AppException) {
-        rethrow;
-      }
-      throw NetworkException('Network error: ${e.toString()}');
-    }
+            if (response.statusCode >= 200 && response.statusCode < 300) {
+              return response;
+            } else {
+              throw _handleError(response);
+            }
+          } catch (e) {
+            if (e is AppException) {
+              rethrow;
+            }
+            throw NetworkException('Network error: ${e.toString()}');
+          }
+        },
+        shouldRetry: (e) => e is NetworkException,
+      ),
+    );
   }
 
   static Future<http.Response> post(
@@ -51,27 +60,34 @@ class ApiService {
     Map<String, dynamic> body, {
     bool requiresAuth = false,
   }) async {
-    try {
-      final uri = Uri.parse('${AppConfig.baseUrl}$endpoint');
-      final headers = await _getHeaders(requiresAuth: requiresAuth);
+    return RetryHelper.withTimeout(
+      () => RetryHelper.retry(
+        () async {
+          try {
+            final uri = Uri.parse('${AppConfig.baseUrl}$endpoint');
+            final headers = await _getHeaders(requiresAuth: requiresAuth);
 
-      final response = await http.post(
-        uri,
-        headers: headers,
-        body: jsonEncode(body),
-      );
+            final response = await http.post(
+              uri,
+              headers: headers,
+              body: jsonEncode(body),
+            );
 
-      if (response.statusCode >= 200 && response.statusCode < 300) {
-        return response;
-      } else {
-        throw _handleError(response);
-      }
-    } catch (e) {
-      if (e is AppException) {
-        rethrow;
-      }
-      throw NetworkException('Network error: ${e.toString()}');
-    }
+            if (response.statusCode >= 200 && response.statusCode < 300) {
+              return response;
+            } else {
+              throw _handleError(response);
+            }
+          } catch (e) {
+            if (e is AppException) {
+              rethrow;
+            }
+            throw NetworkException('Network error: ${e.toString()}');
+          }
+        },
+        shouldRetry: (e) => e is NetworkException,
+      ),
+    );
   }
 
   static Future<http.Response> patch(
@@ -88,6 +104,29 @@ class ApiService {
         headers: headers,
         body: jsonEncode(body),
       );
+
+      if (response.statusCode >= 200 && response.statusCode < 300) {
+        return response;
+      } else {
+        throw _handleError(response);
+      }
+    } catch (e) {
+      if (e is AppException) {
+        rethrow;
+      }
+      throw NetworkException('Network error: ${e.toString()}');
+    }
+  }
+
+  static Future<http.Response> delete(
+    String endpoint, {
+    bool requiresAuth = false,
+  }) async {
+    try {
+      final uri = Uri.parse('${AppConfig.baseUrl}$endpoint');
+      final headers = await _getHeaders(requiresAuth: requiresAuth);
+
+      final response = await http.delete(uri, headers: headers);
 
       if (response.statusCode >= 200 && response.statusCode < 300) {
         return response;

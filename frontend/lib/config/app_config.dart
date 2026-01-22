@@ -2,7 +2,7 @@ class AppConfig {
   // Backend port configuration
   // Change this port to match your backend PORT in .env
   // Available ports: 3001, 3002, 3003, 3004
-  static const int backendPort = 3003;
+  static const int backendPort = 3001;
   
   // Update this URL based on your backend location
   // For Android emulator: http://10.0.2.2:PORT

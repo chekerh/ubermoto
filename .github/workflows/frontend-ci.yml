@@ -1,40 +1,118 @@
-name: Frontend CI
+name: Frontend CI/CD
 
 on:
   push:
-    branches: [main]
-    paths:
-      - 'frontend/**'
+    branches: [ main, develop ]
+    paths: [ 'frontend/**' ]
   pull_request:
-    branches: [main]
-    paths:
-      - 'frontend/**'
+    branches: [ main, develop ]
+    paths: [ 'frontend/**' ]
 
 jobs:
   test:
     runs-on: ubuntu-latest
 
+    defaults:
+      run:
+        working-directory: ./frontend
+
     steps:
-      - uses: actions/checkout@v4
+    - name: Checkout code
+      uses: actions/checkout@v4
 
-      - name: Setup Flutter
-        uses: subosito/flutter-action@v2
-        with:
-          flutter-version: '3.24.0'
-          channel: 'stable'
+    - name: Setup Flutter
+      uses: subosito/flutter-action@v2
+      with:
+        flutter-version: '3.19.0'
+        channel: 'stable'
 
-      - name: Install dependencies
+    - name: Cache Flutter dependencies
+      uses: actions/cache@v3
+      with:
+        path: |
+          ${{ runner.tool_cache }}/flutter
+        key: flutter-${{ runner.os }}-${{ hashFiles('**/pubspec.lock') }}
+
+    - name: Install dependencies
+      run: flutter pub get
+
+    - name: Run Flutter analyze
+      run: flutter analyze
+
+    - name: Run Flutter tests
+      run: flutter test --coverage
+
+    - name: Upload coverage to Codecov
+      uses: codecov/codecov-action@v4
+      with:
+        file: ./frontend/coverage/lcov.info
+        flags: frontend
+        name: frontend-coverage
+
+    - name: Run integration tests
+      run: flutter test integration_test/
+
+  build-web:
+    needs: test
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
         working-directory: ./frontend
-        run: flutter pub get
 
-      - name: Analyze code
-        working-directory: ./frontend
-        run: flutter analyze
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
 
-      - name: Run tests
-        working-directory: ./frontend
-        run: flutter test
+    - name: Setup Flutter
+      uses: subosito/flutter-action@v2
+      with:
+        flutter-version: '3.19.0'
+        channel: 'stable'
 
-      - name: Build
-        working-directory: ./frontend
-        run: flutter build apk --debug
+    - name: Build web app
+      run: flutter build web --release
+
+    - name: Upload build artifacts
+      uses: actions/upload-artifact@v3
+      with:
+        name: web-build
+        path: frontend/build/web/
+
+  deploy-staging:
+    needs: build-web
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/develop' && github.event_name == 'push'
+
+    steps:
+    - name: Download build artifacts
+      uses: actions/download-artifact@v3
+      with:
+        name: web-build
+
+    - name: Deploy to Firebase staging
+      uses: FirebaseExtended/action-hosting-deploy@v0
+      with:
+        repoToken: ${{ secrets.GITHUB_TOKEN }}
+        firebaseServiceAccount: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+        channelId: live
+        projectId: your-project-staging
+
+  deploy-production:
+    needs: build-web
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+
+    steps:
+    - name: Download build artifacts
+      uses: actions/download-artifact@v3
+      with:
+        name: web-build
+
+    - name: Deploy to Firebase production
+      uses: FirebaseExtended/action-hosting-deploy@v0
+      with:
+        repoToken: ${{ secrets.GITHUB_TOKEN }}
+        firebaseServiceAccount: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+        channelId: live
+        projectId: your-project-production
