@@ -7,10 +7,10 @@ class DistanceCalculator {
     String deliveryAddress,
   ) async {
     try {
-      final pickupLocations = await GeolocationService.locationFromAddress(
+      final pickupLocations = await GeolocationService.getLocationsFromAddress(
         pickupAddress,
       );
-      final deliveryLocations = await GeolocationService.locationFromAddress(
+      final deliveryLocations = await GeolocationService.getLocationsFromAddress(
         deliveryAddress,
       );
 

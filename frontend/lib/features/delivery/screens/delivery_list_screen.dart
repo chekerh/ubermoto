@@ -13,6 +13,10 @@ class DeliveryListScreen extends ConsumerWidget {
     switch (status) {
       case DeliveryStatus.pending:
         return 'Pending';
+      case DeliveryStatus.accepted:
+        return 'Accepted';
+      case DeliveryStatus.pickedUp:
+        return 'Picked Up';
       case DeliveryStatus.inProgress:
         return 'In Progress';
       case DeliveryStatus.completed:
@@ -26,6 +30,10 @@ class DeliveryListScreen extends ConsumerWidget {
     switch (status) {
       case DeliveryStatus.pending:
         return Colors.orange;
+      case DeliveryStatus.accepted:
+        return Colors.blue.shade600;
+      case DeliveryStatus.pickedUp:
+        return Colors.purple;
       case DeliveryStatus.inProgress:
         return Colors.blue;
       case DeliveryStatus.completed:
@@ -50,11 +58,7 @@ class DeliveryListScreen extends ConsumerWidget {
             onPressed: () async {
               await ref.read(authStateProvider.notifier).logout();
               if (context.mounted) {
-                Navigator.of(context).pushReplacement(
-                  MaterialPageRoute(
-                    builder: (_) => const LoginScreen(),
-                  ),
-                );
+                Navigator.of(context).pushNamedAndRemoveUntil('/login', (route) => false);
               }
             },
             tooltip: 'Logout',
@@ -107,6 +111,15 @@ class DeliveryListScreen extends ConsumerWidget {
                   margin: const EdgeInsets.only(bottom: 12),
                   child: ListTile(
                     contentPadding: const EdgeInsets.all(16),
+                    onTap: () {
+                      // Navigate to tracking if delivery has a driver
+                      if (delivery.driverId != null && delivery.status != DeliveryStatus.pending) {
+                        Navigator.of(context).pushNamed(
+                          '/customer/delivery/tracking',
+                          arguments: delivery.id,
+                        );
+                      }
+                    },
                     title: Text(
                       delivery.deliveryType,
                       style: const TextStyle(
@@ -245,11 +258,7 @@ class DeliveryListScreen extends ConsumerWidget {
       ),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () {
-          Navigator.of(context).push(
-            MaterialPageRoute(
-              builder: (_) => const DeliveryCreateScreen(),
-            ),
-          );
+          Navigator.of(context).pushNamed('/customer/delivery/create');
         },
         icon: const Icon(Icons.add),
         label: const Text('New Delivery'),

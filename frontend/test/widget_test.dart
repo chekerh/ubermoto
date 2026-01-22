@@ -7,7 +7,7 @@ void main() {
   testWidgets('App should start', (WidgetTester tester) async {
     await tester.pumpWidget(
       const ProviderScope(
-        child: MyApp(isAuthenticated: false),
+        child: MyApp(),
       ),
     );
 

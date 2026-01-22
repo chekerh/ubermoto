@@ -15,6 +15,7 @@ import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../auth/guards/roles.guard';
 import { Roles } from '../auth/decorators/roles.decorator';
 import { UserRole } from '../users/schemas/user.schema';
+import { UploadDocumentsDto, UpdateDriverDocumentsDto } from './dto/upload-documents.dto';
 
 @ApiTags('drivers')
 @Controller('drivers')
@@ -119,5 +120,51 @@ export class DriversController {
   @ApiResponse({ status: 404, description: 'Driver not found' })
   incrementDeliveryCount(@Param('id') id: string) {
     return this.driversService.incrementDeliveryCount(id);
+  }
+
+  @Post(':id/documents')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Upload driver documents' })
+  @ApiResponse({
+    status: 200,
+    description: 'Documents uploaded successfully',
+  })
+  @ApiResponse({ status: 404, description: 'Driver not found' })
+  uploadDocuments(
+    @Param('id') id: string,
+    @Body() uploadDocumentsDto: UploadDocumentsDto,
+  ) {
+    return this.driversService.uploadDocuments(id, uploadDocumentsDto);
+  }
+
+  @Patch(':id/documents')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Update driver documents' })
+  @ApiResponse({
+    status: 200,
+    description: 'Documents updated successfully',
+  })
+  @ApiResponse({ status: 404, description: 'Driver not found' })
+  updateDocuments(
+    @Param('id') id: string,
+    @Body() updateDocumentsDto: UpdateDriverDocumentsDto,
+  ) {
+    return this.driversService.updateDocuments(id, updateDocumentsDto);
+  }
+
+  @Patch(':id/verification')
+  @Roles(UserRole.ADMIN)
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Update driver verification status (Admin only)' })
+  @ApiResponse({
+    status: 200,
+    description: 'Verification status updated',
+  })
+  @ApiResponse({ status: 404, description: 'Driver not found' })
+  updateVerificationStatus(
+    @Param('id') id: string,
+    @Body() body: { isVerified: boolean },
+  ) {
+    return this.driversService.updateVerificationStatus(id, body.isVerified);
   }
 }

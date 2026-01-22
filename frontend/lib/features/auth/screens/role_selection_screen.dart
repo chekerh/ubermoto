@@ -45,11 +45,7 @@ class RoleSelectionScreen extends StatelessWidget {
                 icon: Icons.shopping_bag,
                 color: Colors.blue,
                 onTap: () {
-                  Navigator.of(context).push(
-                    MaterialPageRoute(
-                      builder: (_) => const CustomerRegisterScreen(),
-                    ),
-                  );
+                  Navigator.of(context).pushNamed('/customer-register');
                 },
               ),
               const SizedBox(height: 24),
@@ -59,11 +55,7 @@ class RoleSelectionScreen extends StatelessWidget {
                 icon: Icons.delivery_dining,
                 color: Colors.green,
                 onTap: () {
-                  Navigator.of(context).push(
-                    MaterialPageRoute(
-                      builder: (_) => const DriverRegisterScreen(),
-                    ),
-                  );
+                  Navigator.of(context).pushNamed('/driver-register');
                 },
               ),
               const Spacer(),

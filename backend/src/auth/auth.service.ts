@@ -41,7 +41,10 @@ export class AuthService {
       UserRole.CUSTOMER,
     );
 
-    return this.generateToken(user._id.toString(), user.email, user.role);
+    const userId = user._id.toString();
+    console.log('Created user:', { id: userId, email: user.email, role: user.role });
+
+    return this.generateToken(userId, user.email, user.role);
   }
 
   async registerDriver(registerDto: DriverRegisterDto): Promise<AuthResponse> {
@@ -61,14 +64,17 @@ export class AuthService {
       registerDto.phoneNumber,
     );
 
+    const driverUserId = user._id.toString();
+    console.log('Created driver user:', { id: driverUserId, email: user.email, role: user.role });
+
     // Create driver profile
     await this.driversService.create({
-      userId: user._id.toString(),
+      userId: driverUserId,
       licenseNumber: registerDto.licenseNumber,
       phoneNumber: registerDto.phoneNumber,
     });
 
-    return this.generateToken(user._id.toString(), user.email, user.role);
+    return this.generateToken(driverUserId, user.email, user.role);
   }
 
   // Keep backward compatibility (deprecated)
@@ -77,25 +83,37 @@ export class AuthService {
   }
 
   async login(loginDto: LoginDto): Promise<AuthResponse> {
+    console.log('Login attempt for email:', loginDto.email);
+
     const user = await this.usersService.findByEmail(loginDto.email);
+    console.log('User found:', user ? { id: user._id.toString(), email: user.email } : 'null');
 
     if (!user) {
+      console.log('No user found with email:', loginDto.email);
       throw new UnauthorizedException('Invalid credentials');
     }
 
     const isPasswordValid = await bcrypt.compare(loginDto.password, user.password);
+    console.log('Password valid:', isPasswordValid);
 
     if (!isPasswordValid) {
+      console.log('Invalid password for user:', user.email);
       throw new UnauthorizedException('Invalid credentials');
     }
 
-    return this.generateToken(user._id.toString(), user.email, user.role);
+    const loginUserId = user._id.toString();
+    console.log('Login successful for user:', { id: loginUserId, email: user.email });
+    return this.generateToken(loginUserId, user.email, user.role);
   }
 
   async validateUser(payload: JwtPayload): Promise<unknown> {
+    console.log('Validating user with payload:', payload);
+
     const user = await this.usersService.findById(payload.sub);
+    console.log('Found user:', user ? { id: user._id.toString(), email: user.email } : 'null');
 
     if (!user) {
+      console.log('User not found for ID:', payload.sub);
       throw new UnauthorizedException('User not found');
     }
 

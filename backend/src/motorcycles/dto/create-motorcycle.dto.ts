@@ -12,6 +12,11 @@ export class CreateMotorcycleDto {
   @Max(20)
   fuelConsumption!: number; // Liters per 100 km
 
+  @IsNumber()
+  @IsOptional()
+  @Min(0)
+  mileage?: number; // Current mileage of the motorcycle
+
   @IsString()
   @IsOptional()
   engineType?: string;

@@ -28,6 +28,48 @@ export class User {
 
   @Prop()
   phoneNumber?: string;
+
+  @Prop()
+  avatarUrl?: string;
+
+  @Prop({
+    type: {
+      notifications: {
+        email: { type: Boolean, default: true },
+        push: { type: Boolean, default: true },
+        sms: { type: Boolean, default: false },
+        deliveryUpdates: { type: Boolean, default: true },
+        promotions: { type: Boolean, default: true },
+      },
+      language: { type: String, default: 'en' },
+      theme: { type: String, enum: ['light', 'dark', 'system'], default: 'system' },
+      currency: { type: String, default: 'TND' },
+    },
+    default: {
+      notifications: {
+        email: true,
+        push: true,
+        sms: false,
+        deliveryUpdates: true,
+        promotions: true,
+      },
+      language: 'en',
+      theme: 'system',
+      currency: 'TND',
+    },
+  })
+  preferences?: {
+    notifications: {
+      email: boolean;
+      push: boolean;
+      sms: boolean;
+      deliveryUpdates: boolean;
+      promotions: boolean;
+    };
+    language: string;
+    theme: 'light' | 'dark' | 'system';
+    currency: string;
+  };
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);

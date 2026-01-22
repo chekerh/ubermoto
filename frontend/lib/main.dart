@@ -1,37 +1,40 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'features/auth/providers/auth_provider.dart';
-import 'features/auth/screens/home_screen.dart';
+import 'core/navigation/app_router.dart';
+import 'core/theme/app_theme.dart';
 import 'core/utils/storage_service.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  
-  // Check if user is already authenticated
-  final isAuthenticated = await StorageService.getToken() != null;
-  
+
+  // Clear any stored authentication data on app start to avoid stale tokens
+  // This fixes the "User not found" errors when database has been reset
+  try {
+    await StorageService.clearAll();
+  } catch (e) {
+    // Ignore errors during cleanup
+  }
+
   runApp(
-    ProviderScope(
-      child: MyApp(isAuthenticated: isAuthenticated),
+    const ProviderScope(
+      child: MyApp(),
     ),
   );
 }
 
 class MyApp extends StatelessWidget {
-  final bool isAuthenticated;
-
-  const MyApp({required this.isAuthenticated, super.key});
+  const MyApp({super.key});
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'UberTaxi',
+      title: 'UberMoto',
       debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue),
-        useMaterial3: true,
-      ),
-      home: const HomeScreen(),
+      theme: AppTheme.lightTheme,
+      darkTheme: AppTheme.darkTheme,
+      themeMode: ThemeMode.system, // Support system theme switching
+      initialRoute: '/',
+      onGenerateRoute: AppRouter.generateRoute,
     );
   }
 }

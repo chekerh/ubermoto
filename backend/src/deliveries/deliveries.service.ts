@@ -6,6 +6,7 @@ import { CreateDeliveryDto } from './dto/create-delivery.dto';
 import { MotorcyclesService } from '../motorcycles/motorcycles.service';
 import { CostCalculatorService } from '../core/utils/cost-calculator.service';
 import { DeliveryMatchingService } from './delivery-matching.service';
+import { DeliveryGateway } from '../websocket/delivery.gateway';
 
 @Injectable()
 export class DeliveriesService {
@@ -15,6 +16,7 @@ export class DeliveriesService {
     private motorcyclesService: MotorcyclesService,
     private costCalculatorService: CostCalculatorService,
     private deliveryMatchingService: DeliveryMatchingService,
+    private deliveryGateway: DeliveryGateway,
   ) {}
 
   async create(createDeliveryDto: CreateDeliveryDto, userId: string): Promise<DeliveryDocument> {
@@ -77,6 +79,10 @@ export class DeliveriesService {
     if (!delivery) {
       throw new NotFoundException(`Delivery with ID ${id} not found`);
     }
+
+    // Emit real-time status update
+    this.deliveryGateway.emitDeliveryStatusUpdate(id, delivery);
+
     return delivery;
   }
 
@@ -116,6 +122,9 @@ export class DeliveriesService {
       throw new NotFoundException('Delivery not found or not in accepted status');
     }
 
+    // Emit real-time status update
+    this.deliveryGateway.emitDeliveryStatusUpdate(deliveryId, delivery);
+
     return delivery;
   }
 
@@ -138,6 +147,9 @@ export class DeliveriesService {
     if (!delivery) {
       throw new NotFoundException('Delivery not found');
     }
+
+    // Emit real-time status update before making driver available
+    this.deliveryGateway.emitDeliveryStatusUpdate(deliveryId, delivery);
 
     // Make driver available again and increment delivery count
     await this.deliveryMatchingService.completeDelivery(deliveryId);

@@ -27,7 +27,7 @@ export class MotorcyclesController {
 
   @Post()
   @HttpCode(HttpStatus.CREATED)
-  @Roles(UserRole.ADMIN)
+  @Roles(UserRole.ADMIN, UserRole.DRIVER)
   create(@Body() createMotorcycleDto: CreateMotorcycleDto) {
     return this.motorcyclesService.create(createMotorcycleDto);
   }
@@ -43,7 +43,7 @@ export class MotorcyclesController {
   }
 
   @Patch(':id')
-  @Roles(UserRole.ADMIN)
+  @Roles(UserRole.ADMIN, UserRole.DRIVER)
   update(@Param('id') id: string, @Body() updateMotorcycleDto: UpdateMotorcycleDto) {
     return this.motorcyclesService.update(id, updateMotorcycleDto);
   }

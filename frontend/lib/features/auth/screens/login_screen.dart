@@ -4,8 +4,8 @@ import '../providers/auth_provider.dart';
 import '../../../widgets/custom_text_field.dart';
 import '../../../widgets/custom_button.dart';
 import '../../../widgets/error_message.dart';
+import '../../../core/navigation/app_router.dart';
 import 'role_selection_screen.dart';
-import '../../delivery/screens/delivery_list_screen.dart';
 
 class LoginScreen extends ConsumerStatefulWidget {
   const LoginScreen({super.key});
@@ -39,14 +39,15 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   Widget build(BuildContext context) {
     final authState = ref.watch(authStateProvider);
 
-    // Navigate to delivery list if authenticated
+    // Navigate to role-based home if authenticated
     ref.listen<AuthState>(authStateProvider, (previous, next) {
       if (next.isAuthenticated && previous?.isAuthenticated != true) {
-        Navigator.of(context).pushReplacement(
-          MaterialPageRoute(
-            builder: (_) => const DeliveryListScreen(),
-          ),
-        );
+        // Add a small delay to ensure navigation works properly
+        Future.delayed(const Duration(milliseconds: 500), () {
+          if (context.mounted) {
+            NavigationHelper.navigateToRoleBasedHome(context, ref);
+          }
+        });
       }
     });
 
@@ -54,6 +55,25 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
       appBar: AppBar(
         title: const Text('Login'),
         centerTitle: true,
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.cleaning_services),
+            onPressed: () async {
+              await ref.read(authStateProvider.notifier).clearInvalidAuth();
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text('Authentication data cleared')),
+              );
+            },
+            tooltip: 'Clear Auth Data',
+          ),
+          IconButton(
+            icon: const Icon(Icons.bug_report),
+            onPressed: () {
+              Navigator.of(context).pushNamed('/debug');
+            },
+            tooltip: 'Debug Info',
+          ),
+        ],
       ),
       body: SafeArea(
         child: SingleChildScrollView(
@@ -123,11 +143,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                 const SizedBox(height: 16),
                 TextButton(
                   onPressed: () {
-                    Navigator.of(context).push(
-                      MaterialPageRoute(
-                        builder: (_) => const RoleSelectionScreen(),
-                      ),
-                    );
+                    Navigator.of(context).pushNamed('/role-selection');
                   },
                   child: const Text("Don't have an account? Register"),
                 ),

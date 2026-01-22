@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../providers/auth_provider.dart';
 import '../../delivery/screens/delivery_list_screen.dart';
 import '../../driver/screens/driver_dashboard_screen.dart';
+import '../../../core/navigation/app_router.dart';
 import 'login_screen.dart';
 
 class HomeScreen extends ConsumerWidget {
@@ -12,21 +13,31 @@ class HomeScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final authState = ref.watch(authStateProvider);
 
-    // If not authenticated, show login
-    if (!authState.isAuthenticated || authState.authResponse == null) {
-      return const LoginScreen();
+    // If not authenticated, navigate to login
+    if (!authState.isAuthenticated || authState.user == null) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        NavigationHelper.navigateToLogin(context);
+      });
+      return const Scaffold(body: Center(child: CircularProgressIndicator()));
     }
 
-    // TODO: Get user role from auth response or user data
-    // For now, assume customer (will be updated when user model includes role)
-    final userRole = 'CUSTOMER'; // This should come from JWT token or user data
+    // Navigate to role-based home
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      NavigationHelper.navigateToRoleBasedHome(context, ref);
+    });
 
-    switch (userRole) {
-      case 'DRIVER':
-        return const DriverDashboardScreen();
-      case 'CUSTOMER':
-      default:
-        return const DeliveryListScreen();
-    }
+    // Show loading while navigating
+    return const Scaffold(
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            CircularProgressIndicator(),
+            SizedBox(height: 16),
+            Text('Setting up your dashboard...'),
+          ],
+        ),
+      ),
+    );
   }
 }

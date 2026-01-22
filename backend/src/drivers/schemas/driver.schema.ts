@@ -25,6 +25,18 @@ export class Driver {
 
   @Prop({ default: 0 })
   rating!: number;
+
+  @Prop()
+  licenseDocument?: string; // File path or URL to license document
+
+  @Prop()
+  idDocument?: string; // File path or URL to ID document
+
+  @Prop()
+  motorcycleDocument?: string; // File path or URL to motorcycle registration
+
+  @Prop({ default: false })
+  isVerified!: boolean;
 }
 
 export const DriverSchema = SchemaFactory.createForClass(Driver);

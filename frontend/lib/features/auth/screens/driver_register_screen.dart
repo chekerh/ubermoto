@@ -4,7 +4,7 @@ import '../providers/auth_provider.dart';
 import '../../../widgets/custom_text_field.dart';
 import '../../../widgets/custom_button.dart';
 import '../../../widgets/error_message.dart';
-import 'driver_documents_screen.dart';
+import '../../../core/navigation/app_router.dart';
 
 class DriverRegisterScreen extends ConsumerStatefulWidget {
   const DriverRegisterScreen({super.key});
@@ -49,14 +49,15 @@ class _DriverRegisterScreenState extends ConsumerState<DriverRegisterScreen> {
   Widget build(BuildContext context) {
     final authState = ref.watch(authStateProvider);
 
-    // Navigate to document upload if authenticated
+    // Navigate to role-based home if authenticated
     ref.listen<AuthState>(authStateProvider, (previous, next) {
       if (next.isAuthenticated && previous?.isAuthenticated != true) {
-        Navigator.of(context).pushReplacement(
-          MaterialPageRoute(
-            builder: (_) => const DriverDocumentsScreen(),
-          ),
-        );
+        // Add a small delay to ensure navigation works properly
+        Future.delayed(const Duration(milliseconds: 500), () {
+          if (context.mounted) {
+            NavigationHelper.navigateToRoleBasedHome(context, ref);
+          }
+        });
       }
     });
 
@@ -92,7 +93,77 @@ class _DriverRegisterScreenState extends ConsumerState<DriverRegisterScreen> {
                   textAlign: TextAlign.center,
                 ),
                 const SizedBox(height: 40),
-                ErrorMessage(message: authState.error),
+                if (authState.error?.contains('already exists') == true) ...[
+                  Container(
+                    padding: const EdgeInsets.all(12),
+                    margin: const EdgeInsets.only(bottom: 16),
+                    decoration: BoxDecoration(
+                      color: Colors.blue.shade50,
+                      borderRadius: BorderRadius.circular(8),
+                      border: Border.all(color: Colors.blue.shade200),
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Text(
+                          'Account Already Exists',
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            color: Colors.blue,
+                          ),
+                        ),
+                        const SizedBox(height: 4),
+                        const Text(
+                          'This email is already registered. Try logging in instead.',
+                          style: TextStyle(color: Colors.blue),
+                        ),
+                        const SizedBox(height: 8),
+                        TextButton(
+                          onPressed: () {
+                            Navigator.of(context).pushReplacementNamed('/login');
+                          },
+                          child: const Text('Go to Login'),
+                        ),
+                      ],
+                    ),
+                  ),
+                ] else ...[
+                  ErrorMessage(message: authState.error),
+                ],
+                if (authState.error?.contains('already exists') == true) ...[
+                  const SizedBox(height: 16),
+                  Container(
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: Colors.blue.shade50,
+                      borderRadius: BorderRadius.circular(8),
+                      border: Border.all(color: Colors.blue.shade200),
+                    ),
+                    child: Column(
+                      children: [
+                        const Text(
+                          'Account already exists',
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            color: Colors.blue,
+                          ),
+                        ),
+                        const SizedBox(height: 4),
+                        const Text(
+                          'Try logging in with this email instead.',
+                          style: TextStyle(color: Colors.blue),
+                        ),
+                        const SizedBox(height: 8),
+                        TextButton(
+                          onPressed: () {
+                            Navigator.of(context).pushReplacementNamed('/login');
+                          },
+                          child: const Text('Go to Login'),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
                 CustomTextField(
                   label: 'Full Name',
                   hint: 'Enter your full name',

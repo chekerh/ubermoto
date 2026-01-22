@@ -15,6 +15,9 @@ export class Motorcycle {
   fuelConsumption!: number; // Liters per 100 km
 
   @Prop()
+  mileage?: number; // Current mileage of the motorcycle
+
+  @Prop()
   engineType?: string;
 
   @Prop()
