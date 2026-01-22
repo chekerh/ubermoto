@@ -4,7 +4,6 @@ import { JwtService } from '@nestjs/jwt';
 
 describe('DeliveryGateway', () => {
   let gateway: DeliveryGateway;
-  let jwtService: JwtService;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -20,7 +19,6 @@ describe('DeliveryGateway', () => {
     }).compile();
 
     gateway = module.get<DeliveryGateway>(DeliveryGateway);
-    jwtService = module.get<JwtService>(JwtService);
   });
 
   it('should be defined', () => {

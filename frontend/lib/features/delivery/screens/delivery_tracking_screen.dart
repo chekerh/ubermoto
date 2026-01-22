@@ -4,11 +4,11 @@ import '../../../widgets/delivery_map.dart';
 import '../../../models/delivery_model.dart';
 
 class DeliveryTrackingScreen extends StatefulWidget {
-  final DeliveryModel? delivery;
+  final String? deliveryId;
 
   const DeliveryTrackingScreen({
     super.key,
-    this.delivery,
+    this.deliveryId,
   });
 
   @override
@@ -25,7 +25,7 @@ class _DeliveryTrackingScreenState extends State<DeliveryTrackingScreen> {
   void initState() {
     super.initState();
     // Mock delivery data - in real app, this would come from API
-    _delivery = widget.delivery ?? _createMockDelivery();
+    _delivery = _createMockDelivery();
     _currentStatus = _delivery.status.toString().split('.').last;
     _driverLat = _delivery.driverLatitude;
     _driverLng = _delivery.driverLongitude;
