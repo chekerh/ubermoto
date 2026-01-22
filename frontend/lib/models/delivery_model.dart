@@ -6,6 +6,10 @@ part 'delivery_model.g.dart';
 enum DeliveryStatus {
   @JsonValue('pending')
   pending,
+  @JsonValue('accepted')
+  accepted,
+  @JsonValue('picked_up')
+  pickedUp,
   @JsonValue('in_progress')
   inProgress,
   @JsonValue('completed')
@@ -28,6 +32,12 @@ class DeliveryModel extends Equatable {
   final double? estimatedCost;
   final double? actualCost;
   final int? estimatedTime;
+  final double? pickupLatitude;
+  final double? pickupLongitude;
+  final double? deliveryLatitude;
+  final double? deliveryLongitude;
+  final double? driverLatitude;
+  final double? driverLongitude;
   final DateTime createdAt;
   final DateTime? updatedAt;
 
@@ -44,6 +54,12 @@ class DeliveryModel extends Equatable {
     this.estimatedCost,
     this.actualCost,
     this.estimatedTime,
+    this.pickupLatitude,
+    this.pickupLongitude,
+    this.deliveryLatitude,
+    this.deliveryLongitude,
+    this.driverLatitude,
+    this.driverLongitude,
     required this.createdAt,
     this.updatedAt,
   });
@@ -67,6 +83,12 @@ class DeliveryModel extends Equatable {
         estimatedCost,
         actualCost,
         estimatedTime,
+        pickupLatitude,
+        pickupLongitude,
+        deliveryLatitude,
+        deliveryLongitude,
+        driverLatitude,
+        driverLongitude,
         createdAt,
         updatedAt,
       ];
