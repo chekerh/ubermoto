@@ -1,4 +1,9 @@
-import { Injectable, NotFoundException, BadRequestException, UnauthorizedException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  BadRequestException,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import * as bcrypt from 'bcryptjs';
@@ -16,7 +21,10 @@ export class UsersService {
   async findById(id: string): Promise<UserDocument | null> {
     console.log('Finding user by ID:', id);
     const user = await this.userModel.findById(id).exec();
-    console.log('User found by ID:', user ? { id: user._id.toString(), email: user.email } : 'null');
+    console.log(
+      'User found by ID:',
+      user ? { id: user._id.toString(), email: user.email } : 'null',
+    );
     return user;
   }
 
@@ -42,7 +50,11 @@ export class UsersService {
     });
 
     const savedUser = await user.save();
-    console.log('User saved:', { id: savedUser._id.toString(), email: savedUser.email, role: savedUser.role });
+    console.log('User saved:', {
+      id: savedUser._id.toString(),
+      email: savedUser.email,
+      role: savedUser.role,
+    });
 
     return savedUser;
   }
@@ -147,6 +159,8 @@ export class UsersService {
     }
 
     // Soft delete: mark as deleted instead of actually deleting
-    await this.userModel.findByIdAndUpdate(userId, { email: `deleted_${Date.now()}_${user.email}` }).exec();
+    await this.userModel
+      .findByIdAndUpdate(userId, { email: `deleted_${Date.now()}_${user.email}` })
+      .exec();
   }
 }

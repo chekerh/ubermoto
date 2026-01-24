@@ -34,7 +34,9 @@ export class DriversService {
     }
 
     // Check if driver profile already exists
-    const existingDriver = await this.driverModel.findOne({ userId: createDriverDto.userId }).exec();
+    const existingDriver = await this.driverModel
+      .findOne({ userId: createDriverDto.userId })
+      .exec();
     if (existingDriver) {
       throw new ConflictException('Driver profile already exists for this user');
     }
@@ -54,7 +56,11 @@ export class DriversService {
   }
 
   async findOne(id: string): Promise<DriverDocument> {
-    const driver = await this.driverModel.findById(id).populate('userId').populate('motorcycleId').exec();
+    const driver = await this.driverModel
+      .findById(id)
+      .populate('userId')
+      .populate('motorcycleId')
+      .exec();
     if (!driver) {
       throw new NotFoundException(`Driver with ID ${id} not found`);
     }
@@ -64,7 +70,6 @@ export class DriversService {
   async findByUserId(userId: string): Promise<DriverDocument | null> {
     return this.driverModel.findOne({ userId }).populate('userId').populate('motorcycleId').exec();
   }
-
 
   async updateMotorcycle(id: string, motorcycleId: string): Promise<DriverDocument> {
     const driver = await this.driverModel

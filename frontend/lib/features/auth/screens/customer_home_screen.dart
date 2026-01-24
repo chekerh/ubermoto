@@ -1,10 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../delivery/screens/delivery_create_screen.dart';
 import '../../delivery/screens/delivery_list_screen.dart';
 import '../../delivery/screens/delivery_tracking_screen.dart';
+import '../../delivery/screens/pickup_drop_sheet.dart';
 import '../../customer/screens/profile_screen.dart';
-import '../../../widgets/custom_button.dart';
+import '../../../widgets/map/home_map_widget.dart';
+import '../../../widgets/map/map_search_bar.dart';
+import '../../../widgets/bottom_sheets/service_selector_sheet.dart';
+import '../../../widgets/bottom_sheets/driver_info_sheet.dart';
+import '../../../widgets/empty_states/no_drivers_widget.dart';
+import '../../../core/map/types.dart';
+import '../../motor_taxi/providers/motor_taxi_provider.dart';
+import '../../motor_taxi/screens/destination_selection_sheet.dart';
+import '../../../widgets/map/driver_marker.dart';
 
 class CustomerHomeScreen extends ConsumerStatefulWidget {
   const CustomerHomeScreen({super.key});
@@ -55,277 +63,202 @@ class _CustomerHomeScreenState extends ConsumerState<CustomerHomeScreen> {
         elevation: 8,
         type: BottomNavigationBarType.fixed,
       ),
-      floatingActionButton: _selectedIndex == 0
-          ?           FloatingActionButton(
-              onPressed: () {
-                Navigator.of(context).pushNamed('/customer/delivery/create');
-              },
-              backgroundColor: Theme.of(context).primaryColor,
-              child: const Icon(Icons.add),
-              tooltip: 'Create Delivery',
-            )
-          : null,
     );
   }
 }
 
-class HomeTab extends StatelessWidget {
+class HomeTab extends ConsumerWidget {
   const HomeTab({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('UberMoto'),
-        elevation: 0,
-        backgroundColor: Colors.transparent,
-        foregroundColor: Colors.black,
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.notifications),
-            onPressed: () {
-              // TODO: Navigate to notifications
+  Widget build(BuildContext context, WidgetRef ref) {
+    final drivers = ref.watch(nearbyDriversProvider);
+    final selectedService = ref.watch(serviceSelectionProvider);
+    
+    // Filter available drivers
+    final availableDrivers = drivers.where((d) => d.status == DriverStatus.online).toList();
+
+    return Stack(
+      children: [
+        // Full-screen map
+        HomeMapWidget(
+          drivers: drivers,
+          showUserLocation: true,
+          onDriverTap: (driver) {
+            // Show driver info sheet
+            DriverInfoSheet.show(
+              context: context,
+              driverInfo: DriverInfo(
+                id: driver.driverId,
+                name: 'Driver ${driver.driverId}',
+                rating: 4.8,
+                totalRides: 150,
+                vehicleInfo: 'Motorcycle',
+                distance: 0.5,
+                etaMinutes: 3,
+              ),
+            );
+          },
+          onMapTap: (location) {
+            // Handle map tap if needed
+          },
+        ),
+
+        // Empty state overlay (only show if no available drivers)
+        if (availableDrivers.isEmpty)
+          Positioned.fill(
+            child: Container(
+              color: Colors.black.withOpacity(0.3),
+              child: NoDriversWidget(
+                onRetry: () {
+                  // Refresh driver list
+                  ref.invalidate(nearbyDriversProvider);
+                },
+              ),
+            ),
+          ),
+
+        // Search bar at top
+        Positioned(
+          top: 0,
+          left: 0,
+          right: 0,
+          child: MapSearchBar(
+            placeholder: 'Where to?',
+            onTap: () async {
+              final service = await ServiceSelectorSheet.show(
+                context: context,
+                initialSelection: selectedService,
+              );
+              if (service != null && context.mounted) {
+                ref.read(serviceSelectionProvider.notifier).state = service;
+                // Open destination selection
+                if (service == ServiceType.motorTaxi) {
+                  DestinationSelectionSheet.show(context: context);
+                } else {
+                      // Open delivery flow
+                      await PickupDropSheet.show(context: context);
+                }
+              }
             },
           ),
-        ],
-      ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Welcome Section
-            Container(
-              padding: const EdgeInsets.all(24),
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  colors: [
-                    Theme.of(context).primaryColor,
-                    Theme.of(context).primaryColor.withOpacity(0.8),
+        ),
+
+        // Service selector at bottom
+        Positioned(
+          bottom: 0,
+          left: 0,
+          right: 0,
+          child: SafeArea(
+            child: Padding(
+              padding: const EdgeInsets.all(16),
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(16),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.1),
+                      blurRadius: 10,
+                      offset: const Offset(0, -2),
+                    ),
                   ],
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
                 ),
-                borderRadius: BorderRadius.circular(16),
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Text(
-                    'Welcome back!',
-                    style: TextStyle(
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white,
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    _ServiceButton(
+                      icon: '🛵',
+                      label: 'Motor Taxi',
+                      isSelected: selectedService == ServiceType.motorTaxi,
+                      onTap: () async {
+                        ref.read(serviceSelectionProvider.notifier).state =
+                            ServiceType.motorTaxi;
+                        if (context.mounted) {
+                          await DestinationSelectionSheet.show(context: context);
+                        }
+                      },
                     ),
-                  ),
-                  const SizedBox(height: 8),
-                  const Text(
-                    'Ready to send something?',
-                    style: TextStyle(
-                      fontSize: 16,
-                      color: Colors.white70,
-                    ),
-                  ),
-                  const SizedBox(height: 20),
-                  SizedBox(
-                    width: double.infinity,
-                    child: ElevatedButton(
-                      onPressed: () {
+                    const SizedBox(width: 8),
+                    _ServiceButton(
+                      icon: '📦',
+                      label: 'Delivery',
+                      isSelected: selectedService == ServiceType.delivery,
+                      onTap: () {
+                        ref.read(serviceSelectionProvider.notifier).state =
+                            ServiceType.delivery;
                         Navigator.of(context).pushNamed('/customer/delivery/create');
                       },
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.white,
-                        foregroundColor: Theme.of(context).primaryColor,
-                        padding: const EdgeInsets.symmetric(vertical: 16),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                      ),
-                      child: const Text(
-                        'Create Delivery',
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
                     ),
-                  ),
-                ],
-              ),
-            ),
-
-            const SizedBox(height: 24),
-
-            // Quick Actions
-            const Text(
-              'Quick Actions',
-              style: TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-
-            const SizedBox(height: 16),
-
-            Row(
-              children: [
-                Expanded(
-                  child: _QuickActionCard(
-                    icon: Icons.history,
-                    title: 'Recent Orders',
-                    onTap: () {
-                      // Navigate to orders
-                    },
-                  ),
+                  ],
                 ),
-                const SizedBox(width: 16),
-                Expanded(
-                  child: _QuickActionCard(
-                    icon: Icons.favorite,
-                    title: 'Favorites',
-                    onTap: () {
-                      // Navigate to favorites
-                    },
-                  ),
-                ),
-              ],
-            ),
-
-            const SizedBox(height: 16),
-
-            Row(
-              children: [
-                Expanded(
-                  child: _QuickActionCard(
-                    icon: Icons.location_on,
-                    title: 'Saved Addresses',
-                    onTap: () {
-                      // Navigate to addresses
-                    },
-                  ),
-                ),
-                const SizedBox(width: 16),
-                Expanded(
-                  child: _QuickActionCard(
-                    icon: Icons.support,
-                    title: 'Support',
-                    onTap: () {
-                      // Navigate to support
-                    },
-                  ),
-                ),
-              ],
-            ),
-
-            const SizedBox(height: 24),
-
-            // Recent Deliveries
-            const Text(
-              'Recent Deliveries',
-              style: TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
               ),
             ),
-
-            const SizedBox(height: 16),
-
-            // Placeholder for recent deliveries
-            Container(
-              padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                color: Colors.grey.shade50,
-                borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: Colors.grey.shade200),
-              ),
-              child: const Row(
-                children: [
-                  Icon(Icons.delivery_dining, color: Colors.grey),
-                  SizedBox(width: 16),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'No recent deliveries',
-                          style: TextStyle(
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ),
-                        Text(
-                          'Your delivery history will appear here',
-                          style: TextStyle(
-                            color: Colors.grey,
-                            fontSize: 14,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  Icon(Icons.arrow_forward_ios, color: Colors.grey, size: 16),
-                ],
-              ),
-            ),
-          ],
+          ),
         ),
-      ),
+      ],
     );
   }
 }
 
-class _QuickActionCard extends StatelessWidget {
-  final IconData icon;
-  final String title;
+class _ServiceButton extends StatelessWidget {
+  final String icon;
+  final String label;
+  final bool isSelected;
   final VoidCallback onTap;
 
-  const _QuickActionCard({
+  const _ServiceButton({
     required this.icon,
-    required this.title,
+    required this.label,
+    required this.isSelected,
     required this.onTap,
   });
 
   @override
   Widget build(BuildContext context) {
-    return InkWell(
-      onTap: onTap,
-      borderRadius: BorderRadius.circular(12),
-      child: Container(
-        padding: const EdgeInsets.all(20),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: Colors.grey.shade200),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.grey.shade100,
-              blurRadius: 4,
-              offset: const Offset(0, 2),
-            ),
-          ],
-        ),
-        child: Column(
-          children: [
-            Icon(
-              icon,
-              size: 32,
-              color: Theme.of(context).primaryColor,
-            ),
-            const SizedBox(height: 12),
-            Text(
-              title,
-              style: const TextStyle(
-                fontSize: 14,
-                fontWeight: FontWeight.w500,
+    final theme = Theme.of(context);
+
+    return Expanded(
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(12),
+        child: Container(
+          padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+          decoration: BoxDecoration(
+            color: isSelected
+                ? theme.colorScheme.primary.withOpacity(0.1)
+                : Colors.transparent,
+            borderRadius: BorderRadius.circular(12),
+            border: isSelected
+                ? Border.all(color: theme.colorScheme.primary, width: 2)
+                : null,
+          ),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text(
+                icon,
+                style: const TextStyle(fontSize: 24),
               ),
-              textAlign: TextAlign.center,
-            ),
-          ],
+              const SizedBox(width: 8),
+              Text(
+                label,
+                style: theme.textTheme.titleMedium?.copyWith(
+                  fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                  color: isSelected
+                      ? theme.colorScheme.primary
+                      : theme.colorScheme.onSurface,
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
   }
 }
+
 
 class OrdersTab extends StatelessWidget {
   const OrdersTab({super.key});

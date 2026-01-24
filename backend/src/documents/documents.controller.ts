@@ -68,7 +68,9 @@ export class DocumentsController {
     }
 
     if (file.size > this.maxFileSize) {
-      throw new BadRequestException(`File size exceeds maximum allowed size of ${this.maxFileSize / 1024 / 1024}MB`);
+      throw new BadRequestException(
+        `File size exceeds maximum allowed size of ${this.maxFileSize / 1024 / 1024}MB`,
+      );
     }
 
     if (!this.allowedMimeTypes.includes(file.mimetype)) {
@@ -79,11 +81,7 @@ export class DocumentsController {
   }
 
   private getDocumentDirectory(documentType: DocumentType): string {
-    return path.join(
-      this.uploadsDir,
-      'documents',
-      documentType.toLowerCase().replace('_', '-'),
-    );
+    return path.join(this.uploadsDir, 'documents', documentType.toLowerCase().replace('_', '-'));
   }
 
   @Post('upload')
@@ -137,7 +135,9 @@ export class DocumentsController {
     try {
       fs.writeFileSync(filePath, file.buffer);
     } catch (error) {
-      throw new BadRequestException(`Failed to save file: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      throw new BadRequestException(
+        `Failed to save file: ${error instanceof Error ? error.message : 'Unknown error'}`,
+      );
     }
 
     // Create relative path for storage in database
@@ -211,12 +211,7 @@ export class DocumentsController {
     @Body() body: { status: DocumentStatus; rejectionReason?: string },
     @Request() req: AuthenticatedRequest,
   ) {
-    return this.documentsService.updateStatus(
-      id,
-      body.status,
-      req.user.sub,
-      body.rejectionReason,
-    );
+    return this.documentsService.updateStatus(id, body.status, req.user.sub, body.rejectionReason);
   }
 
   @Delete(':id')

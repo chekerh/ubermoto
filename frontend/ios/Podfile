@@ -1,8 +1,11 @@
 # Uncomment this line to define a global platform for your project
-platform :ios, '14.0'
+platform :ios, '15.0'
 
 # CocoaPods analytics sends network stats synchronously affecting flutter build latency.
 ENV['COCOAPODS_DISABLE_STATS'] = 'true'
+
+# Add source for MapLibre dependencies
+source 'https://cdn.cocoapods.org/'
 
 project 'Runner', {
   'Debug' => :debug,
@@ -40,7 +43,18 @@ post_install do |installer|
   installer.pods_project.targets.each do |target|
     flutter_additional_ios_build_settings(target)
     target.build_configurations.each do |config|
-      config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = '14.0'
+      config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = '15.0'
+    end
+  end
+  
+  # Workaround for MapLibreAnnotationExtension dependency issue
+  # If the pod is missing, it will be handled by maplibre_gl's podspec
+  installer.pod_targets.each do |target|
+    if target.name == 'maplibre_gl'
+      target.build_configurations.each do |config|
+        # Ensure MapLibre dependencies are properly linked
+        config.build_settings['OTHER_LDFLAGS'] ||= ['$(inherited)']
+      end
     end
   end
 end

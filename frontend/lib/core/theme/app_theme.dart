@@ -1,14 +1,20 @@
 import 'package:flutter/material.dart';
 
 class AppTheme {
-  static const Color primaryColor = Color(0xFF2563EB); // Blue-600
+  static const Color primaryColor = Color(0xFF000000); // Black
   static const Color secondaryColor = Color(0xFF7C3AED); // Violet-600
-  static const Color accentColor = Color(0xFFF59E0B); // Amber-500
+  static const Color accentColor = Color(0xFF00C853); // Green
 
-  static const Color successColor = Color(0xFF10B981); // Emerald-500
-  static const Color errorColor = Color(0xFFEF4444); // Red-500
-  static const Color warningColor = Color(0xFFF59E0B); // Amber-500
+  static const Color successColor = Color(0xFF00C853); // Green
+  static const Color errorColor = Color(0xFFE53935); // Red
+  static const Color dangerColor = Color(0xFFE53935); // Red
+  static const Color warningColor = Color(0xFFFFA000); // Amber
   static const Color infoColor = Color(0xFF3B82F6); // Blue-500
+  
+  // Driver status colors
+  static const Color driverOnlineColor = Color(0xFF00C853); // Green
+  static const Color driverBusyColor = Color(0xFFFFA000); // Amber
+  static const Color driverOfflineColor = Color(0xFF9E9E9E); // Grey
 
   static ThemeData lightTheme = ThemeData(
     useMaterial3: true,
@@ -244,16 +250,16 @@ class AppTheme {
     ),
   );
 
-  // Dark theme for future implementation
+  // Dark theme
   static ThemeData darkTheme = ThemeData(
     useMaterial3: true,
     colorScheme: const ColorScheme.dark(
-      primary: primaryColor,
+      primary: primaryColor, // Black
       secondary: secondaryColor,
-      tertiary: accentColor,
+      tertiary: accentColor, // Green
       surface: Color(0xFF1E293B), // Slate-800
       background: Color(0xFF0F172A), // Slate-900
-      error: errorColor,
+      error: errorColor, // Red
       onPrimary: Colors.white,
       onSecondary: Colors.white,
       onSurface: Colors.white,

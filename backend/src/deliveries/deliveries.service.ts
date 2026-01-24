@@ -112,7 +112,7 @@ export class DeliveriesService {
       .findOneAndUpdate(
         { _id: deliveryId, driverId, status: DeliveryStatus.ACCEPTED },
         { status: DeliveryStatus.PICKED_UP },
-        { new: true }
+        { new: true },
       )
       .populate('driverId')
       .populate('motorcycleId')
@@ -128,18 +128,18 @@ export class DeliveriesService {
     return delivery;
   }
 
-  async completeDelivery(deliveryId: string, driverId: string, actualCost?: number): Promise<DeliveryDocument> {
+  async completeDelivery(
+    deliveryId: string,
+    driverId: string,
+    actualCost?: number,
+  ): Promise<DeliveryDocument> {
     const updateData: any = { status: DeliveryStatus.COMPLETED };
     if (actualCost !== undefined) {
       updateData.actualCost = actualCost;
     }
 
     const delivery = await this.deliveryModel
-      .findOneAndUpdate(
-        { _id: deliveryId, driverId },
-        updateData,
-        { new: true }
-      )
+      .findOneAndUpdate({ _id: deliveryId, driverId }, updateData, { new: true })
       .populate('driverId')
       .populate('motorcycleId')
       .exec();

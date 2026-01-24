@@ -37,7 +37,7 @@ export class DeliveryMatchingService {
 
     // Filter to only verified drivers
     const verifiedDrivers = availableDrivers.filter(
-      (driver) => (driver.userId as any)?.isVerified === true
+      (driver) => (driver.userId as any)?.isVerified === true,
     );
 
     // Calculate match scores for each driver
@@ -49,7 +49,7 @@ export class DeliveryMatchingService {
           user: driver.userId,
           score,
         };
-      })
+      }),
     );
 
     // Sort by score (highest first)
@@ -76,7 +76,7 @@ export class DeliveryMatchingService {
           motorcycleId: driver.motorcycleId,
           status: DeliveryStatus.ACCEPTED,
         },
-        { new: true }
+        { new: true },
       )
       .populate('driverId')
       .populate('motorcycleId')
@@ -98,11 +98,7 @@ export class DeliveryMatchingService {
 
   async completeDelivery(deliveryId: string): Promise<DeliveryDocument> {
     const delivery = await this.deliveryModel
-      .findByIdAndUpdate(
-        deliveryId,
-        { status: DeliveryStatus.COMPLETED },
-        { new: true }
-      )
+      .findByIdAndUpdate(deliveryId, { status: DeliveryStatus.COMPLETED }, { new: true })
       .populate('driverId')
       .exec();
 
@@ -112,10 +108,12 @@ export class DeliveryMatchingService {
 
     // Make driver available again and increment delivery count
     if (delivery.driverId) {
-      await this.driverModel.findByIdAndUpdate(delivery.driverId, {
-        isAvailable: true,
-        $inc: { totalDeliveries: 1 },
-      }).exec();
+      await this.driverModel
+        .findByIdAndUpdate(delivery.driverId, {
+          isAvailable: true,
+          $inc: { totalDeliveries: 1 },
+        })
+        .exec();
 
       // Emit driver availability update
       this.deliveryGateway.emitDriverAvailable(delivery.driverId.toString());
@@ -129,11 +127,7 @@ export class DeliveryMatchingService {
 
   async cancelDelivery(deliveryId: string): Promise<DeliveryDocument> {
     const delivery = await this.deliveryModel
-      .findByIdAndUpdate(
-        deliveryId,
-        { status: DeliveryStatus.CANCELLED },
-        { new: true }
-      )
+      .findByIdAndUpdate(deliveryId, { status: DeliveryStatus.CANCELLED }, { new: true })
       .populate('driverId')
       .exec();
 
@@ -143,9 +137,11 @@ export class DeliveryMatchingService {
 
     // Make driver available again if they were assigned
     if (delivery.driverId) {
-      await this.driverModel.findByIdAndUpdate(delivery.driverId, {
-        isAvailable: true,
-      }).exec();
+      await this.driverModel
+        .findByIdAndUpdate(delivery.driverId, {
+          isAvailable: true,
+        })
+        .exec();
     }
 
     return delivery;
@@ -172,7 +168,10 @@ export class DeliveryMatchingService {
       .exec();
   }
 
-  private async calculateMatchScore(driver: DriverDocument, _delivery: DeliveryDocument): Promise<number> {
+  private async calculateMatchScore(
+    driver: DriverDocument,
+    _delivery: DeliveryDocument,
+  ): Promise<number> {
     let score = 0;
 
     // Base score for available verified driver

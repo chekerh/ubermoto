@@ -1,5 +1,6 @@
 import 'package:geolocator/geolocator.dart';
-import 'package:geocoding/geocoding.dart';
+import '../map/types.dart';
+import '../../services/nominatim_service.dart';
 
 class GeolocationService {
   static Future<Position> getCurrentPosition() async {
@@ -41,14 +42,17 @@ class GeolocationService {
     ) / 1000; // Convert meters to kilometers
   }
 
-  static Future<List<Location>> getLocationsFromAddress(String address) async {
-    return await locationFromAddress(address);
+  /// Get locations from address using Nominatim (replaces Google geocoding)
+  static Future<List<MapPoint>> getLocationsFromAddress(String address) async {
+    return await NominatimService.searchAddress(address);
   }
 
-  static Future<List<Placemark>> placemarkFromCoordinates(
+  /// Get placemark from coordinates using Nominatim (replaces Google geocoding)
+  static Future<Map<String, String>> placemarkFromCoordinates(
     double latitude,
     double longitude,
   ) async {
-    return await placemarkFromCoordinates(latitude, longitude);
+    final point = MapPoint(lat: latitude, lng: longitude);
+    return await NominatimService.placemarkFromCoordinates(point);
   }
 }

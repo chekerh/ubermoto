@@ -1,5 +1,5 @@
-import 'package:geocoding/geocoding.dart';
 import 'geolocation_service.dart';
+import '../map/types.dart';
 
 class DistanceCalculator {
   static Future<double?> calculateDistanceBetweenAddresses(
@@ -22,10 +22,10 @@ class DistanceCalculator {
       final delivery = deliveryLocations.first;
 
       return await GeolocationService.calculateDistance(
-        pickup.latitude,
-        pickup.longitude,
-        delivery.latitude,
-        delivery.longitude,
+        pickup.lat,
+        pickup.lng,
+        delivery.lat,
+        delivery.lng,
       );
     } catch (e) {
       return null;

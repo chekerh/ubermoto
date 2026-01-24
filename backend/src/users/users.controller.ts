@@ -88,10 +88,7 @@ export class UsersController {
     status: 200,
     description: 'Preferences updated successfully',
   })
-  async updatePreferences(
-    @Request() req: AuthenticatedRequest,
-    @Body() preferences: any,
-  ) {
+  async updatePreferences(@Request() req: AuthenticatedRequest, @Body() preferences: any) {
     const updatedUser = await this.usersService.updatePreferences(req.user.sub, preferences);
     return updatedUser.preferences;
   }
@@ -107,18 +104,20 @@ export class UsersController {
     if (!user) {
       throw new NotFoundException('User not found');
     }
-    return user.preferences || {
-      notifications: {
-        email: true,
-        push: true,
-        sms: false,
-        deliveryUpdates: true,
-        promotions: true,
-      },
-      language: 'en',
-      theme: 'system',
-      currency: 'TND',
-    };
+    return (
+      user.preferences || {
+        notifications: {
+          email: true,
+          push: true,
+          sms: false,
+          deliveryUpdates: true,
+          promotions: true,
+        },
+        language: 'en',
+        theme: 'system',
+        currency: 'TND',
+      }
+    );
   }
 
   @Delete('me')
@@ -138,12 +137,12 @@ export class UsersController {
     const allUsers = await this.usersService.findAll();
     return {
       count: allUsers.length,
-      users: allUsers.map(u => ({
+      users: allUsers.map((u) => ({
         id: u._id.toString(),
         email: u.email,
         role: u.role,
-        isVerified: u.isVerified
-      }))
+        isVerified: u.isVerified,
+      })),
     };
   }
 }

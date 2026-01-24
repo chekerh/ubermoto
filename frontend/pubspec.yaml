@@ -25,6 +25,7 @@ dependencies:
   # UI
   cupertino_icons: ^1.0.6
   flutter_svg: ^2.0.9
+  flutter_animate: ^4.5.0
   
   # Utilities
   intl: ^0.18.1
@@ -34,11 +35,12 @@ dependencies:
   
   # Geolocation & Maps
   geolocator: ^10.1.0
-  google_maps_flutter: ^2.5.0
-  geocoding: ^2.1.1
+  maplibre_gl: ^0.16.0
 
   # WebSocket
   socket_io_client: ^2.0.3
+  sentry_flutter: ^9.10.0
+  firebase_analytics: ^12.1.1
 
 dev_dependencies:
   flutter_test:

@@ -1,4 +1,6 @@
-import { Module } from '@nestjs/common';
+import { Module, NestModule } from '@nestjs/common';
+import { MiddlewareConsumer } from '@nestjs/common';
+import { MonitoringMiddleware } from './monitoring.middleware';
 import { ConfigModule } from '@nestjs/config';
 import { MongooseModule } from '@nestjs/mongoose';
 import { HealthModule } from './health/health.module';
@@ -36,4 +38,8 @@ import { DatabaseConfigService } from './config/database-config.service';
   ],
   providers: [DatabaseConfigService],
 })
-export class AppModule {}
+export class AppModule implements NestModule {
+  configure(consumer: MiddlewareConsumer) {
+    consumer.apply(MonitoringMiddleware).forRoutes('*');
+  }
+}

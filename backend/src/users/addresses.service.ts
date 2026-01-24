@@ -23,10 +23,7 @@ export class AddressesService {
   async create(userId: string, createAddressDto: CreateAddressDto): Promise<AddressDocument> {
     // If setting as default, unset other default addresses
     if (createAddressDto.isDefault) {
-      await this.addressModel.updateMany(
-        { userId, isDefault: true },
-        { isDefault: false },
-      ).exec();
+      await this.addressModel.updateMany({ userId, isDefault: true }, { isDefault: false }).exec();
     }
 
     const address = new this.addressModel({
@@ -47,10 +44,9 @@ export class AddressesService {
 
     // If setting as default, unset other default addresses
     if (updateAddressDto.isDefault === true) {
-      await this.addressModel.updateMany(
-        { userId, _id: { $ne: id }, isDefault: true },
-        { isDefault: false },
-      ).exec();
+      await this.addressModel
+        .updateMany({ userId, _id: { $ne: id }, isDefault: true }, { isDefault: false })
+        .exec();
     }
 
     const updatedAddress = await this.addressModel
@@ -75,10 +71,9 @@ export class AddressesService {
     await this.findOne(id, userId);
 
     // Unset other default addresses
-    await this.addressModel.updateMany(
-      { userId, _id: { $ne: id }, isDefault: true },
-      { isDefault: false },
-    ).exec();
+    await this.addressModel
+      .updateMany({ userId, _id: { $ne: id }, isDefault: true }, { isDefault: false })
+      .exec();
 
     // Set this address as default
     const updatedAddress = await this.addressModel

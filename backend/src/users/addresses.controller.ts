@@ -47,10 +47,7 @@ export class AddressesController {
     status: 201,
     description: 'Address created successfully',
   })
-  async create(
-    @Request() req: AuthenticatedRequest,
-    @Body() createAddressDto: CreateAddressDto,
-  ) {
+  async create(@Request() req: AuthenticatedRequest, @Body() createAddressDto: CreateAddressDto) {
     return this.addressesService.create(req.user.sub, createAddressDto);
   }
 

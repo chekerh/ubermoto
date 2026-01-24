@@ -4,7 +4,11 @@ import { Model } from 'mongoose';
 import { User, UserDocument, UserRole } from '../users/schemas/user.schema';
 import { Driver, DriverDocument } from '../drivers/schemas/driver.schema';
 import { Delivery, DeliveryDocument } from '../deliveries/schemas/delivery.schema';
-import { DocumentEntity, DocumentDocument, DocumentStatus } from '../documents/schemas/document.schema';
+import {
+  DocumentEntity,
+  DocumentDocument,
+  DocumentStatus,
+} from '../documents/schemas/document.schema';
 import { UsersService } from '../users/users.service';
 import { DocumentsService } from '../documents/documents.service';
 
@@ -107,15 +111,17 @@ export class AdminService {
   }
 
   async getDeliveryStats() {
-    const stats = await this.deliveryModel.aggregate([
-      {
-        $group: {
-          _id: '$status',
-          count: { $sum: 1 },
-          totalCost: { $sum: '$estimatedCost' },
+    const stats = await this.deliveryModel
+      .aggregate([
+        {
+          $group: {
+            _id: '$status',
+            count: { $sum: 1 },
+            totalCost: { $sum: '$estimatedCost' },
+          },
         },
-      },
-    ]).exec();
+      ])
+      .exec();
 
     const result: Record<string, number> = {
       pending: 0,
@@ -139,26 +145,26 @@ export class AdminService {
   }
 
   async getUserStats() {
-    const [
-      totalUsers,
-      activeUsers,
-      driverStats,
-    ] = await Promise.all([
+    const [totalUsers, activeUsers, driverStats] = await Promise.all([
       this.userModel.countDocuments().exec(),
-      this.userModel.countDocuments({ updatedAt: { $gte: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000) } }).exec(),
-      this.userModel.aggregate([
-        { $match: { role: UserRole.DRIVER } },
-        {
-          $group: {
-            _id: '$isVerified',
-            count: { $sum: 1 },
+      this.userModel
+        .countDocuments({ updatedAt: { $gte: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000) } })
+        .exec(),
+      this.userModel
+        .aggregate([
+          { $match: { role: UserRole.DRIVER } },
+          {
+            $group: {
+              _id: '$isVerified',
+              count: { $sum: 1 },
+            },
           },
-        },
-      ]).exec(),
+        ])
+        .exec(),
     ]);
 
-    const verifiedDrivers = driverStats.find(stat => stat._id === true)?.count || 0;
-    const unverifiedDrivers = driverStats.find(stat => stat._id === false)?.count || 0;
+    const verifiedDrivers = driverStats.find((stat) => stat._id === true)?.count || 0;
+    const unverifiedDrivers = driverStats.find((stat) => stat._id === false)?.count || 0;
 
     return {
       total: totalUsers,

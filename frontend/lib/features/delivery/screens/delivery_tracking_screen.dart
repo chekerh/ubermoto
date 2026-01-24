@@ -1,7 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:google_maps_flutter/google_maps_flutter.dart';
-import '../../../widgets/delivery_map.dart';
+import 'package:flutter_animate/flutter_animate.dart';
+import '../../../widgets/map/home_map_widget.dart';
+import '../../../widgets/map/map_search_bar.dart';
+import '../../../widgets/bottom_sheets/draggable_bottom_sheet.dart';
 import '../../../models/delivery_model.dart';
+import '../../../core/animations/sheet_animations.dart';
+import '../../../core/map/types.dart';
 
 class DeliveryTrackingScreen extends StatefulWidget {
   final String? deliveryId;
@@ -80,389 +84,301 @@ class _DeliveryTrackingScreenState extends State<DeliveryTrackingScreen> {
   @override
   Widget build(BuildContext context) {
     final currentStatusData = _statusConfig[_currentStatus]!;
+    final theme = Theme.of(context);
+
+    final pickupLocation = _delivery.pickupLatitude != null &&
+            _delivery.pickupLongitude != null
+        ? MapPoint(lat: _delivery.pickupLatitude!, lng: _delivery.pickupLongitude!)
+        : null;
+    final deliveryLocation = _delivery.deliveryLatitude != null &&
+            _delivery.deliveryLongitude != null
+        ? MapPoint(lat: _delivery.deliveryLatitude!, lng: _delivery.deliveryLongitude!)
+        : null;
+    final driverLocation = _driverLat != null && _driverLng != null
+        ? MapPoint(lat: _driverLat!, lng: _driverLng!)
+        : null;
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Track Delivery'),
-        elevation: 0,
-      ),
-      body: SingleChildScrollView(
-        child: Column(
-          children: [
-            // Status Header
-            Container(
-              padding: const EdgeInsets.all(24),
-              decoration: BoxDecoration(
-                color: currentStatusData['color'].withOpacity(0.1),
-                borderRadius: const BorderRadius.only(
-                  bottomLeft: Radius.circular(24),
-                  bottomRight: Radius.circular(24),
-                ),
-              ),
-              child: Column(
-                children: [
-                  Icon(
-                    currentStatusData['icon'],
-                    size: 64,
-                    color: currentStatusData['color'],
-                  ),
-                  const SizedBox(height: 16),
-                  Text(
-                    currentStatusData['title'],
-                    style: TextStyle(
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold,
-                      color: currentStatusData['color'],
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    currentStatusData['description'],
-                    style: const TextStyle(
-                      fontSize: 16,
-                      color: Colors.black87,
-                    ),
-                    textAlign: TextAlign.center,
-                  ),
-                ],
+      body: Stack(
+        children: [
+          // Full-screen map
+          if (pickupLocation != null && deliveryLocation != null)
+            HomeMapWidget(
+              initialLocation: pickupLocation,
+              showUserLocation: true,
+            )
+          else
+            const Center(child: CircularProgressIndicator()),
+
+          // Search bar
+          const Positioned(
+            top: 0,
+            left: 0,
+            right: 0,
+            child: MapSearchBar(
+              placeholder: 'Tracking delivery...',
+              showBackButton: true,
+            ),
+          ),
+
+          // Status bottom sheet
+          Positioned(
+            bottom: 0,
+            left: 0,
+            right: 0,
+            child: DraggableBottomSheet(
+              initialChildSize: 0.5,
+              minChildSize: 0.3,
+              maxChildSize: 0.9,
+              child: _DeliveryStatusSheet(
+                currentStatus: _currentStatus,
+                statusConfig: _statusConfig,
+                delivery: _delivery,
+                driverLocation: driverLocation,
               ),
             ),
-
-            // Delivery Map
-            if (_delivery.pickupLatitude != null &&
-                _delivery.pickupLongitude != null &&
-                _delivery.deliveryLatitude != null &&
-                _delivery.deliveryLongitude != null)
-              Container(
-                margin: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(12),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withOpacity(0.1),
-                      blurRadius: 8,
-                      offset: const Offset(0, 2),
-                    ),
-                  ],
-                ),
-                child: ClipRRect(
-                  borderRadius: BorderRadius.circular(12),
-                  child: DeliveryMap(
-                    pickupLocation: LatLng(
-                      _delivery.pickupLatitude!,
-                      _delivery.pickupLongitude!,
-                    ),
-                    deliveryLocation: LatLng(
-                      _delivery.deliveryLatitude!,
-                      _delivery.deliveryLongitude!,
-                    ),
-                    driverLocation: _driverLat != null && _driverLng != null
-                        ? LatLng(_driverLat!, _driverLng!)
-                        : null,
-                    status: _currentStatus,
-                  ),
-                ),
-              ),
-
-            // Progress Timeline
-            Padding(
-              padding: const EdgeInsets.all(24),
-              child: Column(
-                children: [
-                  _buildTimelineStep(
-                    'Order Placed',
-                    'Your delivery request has been received',
-                    '10:30 AM',
-                    isCompleted: true,
-                    isActive: _currentStatus == 'pending',
-                  ),
-                  _buildTimelineStep(
-                    'Driver Assigned',
-                    'John Driver has been assigned to your delivery',
-                    '10:35 AM',
-                    isCompleted: ['accepted', 'picked_up', 'delivered'].contains(_currentStatus),
-                    isActive: _currentStatus == 'accepted',
-                  ),
-                  _buildTimelineStep(
-                    'Package Picked Up',
-                    'Driver has picked up your package',
-                    '10:45 AM',
-                    isCompleted: ['picked_up', 'delivered'].contains(_currentStatus),
-                    isActive: _currentStatus == 'picked_up',
-                  ),
-                  _buildTimelineStep(
-                    'Delivered',
-                    'Package delivered successfully',
-                    '11:00 AM',
-                    isCompleted: _currentStatus == 'delivered',
-                    isActive: _currentStatus == 'delivered',
-                  ),
-                ],
-              ),
-            ),
-
-            // Driver Information (only show if driver assigned)
-            if (['accepted', 'picked_up', 'delivered'].contains(_currentStatus))
-              _buildDriverInfo(),
-
-            // Map Placeholder (in real app, integrate Google Maps)
-            Container(
-              height: 200,
-              margin: const EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                color: Colors.grey.shade200,
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: const Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Icon(
-                      Icons.map,
-                      size: 48,
-                      color: Colors.grey,
-                    ),
-                    SizedBox(height: 8),
-                    Text(
-                      'Live Map View',
-                      style: TextStyle(
-                        color: Colors.grey,
-                        fontSize: 16,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-
-            // Action Buttons
-            Padding(
-              padding: const EdgeInsets.all(16),
-              child: Column(
-                children: [
-                  if (_currentStatus != 'delivered')
-                    SizedBox(
-                      width: double.infinity,
-                      child: ElevatedButton.icon(
-                        onPressed: () {
-                          // TODO: Implement call driver
-                        },
-                        icon: const Icon(Icons.phone),
-                        label: const Text('Call Driver'),
-                        style: ElevatedButton.styleFrom(
-                          padding: const EdgeInsets.symmetric(vertical: 16),
-                          backgroundColor: Colors.green,
-                          foregroundColor: Colors.white,
-                        ),
-                      ),
-                    ),
-
-                  const SizedBox(height: 12),
-
-                  SizedBox(
-                    width: double.infinity,
-                    child: OutlinedButton.icon(
-                      onPressed: () {
-                        // TODO: Implement chat with driver
-                      },
-                      icon: const Icon(Icons.chat),
-                      label: const Text('Message Driver'),
-                      style: OutlinedButton.styleFrom(
-                        padding: const EdgeInsets.symmetric(vertical: 16),
-                      ),
-                    ),
-                  ),
-
-                  if (_currentStatus == 'delivered')
-                    const SizedBox(height: 12),
-
-                  if (_currentStatus == 'delivered')
-                    SizedBox(
-                      width: double.infinity,
-                      child: ElevatedButton.icon(
-                        onPressed: () {
-                          // TODO: Navigate to rating screen
-                        },
-                        icon: const Icon(Icons.star),
-                        label: const Text('Rate Delivery'),
-                        style: ElevatedButton.styleFrom(
-                          padding: const EdgeInsets.symmetric(vertical: 16),
-                        ),
-                      ),
-                    ),
-                ],
-              ),
-            ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
+  }
+}
+
+class _DeliveryStatusSheet extends StatelessWidget {
+  final String currentStatus;
+  final Map<String, Map<String, dynamic>> statusConfig;
+  final DeliveryModel delivery;
+  final MapPoint? driverLocation;
+
+  const _DeliveryStatusSheet({
+    required this.currentStatus,
+    required this.statusConfig,
+    required this.delivery,
+    this.driverLocation,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final currentStatusData = statusConfig[currentStatus]!;
+
+    return Padding(
+      padding: const EdgeInsets.all(20),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Status header
+          Row(
+            children: [
+              Container(
+                width: 56,
+                height: 56,
+                decoration: BoxDecoration(
+                  color: (currentStatusData['color'] as Color).withOpacity(0.1),
+                  shape: BoxShape.circle,
+                ),
+                child: Icon(
+                  currentStatusData['icon'],
+                  size: 32,
+                  color: currentStatusData['color'],
+                ),
+              ),
+              const SizedBox(width: 16),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      currentStatusData['title'],
+                      style: theme.textTheme.titleLarge?.copyWith(
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      currentStatusData['description'],
+                      style: theme.textTheme.bodySmall?.copyWith(
+                        color: Colors.grey.shade600,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 24),
+
+          // Progress timeline
+          Expanded(
+            child: SingleChildScrollView(
+              child: Column(
+                children: [
+                  _buildTimelineStep(
+                    context,
+                    'Order Placed',
+                    'Your delivery request has been received',
+                    isCompleted: true,
+                    isActive: currentStatus == 'pending',
+                  ),
+                  _buildTimelineStep(
+                    context,
+                    'Driver Assigned',
+                    'Driver has been assigned to your delivery',
+                    isCompleted: ['accepted', 'picked_up', 'delivered']
+                        .contains(currentStatus),
+                    isActive: currentStatus == 'accepted',
+                  ),
+                  _buildTimelineStep(
+                    context,
+                    'Package Picked Up',
+                    'Driver has picked up your package',
+                    isCompleted: ['picked_up', 'delivered'].contains(currentStatus),
+                    isActive: currentStatus == 'picked_up',
+                  ),
+                  _buildTimelineStep(
+                    context,
+                    'Delivered',
+                    'Package delivered successfully',
+                    isCompleted: currentStatus == 'delivered',
+                    isActive: currentStatus == 'delivered',
+                  ),
+                ],
+              ),
+            ),
+          ),
+
+          // Driver info (if assigned)
+          if (['accepted', 'picked_up', 'delivered'].contains(currentStatus))
+            Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: Colors.grey.shade50,
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Row(
+                children: [
+                  CircleAvatar(
+                    radius: 24,
+                    backgroundColor: theme.colorScheme.primary,
+                    child: const Text(
+                      'D',
+                      style: TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 16),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Driver Name',
+                          style: theme.textTheme.titleMedium?.copyWith(
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        const SizedBox(height: 4),
+                        Row(
+                          children: [
+                            Icon(Icons.star, size: 16, color: Colors.amber.shade700),
+                            const SizedBox(width: 4),
+                            const Text('4.8'),
+                            const SizedBox(width: 16),
+                            Icon(Icons.access_time, size: 16, color: Colors.grey.shade600),
+                            const SizedBox(width: 4),
+                            const Text('23 min'),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                  IconButton(
+                    icon: const Icon(Icons.phone),
+                    onPressed: () {
+                      // Call driver
+                    },
+                    style: IconButton.styleFrom(
+                      backgroundColor: theme.colorScheme.primary,
+                      foregroundColor: Colors.white,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+        ],
+      ),
+    )
+        .animate()
+        .fadeIn(duration: 300.ms)
+        .slideY(begin: 0.1, end: 0, duration: 300.ms);
   }
 
   Widget _buildTimelineStep(
+    BuildContext context,
     String title,
-    String description,
-    String time,
-    {
-      required bool isCompleted,
-      required bool isActive,
-    }
-  ) {
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Column(
-          children: [
-            Container(
-              width: 24,
-              height: 24,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color: isCompleted ? Colors.green : Colors.grey.shade300,
-                border: Border.all(
-                  color: isActive ? Theme.of(context).primaryColor : Colors.transparent,
-                  width: 3,
-                ),
-              ),
-              child: isCompleted
-                ? const Icon(
-                    Icons.check,
-                    size: 16,
-                    color: Colors.white,
-                  )
-                : null,
-            ),
-            if (title != 'Delivered') // Don't show line after last item
-              Container(
-                width: 2,
-                height: 60,
-                color: isCompleted ? Colors.green : Colors.grey.shade300,
-              ),
-          ],
-        ),
-        const SizedBox(width: 16),
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+    String description, {
+    required bool isCompleted,
+    required bool isActive,
+  }) {
+    final theme = Theme.of(context);
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 24),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Column(
             children: [
-              Text(
-                title,
-                style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w600,
-                  color: isActive ? Theme.of(context).primaryColor : Colors.black87,
+              Container(
+                width: 24,
+                height: 24,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: isCompleted ? Colors.green : Colors.grey.shade300,
+                  border: Border.all(
+                    color: isActive ? theme.colorScheme.primary : Colors.transparent,
+                    width: 3,
+                  ),
                 ),
+                child: isCompleted
+                    ? const Icon(Icons.check, size: 16, color: Colors.white)
+                    : null,
               ),
-              const SizedBox(height: 4),
-              Text(
-                description,
-                style: TextStyle(
-                  fontSize: 14,
-                  color: Colors.grey.shade600,
+              if (title != 'Delivered')
+                Container(
+                  width: 2,
+                  height: 40,
+                  color: isCompleted ? Colors.green : Colors.grey.shade300,
                 ),
-              ),
-              const SizedBox(height: 4),
-              Text(
-                time,
-                style: TextStyle(
-                  fontSize: 12,
-                  color: Colors.grey.shade500,
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
-              const SizedBox(height: 24),
             ],
           ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildDriverInfo() {
-    return Card(
-      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Row(
-          children: [
-            CircleAvatar(
-              radius: 24,
-              backgroundColor: Colors.blue.shade100,
-              child: const Icon(
-                Icons.person,
-                color: Colors.blue,
-              ),
-            ),
-            const SizedBox(width: 16),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Text(
-                    'John Driver',
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                  const SizedBox(height: 2),
-                  Row(
-                    children: [
-                      const Icon(
-                        Icons.star,
-                        size: 16,
-                        color: Colors.amber,
-                      ),
-                      const SizedBox(width: 4),
-                      const Text(
-                        '4.8',
-                        style: TextStyle(
-                          fontSize: 14,
-                          color: Colors.grey,
-                        ),
-                      ),
-                      const SizedBox(width: 8),
-                      Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                        decoration: BoxDecoration(
-                          color: Colors.green.shade100,
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        child: Text(
-                          'Honda Forza 300cc',
-                          style: TextStyle(
-                            fontSize: 12,
-                            color: Colors.green.shade800,
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-            ),
-            Column(
+          const SizedBox(width: 16),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  '23 min',
-                  style: TextStyle(
-                    fontSize: 14,
-                    color: Colors.grey.shade600,
+                  title,
+                  style: theme.textTheme.bodyMedium?.copyWith(
+                    fontWeight: isActive ? FontWeight.bold : FontWeight.normal,
+                    color: isActive ? theme.colorScheme.primary : Colors.black87,
                   ),
                 ),
+                const SizedBox(height: 4),
                 Text(
-                  'away',
-                  style: TextStyle(
-                    fontSize: 12,
-                    color: Colors.grey.shade500,
+                  description,
+                  style: theme.textTheme.bodySmall?.copyWith(
+                    color: Colors.grey.shade600,
                   ),
                 ),
               ],
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
+
 }

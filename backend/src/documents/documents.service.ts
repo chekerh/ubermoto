@@ -1,7 +1,12 @@
 import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import { DocumentEntity, DocumentDocument, DocumentType, DocumentStatus } from './schemas/document.schema';
+import {
+  DocumentEntity,
+  DocumentDocument,
+  DocumentType,
+  DocumentStatus,
+} from './schemas/document.schema';
 import { UsersService } from '../users/users.service';
 import { UserRole } from '../users/schemas/user.schema';
 
@@ -33,13 +38,17 @@ export class DocumentsService {
     }
 
     // Check if document type already exists for this user
-    const existingDocument = await this.documentModel.findOne({
-      userId: createDocumentDto.userId,
-      documentType: createDocumentDto.documentType,
-    }).exec();
+    const existingDocument = await this.documentModel
+      .findOne({
+        userId: createDocumentDto.userId,
+        documentType: createDocumentDto.documentType,
+      })
+      .exec();
 
     if (existingDocument) {
-      throw new BadRequestException(`Document of type ${createDocumentDto.documentType} already exists for this user`);
+      throw new BadRequestException(
+        `Document of type ${createDocumentDto.documentType} already exists for this user`,
+      );
     }
 
     const document = new this.documentModel(createDocumentDto);
@@ -51,7 +60,11 @@ export class DocumentsService {
   }
 
   async findOne(id: string): Promise<DocumentDocument> {
-    const document = await this.documentModel.findById(id).populate('userId').populate('reviewedBy').exec();
+    const document = await this.documentModel
+      .findById(id)
+      .populate('userId')
+      .populate('reviewedBy')
+      .exec();
     if (!document) {
       throw new NotFoundException(`Document with ID ${id} not found`);
     }
@@ -93,10 +106,7 @@ export class DocumentsService {
   }
 
   async findPendingDocuments(): Promise<DocumentDocument[]> {
-    return this.documentModel
-      .find({ status: DocumentStatus.PENDING })
-      .populate('userId')
-      .exec();
+    return this.documentModel.find({ status: DocumentStatus.PENDING }).populate('userId').exec();
   }
 
   async getDocumentStats(userId: string): Promise<{
@@ -110,9 +120,9 @@ export class DocumentsService {
 
     const stats = {
       total: documents.length,
-      approved: documents.filter(doc => doc.status === DocumentStatus.APPROVED).length,
-      pending: documents.filter(doc => doc.status === DocumentStatus.PENDING).length,
-      rejected: documents.filter(doc => doc.status === DocumentStatus.REJECTED).length,
+      approved: documents.filter((doc) => doc.status === DocumentStatus.APPROVED).length,
+      pending: documents.filter((doc) => doc.status === DocumentStatus.PENDING).length,
+      rejected: documents.filter((doc) => doc.status === DocumentStatus.REJECTED).length,
       isComplete: false,
     };
 

@@ -74,19 +74,13 @@ export class DeliveriesController {
 
   @Post(':id/accept')
   @Roles(UserRole.DRIVER)
-  acceptDelivery(
-    @Param('id') id: string,
-    @Request() req: AuthenticatedRequest,
-  ): Promise<unknown> {
+  acceptDelivery(@Param('id') id: string, @Request() req: AuthenticatedRequest): Promise<unknown> {
     return this.deliveriesService.acceptDelivery(id, req.user.sub);
   }
 
   @Post(':id/start')
   @Roles(UserRole.DRIVER)
-  startDelivery(
-    @Param('id') id: string,
-    @Request() req: AuthenticatedRequest,
-  ): Promise<unknown> {
+  startDelivery(@Param('id') id: string, @Request() req: AuthenticatedRequest): Promise<unknown> {
     return this.deliveriesService.startDelivery(id, req.user.sub);
   }
 

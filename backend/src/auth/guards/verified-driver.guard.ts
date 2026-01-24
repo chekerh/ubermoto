@@ -13,7 +13,9 @@ export class VerifiedDriverGuard implements CanActivate {
 
     // Check if driver is verified
     if (!user.isVerified) {
-      throw new ForbiddenException('Driver account is not verified. Please complete document verification.');
+      throw new ForbiddenException(
+        'Driver account is not verified. Please complete document verification.',
+      );
     }
 
     return true;

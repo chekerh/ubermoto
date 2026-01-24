@@ -75,10 +75,7 @@ export class DriversController {
     description: 'Driver availability updated',
   })
   @ApiResponse({ status: 404, description: 'Driver not found' })
-  updateAvailability(
-    @Param('id') id: string,
-    @Body() body: { isAvailable: boolean },
-  ) {
+  updateAvailability(@Param('id') id: string, @Body() body: { isAvailable: boolean }) {
     return this.driversService.updateAvailability(id, body.isAvailable);
   }
 
@@ -89,10 +86,7 @@ export class DriversController {
     description: 'Driver motorcycle updated',
   })
   @ApiResponse({ status: 404, description: 'Driver not found' })
-  updateMotorcycle(
-    @Param('id') id: string,
-    @Body() body: { motorcycleId: string },
-  ) {
+  updateMotorcycle(@Param('id') id: string, @Body() body: { motorcycleId: string }) {
     return this.driversService.updateMotorcycle(id, body.motorcycleId);
   }
 
@@ -103,10 +97,7 @@ export class DriversController {
     description: 'Driver rating updated',
   })
   @ApiResponse({ status: 404, description: 'Driver not found' })
-  updateRating(
-    @Param('id') id: string,
-    @Body() body: { rating: number },
-  ) {
+  updateRating(@Param('id') id: string, @Body() body: { rating: number }) {
     return this.driversService.updateRating(id, body.rating);
   }
 
@@ -130,10 +121,7 @@ export class DriversController {
     description: 'Documents uploaded successfully',
   })
   @ApiResponse({ status: 404, description: 'Driver not found' })
-  uploadDocuments(
-    @Param('id') id: string,
-    @Body() uploadDocumentsDto: UploadDocumentsDto,
-  ) {
+  uploadDocuments(@Param('id') id: string, @Body() uploadDocumentsDto: UploadDocumentsDto) {
     return this.driversService.uploadDocuments(id, uploadDocumentsDto);
   }
 
@@ -145,10 +133,7 @@ export class DriversController {
     description: 'Documents updated successfully',
   })
   @ApiResponse({ status: 404, description: 'Driver not found' })
-  updateDocuments(
-    @Param('id') id: string,
-    @Body() updateDocumentsDto: UpdateDriverDocumentsDto,
-  ) {
+  updateDocuments(@Param('id') id: string, @Body() updateDocumentsDto: UpdateDriverDocumentsDto) {
     return this.driversService.updateDocuments(id, updateDocumentsDto);
   }
 
@@ -161,10 +146,7 @@ export class DriversController {
     description: 'Verification status updated',
   })
   @ApiResponse({ status: 404, description: 'Driver not found' })
-  updateVerificationStatus(
-    @Param('id') id: string,
-    @Body() body: { isVerified: boolean },
-  ) {
+  updateVerificationStatus(@Param('id') id: string, @Body() body: { isVerified: boolean }) {
     return this.driversService.updateVerificationStatus(id, body.isVerified);
   }
 }

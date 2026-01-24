@@ -99,7 +99,7 @@ describe('DeliveryGateway', () => {
         pickupLocation: 'Location A',
         deliveryAddress: 'Location B',
         deliveryType: 'Food',
-        estimatedCost: 12.50,
+        estimatedCost: 12.5,
         distance: 5.2,
         createdAt: new Date(),
       };
@@ -112,7 +112,7 @@ describe('DeliveryGateway', () => {
         pickupLocation: 'Location A',
         deliveryAddress: 'Location B',
         deliveryType: 'Food',
-        estimatedCost: 12.50,
+        estimatedCost: 12.5,
         distance: 5.2,
         createdAt: mockDelivery.createdAt,
       });
