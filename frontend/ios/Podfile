@@ -6,6 +6,7 @@ ENV['COCOAPODS_DISABLE_STATS'] = 'true'
 
 # Add source for MapLibre dependencies
 source 'https://cdn.cocoapods.org/'
+source 'https://github.com/IndoorAtlas/maplibre-specs.git'
 
 project 'Runner', {
   'Debug' => :debug,
@@ -34,8 +35,8 @@ target 'Runner' do
   use_frameworks!
 
   # Add MapLibreAnnotationExtension from GitHub before Flutter pods
+  # MapLibre will be resolved from the IndoorAtlas specs repo
   # This must be declared before flutter_install_all_ios_pods so it's available when maplibre_gl resolves dependencies
-  # The podspec file is in the root of the repository
   pod 'MapLibreAnnotationExtension', :git => 'https://github.com/m0nac0/maplibre-annotation-extension.git', :branch => 'master'
 
   flutter_install_all_ios_pods File.dirname(File.realpath(__FILE__))
