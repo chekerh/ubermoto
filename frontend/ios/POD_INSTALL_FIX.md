@@ -26,22 +26,32 @@ If you encounter:
 
 This is a CocoaPods cache permission issue. Fix it by:
 
-1. **Fix cache permissions:**
+1. **Fix cache permissions (recommended):**
    ```bash
    sudo chown -R $(whoami) ~/Library/Caches/CocoaPods
+   cd frontend/ios
+   pod install
    ```
 
 2. **Or remove and recreate cache:**
    ```bash
    rm -rf ~/Library/Caches/CocoaPods
-   pod install
-   ```
-
-3. **Then install pods:**
-   ```bash
    cd frontend/ios
    pod install
    ```
+
+3. **If permission errors persist, try:**
+   ```bash
+   # Clear CocoaPods cache completely
+   pod cache clean --all
+   rm -rf ~/Library/Caches/CocoaPods
+   rm -rf ~/Library/Developer/Xcode/DerivedData
+   cd frontend/ios
+   rm -rf Pods Podfile.lock
+   pod install
+   ```
+
+**Note:** The Podfile is configured to fetch `MapLibreAnnotationExtension` from GitHub. Once permissions are fixed, `pod install` should complete successfully.
 
 ## Verification
 
