@@ -6,32 +6,43 @@ If you encounter the error:
 [!] Unable to find a specification for `MapLibreAnnotationExtension (~> 0.0.1-beta.2)` depended upon by `maplibre_gl`
 ```
 
-This occurs because the CocoaPods specs repository is out of date and doesn't have the MapLibreAnnotationExtension pod specification.
+This occurs because `MapLibreAnnotationExtension` is not available in the CocoaPods trunk repository. The Podfile has been configured to fetch it directly from GitHub.
 
 ## Solution
 
-Run the following commands to update CocoaPods specs and install pods:
+The Podfile is already configured to fetch `MapLibreAnnotationExtension` from GitHub. Simply run:
 
 ```bash
 cd frontend/ios
-pod repo update
 pod install
 ```
 
-**Note:** The `pod repo update` command may take several minutes as it downloads the latest pod specifications.
+## Permission Error Fix
 
-## Alternative Solution
-
-If `pod repo update` fails due to network issues, try:
-
-```bash
-cd frontend/ios
-rm -rf Pods Podfile.lock
-pod install --repo-update
+If you encounter:
+```
+[!] Failed to download 'MapLibreAnnotationExtension': Operation not permitted @ rb_sysopen - /Users/mac/Library/Caches/CocoaPods/Pods/VERSION
 ```
 
-The `--repo-update` flag will update the specs repository during installation.
+This is a CocoaPods cache permission issue. Fix it by:
 
-## After Fix
+1. **Fix cache permissions:**
+   ```bash
+   sudo chown -R $(whoami) ~/Library/Caches/CocoaPods
+   ```
 
-Once the CocoaPods specs repository is updated, `pod install` should complete successfully and the MapLibreAnnotationExtension dependency will be resolved automatically by maplibre_gl.
+2. **Or remove and recreate cache:**
+   ```bash
+   rm -rf ~/Library/Caches/CocoaPods
+   pod install
+   ```
+
+3. **Then install pods:**
+   ```bash
+   cd frontend/ios
+   pod install
+   ```
+
+## Verification
+
+After successful installation, you should see `MapLibreAnnotationExtension` in your `Pods` directory and the build should complete without errors.
