@@ -36,11 +36,10 @@ flutter_ios_podfile_setup
 target 'Runner' do
   use_frameworks!
 
-  # Add MapLibre and MapLibreAnnotationExtension from GitHub before Flutter pods
+  # Add MapLibre and MapLibreAnnotationExtension before Flutter pods
+  # Using local podspecs to avoid CocoaPods specs repo dependency issues
   # These must be declared before flutter_install_all_ios_pods so they're available when maplibre_gl resolves dependencies
-  # Fetch MapLibre directly from GitHub since it's not in CocoaPods trunk
-  # Version 5.12.2 satisfies both MapLibreAnnotationExtension (~> 5.12.0) and maplibre_gl (~> 5.12.2)
-  pod 'MapLibre', :git => 'https://github.com/maplibre/maplibre-native.git', :tag => 'ios-v5.12.2'
+  pod 'MapLibre', :path => './local_pods'
   pod 'MapLibreAnnotationExtension', :git => 'https://github.com/m0nac0/maplibre-annotation-extension.git', :branch => 'master'
 
   flutter_install_all_ios_pods File.dirname(File.realpath(__FILE__))
