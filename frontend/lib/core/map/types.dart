@@ -1,3 +1,5 @@
+import 'package:latlong2/latlong.dart';
+
 /// Provider-agnostic map types to replace Google Maps types
 
 /// Represents a geographic point (replaces LatLng)
@@ -15,14 +17,14 @@ class MapPoint {
     return MapPoint(lat: lat, lng: lng);
   }
 
-  /// Convert to MapLibre format [lng, lat]
-  List<double> toMapLibreCoordinates() {
-    return [lng, lat];
+  /// Convert to LatLng for flutter_map
+  LatLng toLatLng() {
+    return LatLng(lat, lng);
   }
 
-  /// Convert from MapLibre format [lng, lat]
-  factory MapPoint.fromMapLibreCoordinates(List<double> coordinates) {
-    return MapPoint(lat: coordinates[1], lng: coordinates[0]);
+  /// Convert from LatLng object
+  factory MapPoint.fromLatLngObject(LatLng latLng) {
+    return MapPoint(lat: latLng.latitude, lng: latLng.longitude);
   }
 
   @override

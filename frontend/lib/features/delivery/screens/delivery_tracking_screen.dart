@@ -111,13 +111,14 @@ class _DeliveryTrackingScreenState extends State<DeliveryTrackingScreen> {
             const Center(child: CircularProgressIndicator()),
 
           // Search bar
-          const Positioned(
+          Positioned(
             top: 0,
             left: 0,
             right: 0,
             child: MapSearchBar(
               placeholder: 'Tracking delivery...',
               showBackButton: true,
+              onTap: () {}, // Placeholder - can be implemented later
             ),
           ),
 

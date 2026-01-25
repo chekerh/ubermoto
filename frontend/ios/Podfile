@@ -1,6 +1,6 @@
 # Uncomment this line to define a global platform for your project
-# Firebase SDK 12.8.0 requires iOS 15.0+, MapLibre 5.12.2 supports iOS 13.0+
-# Set to 15.0 to satisfy Firebase requirement
+# Firebase SDK 12.8.0 requires iOS 15.0+
+# MapLibre 5.9.0 supports iOS 13.0+
 platform :ios, '15.0'
 
 # CocoaPods analytics sends network stats synchronously affecting flutter build latency.
@@ -36,9 +36,8 @@ flutter_ios_podfile_setup
 target 'Runner' do
   use_frameworks!
 
-  # Add MapLibre and MapLibreAnnotationExtension before Flutter pods
-  # Using local podspecs to avoid CocoaPods specs repo dependency issues
-  # These must be declared before flutter_install_all_ios_pods so they're available when maplibre_gl resolves dependencies
+  # Use local podspec that points to local_pods directory
+  # This uses pre-downloaded source with vendored frameworks (no C++ patching needed)
   pod 'MapLibre', :path => './local_pods'
   pod 'MapLibreAnnotationExtension', :git => 'https://github.com/m0nac0/maplibre-annotation-extension.git', :branch => 'master'
 
@@ -53,18 +52,26 @@ post_install do |installer|
     flutter_additional_ios_build_settings(target)
     target.build_configurations.each do |config|
       # Set minimum deployment target to iOS 15.0 for Firebase SDK 12.8.0 compatibility
-      # MapLibre 5.12.2 also supports iOS 15.0+
       config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = '15.0'
-    end
-  end
-  
-  # Workaround for MapLibreAnnotationExtension dependency issue
-  # If the pod is missing, it will be handled by maplibre_gl's podspec
-  installer.pod_targets.each do |target|
-    if target.name == 'maplibre_gl'
-      target.build_configurations.each do |config|
-        # Ensure MapLibre dependencies are properly linked
-        config.build_settings['OTHER_LDFLAGS'] ||= ['$(inherited)']
+      
+      # Configure MapLibre to expose itself as Mapbox module and enforce C++17
+      if target.name == 'MapLibre'
+        config.build_settings['DEFINES_MODULE'] = 'YES'
+        config.build_settings['CLANG_ENABLE_MODULES'] = 'YES'
+        config.build_settings['SWIFT_INCLUDE_PATHS'] = '$(inherited)'
+        # MapLibre exposes itself as Mapbox module for compatibility
+        config.build_settings['PRODUCT_MODULE_NAME'] = 'Mapbox'
+        # Enable C++17 standard (required for std::optional, std::variant)
+        config.build_settings['CLANG_CXX_LANGUAGE_STANDARD'] = 'c++17'
+        config.build_settings['CLANG_CXX_LIBRARY'] = 'libc++'
+        # Fix auto-generated modulemap to use Mapbox.h instead of MapLibre.h
+        modulemap_path = File.join(installer.sandbox.root, 'Target Support Files', 'MapLibre', 'MapLibre.modulemap')
+        if File.exist?(modulemap_path)
+          modulemap_content = File.read(modulemap_path)
+          # Replace MapLibre.h with Mapbox.h in the generated modulemap
+          modulemap_content = modulemap_content.gsub(/MapLibre\.h/, 'Mapbox.h')
+          File.write(modulemap_path, modulemap_content)
+        end
       end
     end
   end

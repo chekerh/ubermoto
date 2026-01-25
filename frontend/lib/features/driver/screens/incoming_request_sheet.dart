@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 import '../../../widgets/bottom_sheets/draggable_bottom_sheet.dart';
 import '../../../widgets/map/home_map_widget.dart';
 import '../../../core/animations/sheet_animations.dart';
@@ -231,8 +232,8 @@ class IncomingRequestSheet extends StatelessWidget {
       ),
     )
         .animate()
-        .fadeIn(duration: 300.ms)
-        .slideY(begin: 0.1, end: 0, duration: 300.ms);
+        .fadeIn(duration: const Duration(milliseconds: 300))
+        .slideY(begin: 0.1, end: 0, duration: const Duration(milliseconds: 300));
   }
 }
 

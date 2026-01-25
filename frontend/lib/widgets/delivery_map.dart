@@ -1,16 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:maplibre_gl/maplibre_gl.dart' as ml;
+import 'dart:io';
+import 'package:flutter_map/flutter_map.dart' as fm;
+import 'package:latlong2/latlong.dart';
 import 'dart:async';
 import '../core/map/types.dart';
-import '../core/map/map_controller.dart';
-import '../core/map/maplibre_controller.dart';
-import '../core/map/maplibre_marker_adapter.dart';
-import '../core/map/maplibre_route_adapter.dart';
-import '../core/map/map_marker_adapter.dart';
-import '../core/map/map_route_adapter.dart';
 import '../services/osrm_service.dart';
 import '../core/utils/map_utils.dart';
-import '../core/animations/map_animations.dart';
 
 class DeliveryMap extends StatefulWidget {
   final MapPoint pickupLocation;
@@ -31,13 +26,11 @@ class DeliveryMap extends StatefulWidget {
 }
 
 class _DeliveryMapState extends State<DeliveryMap> {
-  ml.MaplibreMapController? _maplibreController;
-  MapController? _mapController;
-  MaplibreMarkerAdapter? _markerAdapter;
-  MaplibreRouteAdapter? _routeAdapter;
-  MapBounds? _bounds;
+  final fm.MapController _mapController = fm.MapController();
   bool _isLoadingRoute = false;
   bool _isUsingFallbackRoute = false;
+  List<LatLng> _routePoints = [];
+  List<LatLng> _driverRoutePoints = [];
 
   @override
   void initState() {
@@ -54,71 +47,36 @@ class _DeliveryMapState extends State<DeliveryMap> {
     }
   }
 
-  void _onMapCreated(ml.MaplibreMapController controller) {
-    _maplibreController = controller;
-    _mapController = MaplibreMapControllerImpl(controller);
-    _markerAdapter = MaplibreMarkerAdapter(controller);
-    _routeAdapter = MaplibreRouteAdapter(controller);
-    
-    _initializeMapData();
-    
-    // Fit bounds to show all markers
-    if (_bounds != null && _mapController != null) {
-      Future.delayed(const Duration(milliseconds: 100), () {
-        MapAnimations.animateToBounds(_mapController!, _bounds!, padding: 50.0);
-      });
-    }
-  }
-
   Future<void> _initializeMapData() async {
-    if (_markerAdapter == null || _routeAdapter == null) return;
-
-    await _markerAdapter!.clearAll();
-    await _routeAdapter!.clearAll();
-
-    // Add pickup marker
-    await _markerAdapter!.addMarker(
-      MarkerData(
-        id: 'pickup',
-        position: widget.pickupLocation,
-        color: Colors.green,
-      ),
-    );
-
-    // Add delivery marker
-    await _markerAdapter!.addMarker(
-      MarkerData(
-        id: 'delivery',
-        position: widget.deliveryLocation,
-        color: Colors.red,
-      ),
-    );
-
-    // Add driver marker if available
-    if (widget.driverLocation != null) {
-      await _markerAdapter!.addMarker(
-        MarkerData(
-          id: 'driver',
-          position: widget.driverLocation!,
-          color: Colors.blue,
-        ),
-      );
-    }
-
-    // Calculate route using OSRM
     await _loadRoute();
-
-    // Create driver route if driver is moving
     if (widget.driverLocation != null && _isDriverMoving()) {
       await _loadDriverRoute();
     }
+    _fitBounds();
+  }
 
-    _calculateBounds();
+  Future<void> _fitBounds() async {
+    final points = <LatLng>[
+      LatLng(widget.pickupLocation.lat, widget.pickupLocation.lng),
+      LatLng(widget.deliveryLocation.lat, widget.deliveryLocation.lng),
+    ];
+    
+    if (widget.driverLocation != null) {
+      points.add(LatLng(widget.driverLocation!.lat, widget.driverLocation!.lng));
+    }
+
+    if (points.isNotEmpty) {
+      final bounds = LatLngBounds.fromPoints(points);
+      _mapController.fitCamera(
+        fm.CameraFit.bounds(
+          bounds: bounds,
+          padding: const EdgeInsets.all(50),
+        ),
+      );
+    }
   }
 
   Future<void> _loadRoute() async {
-    if (_routeAdapter == null) return;
-
     setState(() {
       _isLoadingRoute = true;
       _isUsingFallbackRoute = false;
@@ -132,32 +90,18 @@ class _DeliveryMapState extends State<DeliveryMap> {
 
       setState(() {
         _isUsingFallbackRoute = routeResult.isFallback;
+        _routePoints = routeResult.geometry
+            .map((point) => LatLng(point.lat, point.lng))
+            .toList();
       });
-
-      await _routeAdapter!.addRoute(
-        RouteData(
-          id: 'route',
-          points: routeResult.geometry,
-          color: Colors.blue,
-          width: 4.0,
-          pattern: const [10.0, 5.0], // Dashed line
-        ),
-      );
     } catch (e) {
-      // Fallback to straight line
       setState(() {
         _isUsingFallbackRoute = true;
+        _routePoints = [
+          LatLng(widget.pickupLocation.lat, widget.pickupLocation.lng),
+          LatLng(widget.deliveryLocation.lat, widget.deliveryLocation.lng),
+        ];
       });
-      
-      await _routeAdapter!.addRoute(
-        RouteData(
-          id: 'route',
-          points: [widget.pickupLocation, widget.deliveryLocation],
-          color: Colors.blue,
-          width: 4.0,
-          pattern: const [10.0, 5.0],
-        ),
-      );
     } finally {
       setState(() {
         _isLoadingRoute = false;
@@ -166,7 +110,7 @@ class _DeliveryMapState extends State<DeliveryMap> {
   }
 
   Future<void> _loadDriverRoute() async {
-    if (_routeAdapter == null || widget.driverLocation == null) return;
+    if (widget.driverLocation == null) return;
 
     try {
       final routeResult = await OSRMService.getRoute(
@@ -174,24 +118,18 @@ class _DeliveryMapState extends State<DeliveryMap> {
         widget.driverLocation!,
       );
 
-      await _routeAdapter!.addRoute(
-        RouteData(
-          id: 'driver_route',
-          points: routeResult.geometry,
-          color: Colors.green,
-          width: 3.0,
-        ),
-      );
+      setState(() {
+        _driverRoutePoints = routeResult.geometry
+            .map((point) => LatLng(point.lat, point.lng))
+            .toList();
+      });
     } catch (e) {
-      // Fallback to straight line
-      await _routeAdapter!.addRoute(
-        RouteData(
-          id: 'driver_route',
-          points: [widget.pickupLocation, widget.driverLocation!],
-          color: Colors.green,
-          width: 3.0,
-        ),
-      );
+      setState(() {
+        _driverRoutePoints = [
+          LatLng(widget.pickupLocation.lat, widget.pickupLocation.lng),
+          LatLng(widget.driverLocation!.lat, widget.driverLocation!.lng),
+        ];
+      });
     }
   }
 
@@ -199,11 +137,10 @@ class _DeliveryMapState extends State<DeliveryMap> {
     _initializeMapData();
 
     // Animate camera to show updated driver location
-    if (widget.driverLocation != null && _mapController != null) {
-      MapAnimations.followLocation(
-        _mapController!,
-        widget.driverLocation!,
-        zoom: 16.0,
+    if (widget.driverLocation != null) {
+      _mapController.move(
+        LatLng(widget.driverLocation!.lat, widget.driverLocation!.lng),
+        16.0,
       );
     }
   }
@@ -212,45 +149,121 @@ class _DeliveryMapState extends State<DeliveryMap> {
     return widget.status == 'picked_up' || widget.status == 'in_progress';
   }
 
-  void _calculateBounds() {
-    final points = <MapPoint>[
-      widget.pickupLocation,
-      widget.deliveryLocation,
-    ];
-    
+  List<fm.Marker> _buildMarkers() {
+    final markers = <fm.Marker>[];
+
+    // Pickup marker
+    markers.add(
+      fm.Marker(
+        point: LatLng(widget.pickupLocation.lat, widget.pickupLocation.lng),
+        width: 40,
+        height: 40,
+        child: Container(
+          decoration: BoxDecoration(
+            color: Colors.green,
+            shape: BoxShape.circle,
+            border: Border.all(color: Colors.white, width: 3),
+          ),
+          child: const Icon(Icons.location_on, color: Colors.white, size: 20),
+        ),
+      ),
+    );
+
+    // Delivery marker
+    markers.add(
+      fm.Marker(
+        point: LatLng(widget.deliveryLocation.lat, widget.deliveryLocation.lng),
+        width: 40,
+        height: 40,
+        child: Container(
+          decoration: BoxDecoration(
+            color: Colors.red,
+            shape: BoxShape.circle,
+            border: Border.all(color: Colors.white, width: 3),
+          ),
+          child: const Icon(Icons.flag, color: Colors.white, size: 20),
+        ),
+      ),
+    );
+
+    // Driver marker
     if (widget.driverLocation != null) {
-      points.add(widget.driverLocation!);
+      markers.add(
+        fm.Marker(
+          point: LatLng(widget.driverLocation!.lat, widget.driverLocation!.lng),
+          width: 40,
+          height: 40,
+          child: Container(
+            decoration: BoxDecoration(
+              color: Colors.blue,
+              shape: BoxShape.circle,
+              border: Border.all(color: Colors.white, width: 3),
+            ),
+            child: const Icon(Icons.motorcycle, color: Colors.white, size: 20),
+          ),
+        ),
+      );
     }
 
-    if (points.isNotEmpty) {
-      _bounds = MapBounds.fromPoints(points);
-    }
+    return markers;
   }
 
   @override
   Widget build(BuildContext context) {
+    // Temporarily disable iOS
+    if (!Platform.isAndroid) {
+      return const SizedBox();
+    }
+
     return SizedBox(
       height: 300,
       child: Stack(
         children: [
-          ml.MaplibreMap(
-            onMapCreated: _onMapCreated,
-            initialCameraPosition: ml.CameraPosition(
-              target: ml.LatLng(
+          fm.FlutterMap(
+            mapController: _mapController,
+            options: fm.MapOptions(
+              initialCenter: LatLng(
                 widget.pickupLocation.lat,
                 widget.pickupLocation.lng,
               ),
-              zoom: 12,
+              initialZoom: 12,
             ),
-            styleString: 'https://demotiles.maplibre.org/style.json',
-            myLocationEnabled: false,
-            zoomControlsEnabled: true,
+            children: [
+              fm.TileLayer(
+                urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+                userAgentPackageName: 'com.ubermoto.app',
+              ),
+              if (_routePoints.isNotEmpty)
+                fm.PolylineLayer(
+                  polylines: [
+                    fm.Polyline(
+                      points: _routePoints,
+                      strokeWidth: 4,
+                      color: Colors.blue,
+                      borderStrokeWidth: 0,
+                    ),
+                  ],
+                ),
+              if (_driverRoutePoints.isNotEmpty)
+                fm.PolylineLayer(
+                  polylines: [
+                    fm.Polyline(
+                      points: _driverRoutePoints,
+                      strokeWidth: 3,
+                      color: Colors.green,
+                      borderStrokeWidth: 0,
+                    ),
+                  ],
+                ),
+              fm.MarkerLayer(
+                markers: _buildMarkers(),
+              ),
+            ],
           ),
           if (_isLoadingRoute)
             const Center(
               child: CircularProgressIndicator(),
             ),
-          // Fallback route info banner
           if (_isUsingFallbackRoute && !_isLoadingRoute)
             Positioned(
               top: 8,
@@ -294,11 +307,5 @@ class _DeliveryMapState extends State<DeliveryMap> {
         ],
       ),
     );
-  }
-
-  @override
-  void dispose() {
-    _maplibreController?.dispose();
-    super.dispose();
   }
 }

@@ -4,7 +4,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../widgets/map/home_map_widget.dart';
 import '../../../widgets/map/map_search_bar.dart';
 import '../../../widgets/empty_states/no_drivers_widget.dart';
-import '../../../core/animations/map_animations.dart';
 import '../../../core/map/types.dart';
 import '../providers/motor_taxi_provider.dart';
 import '../../../widgets/map/driver_marker.dart';
@@ -130,13 +129,14 @@ class _MatchingScreenState extends ConsumerState<MatchingScreen> {
           ),
 
           // Search bar
-          const Positioned(
+          Positioned(
             top: 0,
             left: 0,
             right: 0,
             child: MapSearchBar(
               placeholder: 'Finding your ride...',
               showBackButton: true,
+              onTap: () {}, // Placeholder - can be implemented later
             ),
           ),
 

@@ -18,6 +18,7 @@ class _DriverInterpolationState {
     this.targetPosition,
     this.interpolationStartTime,
     this.interpolationDuration = const Duration(milliseconds: 1500),
+    this.currentInterpolatedPosition,
   });
 }
 

@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../widgets/map/home_map_widget.dart';
 import '../../../widgets/map/map_search_bar.dart';
+import '../../../widgets/map/driver_marker.dart';
 import '../../../widgets/bottom_sheets/driver_info_sheet.dart';
-import '../../../core/animations/map_animations.dart';
 import '../../../core/map/types.dart';
 import '../providers/motor_taxi_provider.dart';
 
@@ -46,13 +46,14 @@ class _LiveRideScreenState extends ConsumerState<LiveRideScreen> {
           ),
 
           // Search bar
-          const Positioned(
+          Positioned(
             top: 0,
             left: 0,
             right: 0,
             child: MapSearchBar(
               placeholder: 'Ride in progress',
               showBackButton: true,
+              onTap: () {}, // Placeholder - can be implemented later
             ),
           ),
 

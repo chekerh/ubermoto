@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../widgets/map/home_map_widget.dart';
 import '../../../widgets/map/map_search_bar.dart';
-import '../../../core/animations/map_animations.dart';
 import '../../../core/map/types.dart';
 
 enum RideStatus { enRoute, arrived, pickedUp, inTransit, completed }
@@ -89,13 +88,14 @@ class _ActiveRideScreenState extends ConsumerState<ActiveRideScreen> {
           ),
 
           // Search bar
-          const Positioned(
+          Positioned(
             top: 0,
             left: 0,
             right: 0,
             child: MapSearchBar(
               placeholder: 'Active ride',
               showBackButton: true,
+              onTap: () {}, // Placeholder - can be implemented later
             ),
           ),
 

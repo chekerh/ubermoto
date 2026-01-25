@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../core/theme/app_theme.dart';
 import '../../core/map/types.dart';
-import '../../core/map/map_marker_adapter.dart';
 
 enum DriverStatus { online, busy, offline }
 
@@ -30,16 +29,4 @@ class DriverMarker {
     }
   }
 
-  /// Create a MarkerData from DriverMarker
-  MarkerData toMapMarker({
-    VoidCallback? onTap,
-  }) {
-    return MarkerData(
-      id: driverId,
-      position: position,
-      color: color,
-      bearing: bearing,
-      onTap: onTap,
-    );
-  }
 }
