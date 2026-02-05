@@ -13,7 +13,10 @@ dependencies:
   # State Management
   flutter_riverpod: ^2.4.9
   riverpod_annotation: ^2.3.3
-  
+
+  #maplibre_gl
+  maplibre_gl: ^0.16.0
+
   # HTTP & API
   http: ^1.1.0
   dio: ^5.4.0
