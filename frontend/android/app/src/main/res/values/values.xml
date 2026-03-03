@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="default_web_client_id" translatable="false">your-web-client-id</string>
+    <string name="firebase_database_url" translatable="false">https://your-project.firebaseio.com</string>
+    <string name="gcm_defaultSenderId" translatable="false">your-sender-id</string>
+    <string name="google_storage_bucket" translatable="false">your-project.appspot.com</string>
+    <string name="project_id" translatable="false">your-project-id</string>
+    <string name="google_api_key" translatable="false">your-api-key</string>
+    <string name="google_crash_reporting_api_key" translatable="false">your-api-key</string>
+    <string name="google_app_id" translatable="false">1:1234567890:android:abcdef123456</string>
+</resources>
