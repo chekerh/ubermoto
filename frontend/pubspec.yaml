@@ -1,5 +1,5 @@
 name: ubertaxi_frontend
-description: UberMoto - Fast & Reliable Delivery Platform
+description: Nassib - Fast & Reliable Delivery Platform
 publish_to: 'none'
 version: 1.0.0+1
 
@@ -85,6 +85,7 @@ flutter:
   uses-material-design: true
   
   assets:
+    - assets/nassib-logo.png
     - assets/animations/
     - assets/images/
     - assets/icons/
