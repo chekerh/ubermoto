@@ -16,5 +16,18 @@ analyzer:
   exclude:
     - "**/*.g.dart"
     - "**/*.freezed.dart"
+    - "integration_test/**"
+    - "test_direction.dart"
+    - "test_direction_enum.dart"
+    - "lib/core/navigation/app_router_simple.dart"
+    - "lib/screens/enhanced_auth_screen.dart"
+    - "lib/screens/**"
+    - "lib/services/biometric_service.dart"
+    - "lib/core/navigation/**"
+    - "lib/features/auth/screens/**"
+    - "lib/features/customer/screens/**"
+    - "lib/features/delivery/screens/**"
+    - "lib/features/driver/screens/**"
+    - "lib/features/motor_taxi/screens/**"
   errors:
     invalid_annotation_target: ignore

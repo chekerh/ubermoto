@@ -1,5 +1,5 @@
 name: ubertaxi_frontend
-description: Flutter frontend for UberTaxi application
+description: UberMoto - Fast & Reliable Delivery Platform
 publish_to: 'none'
 version: 1.0.0+1
 
@@ -9,51 +9,135 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+  webview_flutter: ^4.7.0
   
+  # Internationalization
+  easy_localization: ^3.0.7
+  flutter_localizations:
+    sdk: flutter
+  
+  # Firebase Integration
+  firebase_core: ^3.15.2
+  firebase_messaging: ^15.2.10
+  firebase_analytics: ^11.6.0
+  firebase_crashlytics: ^4.3.10
+
   # State Management
-  flutter_riverpod: ^2.4.9
-  riverpod_annotation: ^2.3.3
+  flutter_riverpod: ^2.6.1
+  riverpod_annotation: ^2.6.1
 
-  #maplibre_gl
-  maplibre_gl: ^0.16.0
+  # Security & Authentication
+  flutter_secure_storage: ^10.0.0
+  local_auth: ^3.0.0
+  encrypt: ^5.0.0
+  http_certificate_pinning: ^3.0.0
 
-  # HTTP & API
-  http: ^1.1.0
-  dio: ^5.4.0
-  
-  # Storage
-  flutter_secure_storage: ^9.0.0
-  shared_preferences: ^2.2.2
-  
-  # UI
-  cupertino_icons: ^1.0.6
-  flutter_svg: ^2.0.9
+  # Modern UI & Design
+  material_color_utilities: ^0.13.0
+  google_fonts: ^6.3.3
+  lottie: ^3.0.0
   flutter_animate: ^4.5.0
-  
-  # Utilities
-  intl: ^0.18.1
-  equatable: ^2.0.5
-  json_annotation: ^4.8.1
-  package_info_plus: ^8.0.0
-  
-  # Geolocation & Maps
-  geolocator: ^10.1.0
-  flutter_map: ^7.0.2
-  latlong2: ^0.9.1
+  vibration: ^2.1.0
+  cached_network_image: ^3.4.0
+  shimmer: ^3.0.0
+  flutter_staggered_animations: ^1.1.0
 
-  # WebSocket
+  # HTTP & Networking
+  dio: ^5.9.0
+  http: ^1.2.0
+  connectivity_plus: ^6.1.5
+
+  # Location & Maps
+  geolocator: ^14.0.0
+  flutter_map: ^8.2.0
+  latlong2: ^0.9.1
+  maplibre_gl: ^0.25.0
+
+  # WebSocket & Real-time
+  web_socket_channel: ^2.4.0
   socket_io_client: ^2.0.3
-  sentry_flutter: ^9.10.0
-  firebase_analytics: ^12.1.1
+
+  # Storage & Database
+  shared_preferences: ^2.3.0
+  hive: ^2.2.3
+  hive_flutter: ^1.1.0
+
+  # Utilities
+  uuid: ^4.4.0
+  intl: ^0.20.2
+  logger: ^2.4.0
+  permission_handler: ^11.3.0
+  equatable: ^2.0.5
+
+  # Device Info
+  device_info_plus: ^11.5.0
+  package_info_plus: ^8.3.0
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
-  flutter_lints: ^3.0.1
-  build_runner: ^2.4.7
-  riverpod_generator: ^2.3.9
-  json_serializable: ^6.7.1
-  riverpod_lint: ^2.3.7
+  flutter_lints: ^3.0.2
+  build_runner: ^2.5.4
+  riverpod_generator: ^2.6.5
+  json_serializable: ^6.9.5
 
 flutter:
   uses-material-design: true
+  
+  assets:
+    - assets/animations/
+    - assets/images/
+    - assets/icons/
+    - assets/fonts/
+    - assets/translations/
+    # Stitch UI assets (explicit folders to ensure bundling)
+    - stitch/active_delivery_job_view/
+    - stitch/admin_analytics_fraud_control/
+    - stitch/admin_catalog_management/
+    - stitch/admin_management_console/
+    - stitch/advanced_filters_recommendations/
+    - stitch/ai_smart_ordering_derja/
+    - stitch/ai_voice_command_personalization/
+    - stitch/biometric_otp_authentication/
+    - stitch/cart_and_checkout/
+    - stitch/customer_home_dashboard/
+    - stitch/driver_dashboard_online/
+    - stitch/driver_document_verification/
+    - stitch/driver_navigation_emergency_sos/
+    - stitch/driver_rating_quality_feedback/
+    - stitch/driver_training_hub/
+    - stitch/enhanced_checkout_promo_codes/
+    - stitch/live_order_tracking/
+    - stitch/login_and_role_selection_1/
+    - stitch/login_and_role_selection_2/
+    - stitch/motorcycle_selection_slider/
+    - stitch/notification_and_reorder_settings/
+    - stitch/order_confirmation_cancel/
+    - stitch/product_details_harissa/
+    - stitch/ubermoto_splash_and_language_select_1/
+    - stitch/ubermoto_splash_and_language_select_2/
+    - stitch/ubermoto_splash_and_language_select_3/
+    - stitch/ubermoto_splash_and_language_select_4/
+    - stitch/user_registration_role_selection_1/
+    - stitch/user_registration_role_selection_2/
+
+  fonts:
+    - family: Inter
+      fonts:
+        - asset: assets/fonts/Inter-Regular.ttf
+        - asset: assets/fonts/Inter-Medium.ttf
+          weight: 500
+        - asset: assets/fonts/Inter-SemiBold.ttf
+          weight: 600
+        - asset: assets/fonts/Inter-Bold.ttf
+          weight: 700
+
+    - family: Cairo
+      fonts:
+        - asset: assets/fonts/Cairo-Regular.ttf
+        - asset: assets/fonts/Cairo-Medium.ttf
+          weight: 500
+        - asset: assets/fonts/Cairo-SemiBold.ttf
+          weight: 600
+        - asset: assets/fonts/Cairo-Bold.ttf
+          weight: 700
