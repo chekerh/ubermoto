@@ -20,6 +20,9 @@ export class User {
   @Prop({ required: true })
   name!: string;
 
+  @Prop()
+  fcmToken?: string;
+
   @Prop({ required: true, enum: UserRole, default: UserRole.CUSTOMER })
   role!: UserRole;
 
@@ -31,6 +34,15 @@ export class User {
 
   @Prop()
   avatarUrl?: string;
+
+  @Prop()
+  region?: string;
+
+  @Prop({ default: 0 })
+  totalOrders?: number;
+
+  @Prop({ default: 0 })
+  lifetimeValue?: number;
 
   @Prop({
     type: {

@@ -18,14 +18,17 @@ export class UsersService {
     return this.userModel.findOne({ email }).exec();
   }
 
+  async findByPhoneNumber(phoneNumber: string): Promise<UserDocument | null> {
+    const normalized = phoneNumber.replace(/\s+/g, '');
+    return this.userModel
+      .findOne({
+        phoneNumber: { $in: [phoneNumber, normalized] },
+      })
+      .exec();
+  }
+
   async findById(id: string): Promise<UserDocument | null> {
-    console.log('Finding user by ID:', id);
-    const user = await this.userModel.findById(id).exec();
-    console.log(
-      'User found by ID:',
-      user ? { id: user._id.toString(), email: user.email } : 'null',
-    );
-    return user;
+    return this.userModel.findById(id).exec();
   }
 
   async findAll(): Promise<UserDocument[]> {
@@ -39,8 +42,6 @@ export class UsersService {
     role: UserRole = UserRole.CUSTOMER,
     phoneNumber?: string,
   ): Promise<UserDocument> {
-    console.log('Creating user:', { email, name, role, phoneNumber });
-
     const user = new this.userModel({
       email,
       password,
@@ -49,18 +50,25 @@ export class UsersService {
       phoneNumber,
     });
 
-    const savedUser = await user.save();
-    console.log('User saved:', {
-      id: savedUser._id.toString(),
-      email: savedUser.email,
-      role: savedUser.role,
-    });
-
-    return savedUser;
+    return user.save();
   }
 
-  async updateVerificationStatus(id: string, isVerified: boolean): Promise<UserDocument | null> {
-    return this.userModel.findByIdAndUpdate(id, { isVerified }, { new: true }).exec();
+  async updateVerificationStatus(userId: string, isVerified: boolean): Promise<UserDocument> {
+    const user = await this.userModel
+      .findByIdAndUpdate(userId, { isVerified }, { new: true })
+      .exec();
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+    return user;
+  }
+
+  async updateFcmToken(userId: string, fcmToken: string): Promise<UserDocument> {
+    const user = await this.userModel.findByIdAndUpdate(userId, { fcmToken }, { new: true }).exec();
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+    return user;
   }
 
   async updateProfile(userId: string, updateData: UpdateProfileDto): Promise<UserDocument> {
@@ -158,9 +166,13 @@ export class UsersService {
       throw new NotFoundException('User not found');
     }
 
-    // Soft delete: mark as deleted instead of actually deleting
+    // Soft delete: mark as deleted and disable login
     await this.userModel
-      .findByIdAndUpdate(userId, { email: `deleted_${Date.now()}_${user.email}` })
+      .findByIdAndUpdate(userId, {
+        email: `deleted_${Date.now()}_${user.email}`,
+        isDeleted: true,
+        password: 'ACCOUNT_DELETED', // Prevent login
+      })
       .exec();
   }
 }

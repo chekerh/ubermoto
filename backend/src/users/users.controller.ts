@@ -14,6 +14,9 @@ import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth } from '@nestjs/swagg
 import { UsersService } from './users.service';
 import { UpdateProfileDto, ChangePasswordDto } from './dto/update-profile.dto';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+import { RolesGuard } from '../auth/guards/roles.guard';
+import { Roles } from '../auth/decorators/roles.decorator';
+import { UserRole } from './schemas/user.schema';
 
 interface AuthenticatedRequest extends Request {
   user: {
@@ -25,7 +28,7 @@ interface AuthenticatedRequest extends Request {
 
 @ApiTags('users')
 @Controller('users')
-@UseGuards(JwtAuthGuard)
+@UseGuards(JwtAuthGuard, RolesGuard)
 @ApiBearerAuth()
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
@@ -36,7 +39,7 @@ export class UsersController {
     status: 200,
     description: 'User profile retrieved successfully',
   })
-  async getProfile(@Request() req: AuthenticatedRequest) {
+  async getProfile(@Request() req: AuthenticatedRequest): Promise<any> {
     const user = await this.usersService.findById(req.user.sub);
     if (!user) {
       throw new NotFoundException('User not found');
@@ -57,7 +60,7 @@ export class UsersController {
   async updateProfile(
     @Request() req: AuthenticatedRequest,
     @Body() updateProfileDto: UpdateProfileDto,
-  ) {
+  ): Promise<Record<string, any>> {
     const updatedUser = await this.usersService.updateProfile(req.user.sub, updateProfileDto);
     const userObj = updatedUser.toObject();
     delete userObj.password;
@@ -78,7 +81,7 @@ export class UsersController {
   async changePassword(
     @Request() req: AuthenticatedRequest,
     @Body() changePasswordDto: ChangePasswordDto,
-  ) {
+  ): Promise<void> {
     await this.usersService.changePassword(req.user.sub, changePasswordDto);
   }
 
@@ -88,9 +91,12 @@ export class UsersController {
     status: 200,
     description: 'Preferences updated successfully',
   })
-  async updatePreferences(@Request() req: AuthenticatedRequest, @Body() preferences: any) {
+  async updatePreferences(
+    @Request() req: AuthenticatedRequest,
+    @Body() preferences: Record<string, boolean>,
+  ): Promise<Record<string, any>> {
     const updatedUser = await this.usersService.updatePreferences(req.user.sub, preferences);
-    return updatedUser.preferences;
+    return updatedUser?.preferences || {};
   }
 
   @Get('me/preferences')
@@ -99,7 +105,9 @@ export class UsersController {
     status: 200,
     description: 'Preferences retrieved successfully',
   })
-  async getPreferences(@Request() req: AuthenticatedRequest) {
+  async getPreferences(
+    @Request() req: AuthenticatedRequest,
+  ): Promise<Record<string, any> | undefined> {
     const user = await this.usersService.findById(req.user.sub);
     if (!user) {
       throw new NotFoundException('User not found');
@@ -127,13 +135,15 @@ export class UsersController {
     status: 204,
     description: 'Account deleted successfully',
   })
-  async deleteAccount(@Request() req: AuthenticatedRequest) {
+  async deleteAccount(@Request() req: AuthenticatedRequest): Promise<{ message: string }> {
     await this.usersService.deleteAccount(req.user.sub);
+    return { message: 'Account deleted successfully' };
   }
 
   @Get('debug')
-  @ApiOperation({ summary: 'Debug endpoint to check users' })
-  async debug() {
+  @Roles(UserRole.ADMIN)
+  @ApiOperation({ summary: 'Debug endpoint to check users (Admin only)' })
+  async debug(): Promise<{ count: number; users: unknown[] }> {
     const allUsers = await this.usersService.findAll();
     return {
       count: allUsers.length,
