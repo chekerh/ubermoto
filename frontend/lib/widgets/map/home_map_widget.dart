@@ -202,7 +202,7 @@ class _HomeMapWidgetState extends ConsumerState<HomeMapWidget> {
       children: [
         fm.TileLayer(
           urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
-          userAgentPackageName: 'com.ubermoto.app',
+          userAgentPackageName: 'com.nassib.app',
         ),
         fm.MarkerLayer(
           markers: _buildMarkers(),

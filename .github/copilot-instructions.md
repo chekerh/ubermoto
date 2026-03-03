@@ -1,7 +1,7 @@
-# UberMoto AI Agent Instructions
+# Nassib AI Agent Instructions
 
 ## Project Overview
-UberMoto is a motorcycle delivery platform with **three user types** (Customer, Driver, Admin). The unique architecture uses a **Stitch HTML-in-WebView system** for Flutter UI, where screens are HTML files with JavaScript-to-Dart bridge communication.
+Nassib is a motorcycle delivery platform with **three user types** (Customer, Driver, Admin). The unique architecture uses a **Stitch HTML-in-WebView system** for Flutter UI, where screens are HTML files with JavaScript-to-Dart bridge communication.
 
 ### Monorepo Structure
 ```
@@ -110,7 +110,7 @@ cd frontend && flutter test     # Frontend tests
 - Use DTOs with `class-validator` decorators
 - Inject services via constructor DI
 - Add `@ApiOperation()` Swagger docs
-- See Postman collection: `backend/UberMoto_API.postman_collection.json`
+- See Postman collection: `backend/Nassib_API.postman_collection.json`
 
 ### WebSocket Real-Time Updates
 - Client connects to `http://localhost:3003/delivery` namespace
@@ -131,7 +131,7 @@ cd frontend && flutter test     # Frontend tests
 - `PROJECT_ANALYSIS.md` — Architecture overview, 18 bugs fixed
 - `frontend/lib/stitch/stitch_viewer.dart` — Complete bridge implementation (~1500 lines)
 - `backend/src/deliveries/deliveries.service.ts` — Core business logic
-- `backend/UberMoto_API.postman_collection.json` — All API endpoints with examples
+- `backend/Nassib_API.postman_collection.json` — All API endpoints with examples
 
 ## What NOT to Do
 

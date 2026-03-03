@@ -6,7 +6,7 @@ import '../core/map/types.dart';
 /// Nominatim geocoding service (replaces Google geocoding)
 class NominatimService {
   static const String _baseUrl = 'https://nominatim.openstreetmap.org';
-  static const String _userAgent = 'UberMoto/1.0';
+  static const String _userAgent = 'Nassib/1.0';
   static const Duration _cacheTTL = Duration(hours: 1);
   static const Duration _rateLimitDelay = Duration(seconds: 1);
   

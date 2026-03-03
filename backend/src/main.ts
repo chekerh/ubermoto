@@ -29,8 +29,8 @@ async function bootstrap(): Promise<void> {
 
   // Swagger Configuration
   const config = new DocumentBuilder()
-    .setTitle('UberMoto API')
-    .setDescription('API documentation for UberMoto - Motorcycle delivery platform')
+    .setTitle('Nassib API')
+    .setDescription('API documentation for Nassib - Motorcycle delivery platform')
     .setVersion('1.0')
     .addBearerAuth(
       {
