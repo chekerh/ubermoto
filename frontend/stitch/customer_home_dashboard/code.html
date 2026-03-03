@@ -3,7 +3,7 @@
 <html lang="fr"><head>
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<title>UberMoto - Customer Home</title>
+<title>Nassib - Customer Home</title>
 <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
@@ -159,67 +159,17 @@
 <span class="h-1.5 w-1.5 rounded-full bg-slate-300 dark:bg-slate-700"></span>
 </div>
 </div>
-<div class="grid grid-cols-2 gap-4">
-<!-- Product Card 1 -->
-<div id="product-card-harissa" class="flex flex-col gap-2 group cursor-pointer">
-<div class="relative aspect-square rounded-2xl overflow-hidden bg-background-light dark:bg-background-dark">
-<img alt="Harissa Can" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" data-alt="Traditional Harissa spice jar" src="https://lh3.googleusercontent.com/aida-public/AB6AXuANljbrau7PDzD7_YiNrqQ_1M3eU3Ks2oRtuDDoBpey7tQoCGZjp24JaX4BDKhEdvQKLy9Z8AK3xT_1Wo7TEp-RHKn40jFhESz7SFEHTBJ3iRvv9YiO3Mz-bdRrNkkhFSHfa1MP5-Ja3yPTzcwQ8FN-wJ12eyhLJA-PZt6bC5c1OGI7J8DA50UGeQBKTQveb7BRhEvhotwBK7CfvGaYkTVm-NqjZLMKR1oVAdBxbqjTH5ckN2RRZHtojI9fmwdws6zvSUR2MM53dP4"/>
-<button class="absolute top-2 right-2 h-8 w-8 bg-white/80 dark:bg-black/50 backdrop-blur rounded-full flex items-center justify-center text-red-500 hover:bg-red-50 transition-colors">
-<span class="material-symbols-outlined text-lg">favorite</span>
-</button>
+<div id="products-grid" class="grid grid-cols-2 gap-4">
+<!-- Dynamic product cards injected by Dart -->
+<div class="flex flex-col gap-2 animate-pulse">
+  <div class="aspect-square rounded-2xl bg-slate-200 dark:bg-slate-800"></div>
+  <div class="h-4 w-2/3 bg-slate-200 dark:bg-slate-800 rounded"></div>
+  <div class="h-3 w-1/2 bg-slate-200 dark:bg-slate-800 rounded"></div>
 </div>
-<div>
-<div class="flex justify-between items-start">
-<h4 class="font-bold text-base line-clamp-1">Harissa Sicam</h4>
-<span class="text-primary font-bold text-sm whitespace-nowrap">2.5 DT</span>
-</div>
-<p class="text-xs text-text-sub-light dark:text-text-sub-dark mt-0.5">Épices &amp; Condiments</p>
-</div>
-</div>
-<!-- Product Card 2 -->
-<div id="product-card-couscous" class="flex flex-col gap-2 group cursor-pointer">
-<div class="relative aspect-square rounded-2xl overflow-hidden bg-background-light dark:bg-background-dark">
-<img alt="Couscous Pack" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" data-alt="Packet of traditional Couscous" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAT2iQyz2C0-laySzWV8rn3aQUaJt6Edog8SSTjet8wHQ2FEQaunTRXt1HBedaqikhd97FH84jHQLCtxsxAuiPfaV8YSGua_Z9okmXtO-XXFK3VCOM690vXf7mm0VdOw4it3ZjSpODBAdk3X8ZwFwCaquhzFnR7PcUVlKYU9Kk3ieT5u4NgTqCqfdyNwzLeMReyDaILHCjX6qhunDIWOdj1JkfKV7jirT9gRZiuS-0AUSvOj8of65T5GRtXgMbGDmx5jlQulMIysu0"/>
-<button class="absolute top-2 right-2 h-8 w-8 bg-white/80 dark:bg-black/50 backdrop-blur rounded-full flex items-center justify-center text-slate-400 hover:text-red-500 transition-colors">
-<span class="material-symbols-outlined text-lg">favorite</span>
-</button>
-</div>
-<div>
-<div class="flex justify-between items-start">
-<h4 class="font-bold text-base line-clamp-1">Couscous Fin</h4>
-<span class="text-primary font-bold text-sm whitespace-nowrap">1.8 DT</span>
-</div>
-<p class="text-xs text-text-sub-light dark:text-text-sub-dark mt-0.5">Céréales</p>
-</div>
-</div>
-<!-- Product Card 3 (Shimmer Loading) -->
-<div class="flex flex-col gap-2">
-<div class="aspect-square rounded-2xl shimmer overflow-hidden relative">
-<!-- Placeholder content -->
-</div>
-<div class="flex flex-col gap-1 mt-1">
-<div class="h-4 w-2/3 bg-slate-200 dark:bg-slate-800 rounded shimmer"></div>
-<div class="h-3 w-1/2 bg-slate-200 dark:bg-slate-800 rounded shimmer"></div>
-</div>
-</div>
-<!-- Product Card 4 -->
-<div id="product-card-indomie" class="flex flex-col gap-2 group cursor-pointer">
-<div class="relative aspect-square rounded-2xl overflow-hidden bg-background-light dark:bg-background-dark">
-<img alt="Ramen Noodles" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" data-alt="Bowl of spicy ramen" src="https://lh3.googleusercontent.com/aida-public/AB6AXuALx9X92FJa37FQ9OVX09SBkzeWm6woCk5qqeY3nNsbY0sX5Zvjc_tf9kwkKTLtXAnQYsfITsEfM0mATrpJYE-FIYUbqD5JXj3m0-XpLUmf3MI6LIfxIy4QYGXjEELrDTafj44yeFUjILADLbgU854lt3lLO7d2OvjnFY4mAfLhBQCpDLX9TLeYcIjOFMwXsYKoNOIVmBo8D96pf6jXUYHVAv5bjPbdyln-xkXR_RS-c16M3vKyug3rTFxIY2zlWYoo-OF5l6XIeU0"/>
-<button class="absolute top-2 right-2 h-8 w-8 bg-white/80 dark:bg-black/50 backdrop-blur rounded-full flex items-center justify-center text-slate-400 hover:text-red-500 transition-colors">
-<span class="material-symbols-outlined text-lg">favorite</span>
-</button>
-<div class="absolute bottom-2 left-2 bg-primary text-white text-[10px] font-bold px-2 py-1 rounded-md">
-                            -20%
-                        </div>
-</div>
-<div>
-<div class="flex justify-between items-start">
-<h4 class="font-bold text-base line-clamp-1">Indomie Poulet</h4>
-<span class="text-primary font-bold text-sm whitespace-nowrap">1.2 DT</span>
-</div>
-<p class="text-xs text-text-sub-light dark:text-text-sub-dark mt-0.5">Pâtes Instantanées</p>
-</div>
+<div class="flex flex-col gap-2 animate-pulse">
+  <div class="aspect-square rounded-2xl bg-slate-200 dark:bg-slate-800"></div>
+  <div class="h-4 w-2/3 bg-slate-200 dark:bg-slate-800 rounded"></div>
+  <div class="h-3 w-1/2 bg-slate-200 dark:bg-slate-800 rounded"></div>
 </div>
 </div>
 </div>

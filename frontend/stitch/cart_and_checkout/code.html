@@ -3,7 +3,7 @@
 <html lang="en"><head>
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<title>UberMoto Checkout</title>
+<title>Nassib Checkout</title>
 <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
@@ -77,30 +77,14 @@
 <!-- Order Summary -->
 <div class="px-4 pt-2 pb-4">
 <h3 class="text-sm font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-3 ml-1">Order Summary</h3>
-<div class="flex flex-col gap-3">
-<!-- Item 1 -->
-<div class="flex items-center gap-4 rounded-xl bg-white dark:bg-stone-800 p-3 shadow-sm border border-stone-100 dark:border-stone-700">
-<div class="bg-center bg-no-repeat aspect-square bg-cover rounded-lg size-16 shrink-0 bg-stone-100 dark:bg-stone-700" data-alt="Spicy red Harissa paste in a jar" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuDyojQoQsWs7_N9ZMywTlKuF75WYjGje6GgTzFWzIZfneoSX9s49taMdwl3poDt1dPUSu68Jh8XhTZydhOzhjichyJLdmFn74HqTTEn3tsnfC_Ffxb4tN9tAd2efHfNvsowyGOGSZj0f5bUL25-nFGFiTPPPgEdsRyjRUBzgsW_QMqFVQSfxJbIqT65aWUrLBeTPcxpIIqGV2arH8UaSiVsdQGPCkwywtaWEIEgkm-qRexGtbTYjnh9-yq-nzM_LeVMC0knJl3fZ6E");'></div>
-<div class="flex flex-col justify-center flex-1">
-<p class="text-slate-900 dark:text-slate-100 text-base font-bold leading-normal line-clamp-1">Harissa du Cap Bon</p>
-<p class="text-slate-500 dark:text-slate-400 text-sm font-medium">Spicy Tunisian Paste</p>
-</div>
-<div class="flex flex-col items-end gap-1">
-<p class="text-primary text-base font-bold">3.500 DT</p>
-<p class="text-xs text-slate-400 font-medium">x 1</p>
-</div>
-</div>
-<!-- Item 2 -->
-<div class="flex items-center gap-4 rounded-xl bg-white dark:bg-stone-800 p-3 shadow-sm border border-stone-100 dark:border-stone-700">
-<div class="bg-center bg-no-repeat aspect-square bg-cover rounded-lg size-16 shrink-0 bg-stone-100 dark:bg-stone-700" data-alt="Carton of fresh milk" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuD2b9xRQ-MN9TZyXqoFffM4_6gYMm3iJVeISZ65t01TVi4eH3jVMF1HjusQe5CjnUJ5OeCtZ0629A9J_1Pv0s04_5bKl_tpaPzKy7gZ1z-1TxQyLUkScEhW-3M6TyEwS5m8sIINfIl4CNlbJwVJZYhqhTapgsImPR3SC-ykj3kLrnz3XRhG32YfN4UXv44Do5vvY_yls5d8fFU1ECr7E9Bzmspp1KokNLlo7RavCzwn4It31bsAP8iLMRmb3-GmWrvDxb8MRIZX1uE");'></div>
-<div class="flex flex-col justify-center flex-1">
-<p class="text-slate-900 dark:text-slate-100 text-base font-bold leading-normal line-clamp-1">Délice Milk</p>
-<p class="text-slate-500 dark:text-slate-400 text-sm font-medium">Full Cream, 1L</p>
-</div>
-<div class="flex flex-col items-end gap-1">
-<p class="text-primary text-base font-bold">1.400 DT</p>
-<p class="text-xs text-slate-400 font-medium">x 2</p>
-</div>
+<div id="cart-items-container" class="flex flex-col gap-3">
+<!-- Dynamic cart items injected by Dart -->
+<div class="flex items-center gap-4 rounded-xl bg-white dark:bg-stone-800 p-3 shadow-sm border border-stone-100 dark:border-stone-700 animate-pulse">
+  <div class="rounded-lg size-16 shrink-0 bg-stone-200 dark:bg-stone-700"></div>
+  <div class="flex-1 space-y-2">
+    <div class="h-4 w-2/3 bg-stone-200 dark:bg-stone-700 rounded"></div>
+    <div class="h-3 w-1/2 bg-stone-200 dark:bg-stone-700 rounded"></div>
+  </div>
 </div>
 </div>
 </div>
@@ -154,16 +138,16 @@
 <div class="bg-white dark:bg-stone-800 rounded-xl p-5 border border-stone-100 dark:border-stone-700 shadow-sm space-y-3">
 <div class="flex justify-between items-center text-sm">
 <span class="text-slate-500 dark:text-slate-400 font-medium">Subtotal</span>
-<span class="text-slate-900 dark:text-slate-100 font-bold">6.300 DT</span>
+<span id="cart-subtotal" class="text-slate-900 dark:text-slate-100 font-bold">0.000 DT</span>
 </div>
 <div class="flex justify-between items-center text-sm">
 <span class="text-slate-500 dark:text-slate-400 font-medium">Delivery Fee</span>
-<span class="text-slate-900 dark:text-slate-100 font-bold">2.000 DT</span>
+<span id="cart-delivery-fee" class="text-slate-900 dark:text-slate-100 font-bold">2.000 DT</span>
 </div>
 <div class="h-px bg-stone-100 dark:bg-stone-700 my-2"></div>
 <div class="flex justify-between items-center text-lg">
 <span class="text-slate-900 dark:text-slate-100 font-bold">Total</span>
-<span class="text-primary font-bold text-xl">8.300 DT</span>
+<span id="cart-total" class="text-primary font-bold text-xl">0.000 DT</span>
 </div>
 </div>
 </div>
