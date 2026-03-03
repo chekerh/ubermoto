@@ -56,7 +56,7 @@
 <body class="bg-background-light dark:bg-background-dark font-display h-screen flex flex-col overflow-hidden text-slate-900 dark:text-slate-100">
 <!-- Header -->
 <header class="flex items-center justify-between px-4 py-3 bg-surface-light dark:bg-surface-dark shadow-sm z-10">
-<button class="flex items-center justify-center p-2 rounded-full hover:bg-background-light dark:hover:bg-background-dark text-slate-900 dark:text-slate-100">
+<button id="ai-order-back-btn" class="flex items-center justify-center p-2 rounded-full hover:bg-background-light dark:hover:bg-background-dark text-slate-900 dark:text-slate-100">
 <span class="material-symbols-outlined">arrow_back</span>
 </button>
 <div class="flex flex-col items-center">
@@ -162,7 +162,7 @@
 <button class="flex-1 bg-surface-light dark:bg-surface-dark border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 py-2.5 px-4 rounded-xl text-sm font-semibold hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors">
                         Edit Order
                     </button>
-<button class="flex-1 bg-primary hover:bg-primary-dark text-white py-2.5 px-4 rounded-xl text-sm font-semibold shadow-sm transition-colors flex items-center justify-center gap-2">
+<button id="ai-order-add-cart" class="flex-1 bg-primary hover:bg-primary-dark text-white py-2.5 px-4 rounded-xl text-sm font-semibold shadow-sm transition-colors flex items-center justify-center gap-2">
                         Add to Cart
                         <span class="material-symbols-outlined text-lg">check_circle</span>
 </button>
@@ -177,23 +177,23 @@
 <span class="material-symbols-outlined">add_circle</span>
 </button>
 <div class="flex-1 relative">
-<input class="w-full bg-background-light dark:bg-slate-800 border-none rounded-full py-3 pl-4 pr-10 text-sm focus:ring-2 focus:ring-primary dark:text-white placeholder-slate-400" placeholder="Type your order in Derja..." type="text"/>
+<input id="ai-order-input" class="w-full bg-background-light dark:bg-slate-800 border-none rounded-full py-3 pl-4 pr-10 text-sm focus:ring-2 focus:ring-primary dark:text-white placeholder-slate-400" placeholder="Type your order in Derja..." type="text"/>
 <button class="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 bg-white dark:bg-slate-700 rounded-full shadow-sm text-slate-400 hover:text-primary transition-colors">
 <span class="material-symbols-outlined text-lg">sentiment_satisfied</span>
 </button>
 </div>
-<button class="p-3 bg-primary text-white rounded-full hover:bg-primary-dark shadow-md transition-transform active:scale-95 flex items-center justify-center">
+<button id="ai-order-mic-btn" class="p-3 bg-primary text-white rounded-full hover:bg-primary-dark shadow-md transition-transform active:scale-95 flex items-center justify-center">
 <span class="material-symbols-outlined">mic</span>
 </button>
 </div>
 </div>
 <!-- Bottom Nav Bar -->
 <nav class="bg-surface-light dark:bg-surface-dark border-t border-slate-100 dark:border-slate-800 px-6 pb-6 pt-3 flex justify-between items-center z-20">
-<a class="flex flex-col items-center gap-1 group" href="#">
+<a id="nav-home" class="flex flex-col items-center gap-1 group" href="#">
 <span class="material-symbols-outlined text-slate-400 group-hover:text-primary transition-colors">home</span>
 <span class="text-[10px] font-medium text-slate-400 group-hover:text-primary transition-colors">Home</span>
 </a>
-<a class="flex flex-col items-center gap-1 group" href="#">
+<a id="nav-smart-order" class="flex flex-col items-center gap-1 group" href="#">
 <div class="relative">
 <span class="material-symbols-outlined text-primary fill-current">chat_bubble</span>
 <span class="absolute -top-1 -right-1 w-2.5 h-2.5 bg-red-500 rounded-full border-2 border-white dark:border-surface-dark"></span>
@@ -205,11 +205,11 @@
 <span class="material-symbols-outlined text-3xl">sports_motorsports</span>
 </button>
 </div>
-<a class="flex flex-col items-center gap-1 group" href="#">
+<a id="nav-activity" class="flex flex-col items-center gap-1 group" href="#">
 <span class="material-symbols-outlined text-slate-400 group-hover:text-primary transition-colors">history</span>
 <span class="text-[10px] font-medium text-slate-400 group-hover:text-primary transition-colors">Activity</span>
 </a>
-<a class="flex flex-col items-center gap-1 group" href="#">
+<a id="nav-profile" class="flex flex-col items-center gap-1 group" href="#">
 <span class="material-symbols-outlined text-slate-400 group-hover:text-primary transition-colors">person</span>
 <span class="text-[10px] font-medium text-slate-400 group-hover:text-primary transition-colors">Profile</span>
 </a>

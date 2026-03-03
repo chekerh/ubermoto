@@ -45,11 +45,11 @@
 <!-- Header Overlay -->
 <div class="absolute top-0 left-0 w-full z-20 pt-12 pb-2 px-4 bg-gradient-to-b from-background-light/90 to-transparent dark:from-background-dark/90 pointer-events-none">
 <div class="flex items-center justify-between pointer-events-auto">
-<button class="flex size-10 items-center justify-center rounded-full bg-background-light dark:bg-background-dark shadow-md text-slate-900 dark:text-slate-100">
+<button id="tracking-back-btn" class="flex size-10 items-center justify-center rounded-full bg-background-light dark:bg-background-dark shadow-md text-slate-900 dark:text-slate-100">
 <span class="material-symbols-outlined">arrow_back</span>
 </button>
 <h2 class="text-slate-900 dark:text-slate-100 text-lg font-bold">Order #8321</h2>
-<button class="px-4 py-2 bg-background-light dark:bg-background-dark rounded-full text-primary font-bold text-sm shadow-md">
+<button id="tracking-help-btn" class="px-4 py-2 bg-background-light dark:bg-background-dark rounded-full text-primary font-bold text-sm shadow-md">
                     Help
                 </button>
 </div>
@@ -155,10 +155,10 @@
 <p class="text-sm text-slate-500 dark:text-slate-400">Peugeot 103 • Blue</p>
 </div>
 <div class="flex gap-2">
-<button class="size-10 rounded-full bg-slate-100 dark:bg-slate-700 text-slate-900 dark:text-white flex items-center justify-center hover:bg-slate-200 dark:hover:bg-slate-600 transition-colors">
+<button id="tracking-chat-btn" class="size-10 rounded-full bg-slate-100 dark:bg-slate-700 text-slate-900 dark:text-white flex items-center justify-center hover:bg-slate-200 dark:hover:bg-slate-600 transition-colors">
 <span class="material-symbols-outlined">chat</span>
 </button>
-<button class="size-10 rounded-full bg-primary text-white flex items-center justify-center shadow-lg shadow-primary/30 hover:bg-primary/90 transition-colors">
+<button id="tracking-call-btn" class="size-10 rounded-full bg-primary text-white flex items-center justify-center shadow-lg shadow-primary/30 hover:bg-primary/90 transition-colors">
 <span class="material-symbols-outlined">call</span>
 </button>
 </div>
@@ -180,11 +180,11 @@
 <!-- Bottom Navigation Bar -->
 <div class="bg-background-light dark:bg-background-dark border-t border-slate-200 dark:border-slate-700 px-4 pb-6 pt-2 z-30 relative">
 <div class="flex justify-between items-end">
-<a class="flex flex-1 flex-col items-center justify-end gap-1 text-primary group" href="#">
+<a id="nav-home" class="flex flex-1 flex-col items-center justify-end gap-1 text-primary group" href="#">
 <span class="material-symbols-outlined text-2xl group-hover:scale-110 transition-transform">home</span>
 <p class="text-xs font-medium">Home</p>
 </a>
-<a class="flex flex-1 flex-col items-center justify-end gap-1 text-slate-400 dark:text-slate-500 hover:text-primary dark:hover:text-primary transition-colors group" href="#">
+<a id="nav-activity" class="flex flex-1 flex-col items-center justify-end gap-1 text-slate-400 dark:text-slate-500 hover:text-primary dark:hover:text-primary transition-colors group" href="#">
 <span class="material-symbols-outlined text-2xl group-hover:scale-110 transition-transform">history</span>
 <p class="text-xs font-medium">Activity</p>
 </a>
@@ -194,11 +194,11 @@
 <span class="material-symbols-outlined text-3xl">add</span>
 </button>
 </div>
-<a class="flex flex-1 flex-col items-center justify-end gap-1 text-slate-400 dark:text-slate-500 hover:text-primary dark:hover:text-primary transition-colors group" href="#">
+<a id="nav-wallet" class="flex flex-1 flex-col items-center justify-end gap-1 text-slate-400 dark:text-slate-500 hover:text-primary dark:hover:text-primary transition-colors group" href="#">
 <span class="material-symbols-outlined text-2xl group-hover:scale-110 transition-transform">account_balance_wallet</span>
 <p class="text-xs font-medium">Wallet</p>
 </a>
-<a class="flex flex-1 flex-col items-center justify-end gap-1 text-slate-400 dark:text-slate-500 hover:text-primary dark:hover:text-primary transition-colors group" href="#">
+<a id="nav-profile" class="flex flex-1 flex-col items-center justify-end gap-1 text-slate-400 dark:text-slate-500 hover:text-primary dark:hover:text-primary transition-colors group" href="#">
 <span class="material-symbols-outlined text-2xl group-hover:scale-110 transition-transform">person</span>
 <p class="text-xs font-medium">Profile</p>
 </a>

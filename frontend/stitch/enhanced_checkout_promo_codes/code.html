@@ -59,7 +59,7 @@
 <div class="relative flex h-full min-h-screen w-full flex-col overflow-x-hidden max-w-md mx-auto border-x border-slate-200 dark:border-slate-800 bg-background-light dark:bg-background-dark shadow-xl">
 <!-- Header -->
 <div class="sticky top-0 z-10 flex items-center justify-between bg-background-light/95 dark:bg-background-dark/95 backdrop-blur-md p-4 pb-2 border-b border-slate-100 dark:border-slate-800">
-<button class="flex size-10 items-center justify-center rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors text-slate-900 dark:text-slate-100">
+<button id="checkout-back-btn" class="flex size-10 items-center justify-center rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors text-slate-900 dark:text-slate-100">
 <span class="material-symbols-outlined text-[24px]">arrow_back</span>
 </button>
 <h2 class="text-lg font-bold leading-tight tracking-[-0.015em]">Checkout</h2>
@@ -184,7 +184,7 @@
 </div>
 <!-- Confirm Button -->
 <div class="px-4 pb-4">
-<button class="w-full flex items-center justify-center gap-2 rounded-full bg-primary py-4 text-base font-bold text-white shadow-lg shadow-primary/30 transition-transform active:scale-[0.98] hover:bg-primary/90">
+<button id="checkout-confirm-btn" class="w-full flex items-center justify-center gap-2 rounded-full bg-primary py-4 text-base font-bold text-white shadow-lg shadow-primary/30 transition-transform active:scale-[0.98] hover:bg-primary/90">
                     Confirm Order
                     <span class="material-symbols-outlined text-[20px]">arrow_forward</span>
 </button>
@@ -193,32 +193,32 @@
 <!-- Bottom Navigation -->
 <div class="sticky bottom-0 z-20 w-full border-t border-slate-100 bg-background-light dark:bg-background-dark dark:border-slate-800 px-4 pb-safe pt-2">
 <div class="flex justify-between items-center px-2 pb-3">
-<a class="group flex flex-1 flex-col items-center justify-end gap-1 rounded-full text-slate-400 dark:text-slate-500 hover:text-primary dark:hover:text-primary transition-colors" href="#">
+<a id="nav-home" class="group flex flex-1 flex-col items-center justify-end gap-1 rounded-full text-slate-400 dark:text-slate-500 hover:text-primary dark:hover:text-primary transition-colors" href="#">
 <div class="flex h-8 items-center justify-center transition-transform group-hover:-translate-y-0.5">
 <span class="material-symbols-outlined text-[28px]">home</span>
 </div>
 <p class="text-[10px] font-medium leading-normal tracking-wide">Home</p>
 </a>
-<a class="group flex flex-1 flex-col items-center justify-end gap-1 text-slate-400 dark:text-slate-500 hover:text-primary dark:hover:text-primary transition-colors" href="#">
+<a id="nav-activity" class="group flex flex-1 flex-col items-center justify-end gap-1 text-slate-400 dark:text-slate-500 hover:text-primary dark:hover:text-primary transition-colors" href="#">
 <div class="flex h-8 items-center justify-center transition-transform group-hover:-translate-y-0.5">
 <span class="material-symbols-outlined text-[28px]">history</span>
 </div>
 <p class="text-[10px] font-medium leading-normal tracking-wide">Activity</p>
 </a>
 <!-- Center FAB-like button for ordering/cart if needed, or just regular tab -->
-<a class="group flex flex-1 flex-col items-center justify-end gap-1 text-primary" href="#">
+<a id="nav-cart" class="group flex flex-1 flex-col items-center justify-end gap-1 text-primary" href="#">
 <div class="relative flex h-12 w-12 items-center justify-center rounded-full bg-primary/10 text-primary dark:bg-primary/20 mb-1 shadow-sm">
 <span class="material-symbols-outlined text-[28px]">shopping_bag</span>
 </div>
 <!-- No text for the center active one typically, or customized -->
 </a>
-<a class="group flex flex-1 flex-col items-center justify-end gap-1 text-slate-400 dark:text-slate-500 hover:text-primary dark:hover:text-primary transition-colors" href="#">
+<a id="nav-wallet" class="group flex flex-1 flex-col items-center justify-end gap-1 text-slate-400 dark:text-slate-500 hover:text-primary dark:hover:text-primary transition-colors" href="#">
 <div class="flex h-8 items-center justify-center transition-transform group-hover:-translate-y-0.5">
 <span class="material-symbols-outlined text-[28px]">account_balance_wallet</span>
 </div>
 <p class="text-[10px] font-medium leading-normal tracking-wide">Wallet</p>
 </a>
-<a class="group flex flex-1 flex-col items-center justify-end gap-1 text-slate-400 dark:text-slate-500 hover:text-primary dark:hover:text-primary transition-colors" href="#">
+<a id="nav-profile" class="group flex flex-1 flex-col items-center justify-end gap-1 text-slate-400 dark:text-slate-500 hover:text-primary dark:hover:text-primary transition-colors" href="#">
 <div class="flex h-8 items-center justify-center transition-transform group-hover:-translate-y-0.5">
 <span class="material-symbols-outlined text-[28px]">person</span>
 </div>

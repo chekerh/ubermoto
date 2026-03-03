@@ -48,7 +48,7 @@
 <div class="relative flex h-full min-h-screen w-full max-w-md flex-col overflow-x-hidden bg-background-light dark:bg-background-dark shadow-2xl">
 <!-- Header -->
 <div class="sticky top-0 z-10 flex items-center justify-between bg-background-light/95 dark:bg-background-dark/95 backdrop-blur-md p-4 pb-2">
-<button class="flex size-10 items-center justify-center rounded-full bg-white dark:bg-stone-800 shadow-sm text-slate-800 dark:text-slate-200 transition-transform active:scale-95">
+<button id="cart-back-btn" class="flex size-10 items-center justify-center rounded-full bg-white dark:bg-stone-800 shadow-sm text-slate-800 dark:text-slate-200 transition-transform active:scale-95">
 <span class="material-symbols-outlined">arrow_back</span>
 </button>
 <h2 class="text-lg font-bold leading-tight tracking-[-0.015em] flex-1 text-center pr-10">Checkout</h2>
@@ -69,7 +69,7 @@
 </div>
 <p class="text-slate-500 dark:text-slate-400 text-sm font-medium leading-normal line-clamp-1">15 Avenue Habib Bourguiba, Tunis</p>
 </div>
-<div class="shrink-0 text-primary">
+<div id="cart-edit-address" class="shrink-0 text-primary">
 <span class="material-symbols-outlined">edit</span>
 </div>
 </div>
@@ -171,7 +171,7 @@
 </div>
 <!-- Floating Bottom Action -->
 <div class="fixed bottom-[88px] left-0 right-0 p-4 max-w-md mx-auto z-20">
-<button class="w-full bg-primary hover:bg-orange-600 text-white font-bold py-4 px-6 rounded-full shadow-lg shadow-orange-500/30 flex items-center justify-between group active:scale-[0.98] transition-all">
+<button id="cart-confirm-btn" class="w-full bg-primary hover:bg-orange-600 text-white font-bold py-4 px-6 rounded-full shadow-lg shadow-orange-500/30 flex items-center justify-between group active:scale-[0.98] transition-all">
 <span class="text-lg">Confirm Order</span>
 <div class="bg-white/20 rounded-full p-1.5 group-hover:bg-white/30 transition-colors">
 <span class="material-symbols-outlined text-white">arrow_forward</span>
@@ -180,19 +180,19 @@
 </div>
 <!-- Bottom Nav Bar -->
 <div class="flex gap-2 border-t border-stone-200 dark:border-stone-800 bg-background-light dark:bg-background-dark px-4 pb-6 pt-3 z-30 sticky bottom-0">
-<a class="flex flex-1 flex-col items-center justify-end gap-1 text-slate-400 hover:text-primary transition-colors" href="#">
+<a id="nav-home" class="flex flex-1 flex-col items-center justify-end gap-1 text-slate-400 hover:text-primary transition-colors" href="#">
 <span class="material-symbols-outlined text-[24px]">home</span>
 <p class="text-xs font-medium leading-normal">Home</p>
 </a>
-<a class="flex flex-1 flex-col items-center justify-end gap-1 text-primary" href="#">
+<a id="nav-cart" class="flex flex-1 flex-col items-center justify-end gap-1 text-primary" href="#">
 <span class="material-symbols-outlined text-[24px] font-variation-settings-'FILL'1">shopping_bag</span>
 <p class="text-xs font-bold leading-normal">Cart</p>
 </a>
-<a class="flex flex-1 flex-col items-center justify-end gap-1 text-slate-400 hover:text-primary transition-colors" href="#">
+<a id="nav-orders" class="flex flex-1 flex-col items-center justify-end gap-1 text-slate-400 hover:text-primary transition-colors" href="#">
 <span class="material-symbols-outlined text-[24px]">receipt_long</span>
 <p class="text-xs font-medium leading-normal">Orders</p>
 </a>
-<a class="flex flex-1 flex-col items-center justify-end gap-1 text-slate-400 hover:text-primary transition-colors" href="#">
+<a id="nav-profile" class="flex flex-1 flex-col items-center justify-end gap-1 text-slate-400 hover:text-primary transition-colors" href="#">
 <span class="material-symbols-outlined text-[24px]">person</span>
 <p class="text-xs font-medium leading-normal">Account</p>
 </a>

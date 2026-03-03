@@ -42,7 +42,7 @@
 <div class="relative flex h-screen w-full flex-col overflow-hidden max-w-md mx-auto shadow-2xl">
 <!-- Header -->
 <div class="absolute top-0 left-0 w-full z-20 flex items-center justify-between p-6 pt-12 bg-transparent">
-<button class="flex h-10 w-10 items-center justify-center rounded-full bg-black/20 backdrop-blur-md text-white hover:bg-black/30 transition">
+<button id="voice-back-btn" class="flex h-10 w-10 items-center justify-center rounded-full bg-black/20 backdrop-blur-md text-white hover:bg-black/30 transition">
 <span class="material-symbols-outlined text-2xl">arrow_back</span>
 </button>
 <h2 class="text-white text-lg font-bold tracking-tight">AI Assistant</h2>
@@ -78,7 +78,7 @@
 <div class="h-32 w-32 rounded-full border border-white/30 bg-white/10"></div>
 </div>
 <!-- Main Button -->
-<button class="relative z-10 flex h-20 w-20 items-center justify-center rounded-full bg-white shadow-[0_0_40px_-10px_rgba(255,255,255,0.6)] transition transform active:scale-95">
+<button id="voice-mic-btn" class="relative z-10 flex h-20 w-20 items-center justify-center rounded-full bg-white shadow-[0_0_40px_-10px_rgba(255,255,255,0.6)] transition transform active:scale-95">
 <span class="material-symbols-outlined text-4xl text-primary font-bold">mic</span>
 </button>
 </div>
@@ -101,25 +101,25 @@
 </div>
 <!-- Bottom Navigation -->
 <div class="flex items-center justify-between border-t border-[#232f48] bg-background-dark px-4 pb-6 pt-3 z-20">
-<a class="flex flex-1 flex-col items-center justify-end gap-1 text-slate-400 hover:text-primary transition-colors" href="#">
+<a id="nav-home" class="flex flex-1 flex-col items-center justify-end gap-1 text-slate-400 hover:text-primary transition-colors" href="#">
 <span class="material-symbols-outlined text-[24px]">home</span>
 <span class="text-[10px] font-medium leading-normal tracking-wide">Home</span>
 </a>
-<a class="flex flex-1 flex-col items-center justify-end gap-1 text-slate-400 hover:text-primary transition-colors" href="#">
+<a id="nav-orders" class="flex flex-1 flex-col items-center justify-end gap-1 text-slate-400 hover:text-primary transition-colors" href="#">
 <span class="material-symbols-outlined text-[24px]">receipt_long</span>
 <span class="text-[10px] font-medium leading-normal tracking-wide">Orders</span>
 </a>
 <!-- Active State for Voice/Center Button -->
-<a class="relative -top-6 flex flex-col items-center justify-end gap-1" href="#">
+<a id="nav-voice" class="relative -top-6 flex flex-col items-center justify-end gap-1" href="#">
 <div class="flex h-14 w-14 items-center justify-center rounded-full bg-primary text-white shadow-lg shadow-primary/40 ring-4 ring-background-dark">
 <span class="material-symbols-outlined text-[28px]">mic</span>
 </div>
 </a>
-<a class="flex flex-1 flex-col items-center justify-end gap-1 text-slate-400 hover:text-primary transition-colors" href="#">
+<a id="nav-wallet" class="flex flex-1 flex-col items-center justify-end gap-1 text-slate-400 hover:text-primary transition-colors" href="#">
 <span class="material-symbols-outlined text-[24px]">account_balance_wallet</span>
 <span class="text-[10px] font-medium leading-normal tracking-wide">Wallet</span>
 </a>
-<a class="flex flex-1 flex-col items-center justify-end gap-1 text-slate-400 hover:text-primary transition-colors" href="#">
+<a id="nav-profile" class="flex flex-1 flex-col items-center justify-end gap-1 text-slate-400 hover:text-primary transition-colors" href="#">
 <span class="material-symbols-outlined text-[24px]">person</span>
 <span class="text-[10px] font-medium leading-normal tracking-wide">Account</span>
 </a>

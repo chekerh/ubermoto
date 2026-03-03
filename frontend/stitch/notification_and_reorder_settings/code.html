@@ -50,7 +50,7 @@
 <body class="bg-background-light dark:bg-background-dark font-display antialiased min-h-screen flex flex-col">
 <!-- Header -->
 <div class="sticky top-0 z-10 flex items-center justify-between bg-surface-light dark:bg-surface-dark p-4 border-b border-border-light dark:border-border-dark shadow-sm">
-<button class="text-text-main-light dark:text-text-main-dark flex size-10 shrink-0 items-center justify-center rounded-full hover:bg-border-light dark:hover:bg-border-dark transition-colors">
+<button id="notif-back-btn" class="text-text-main-light dark:text-text-main-dark flex size-10 shrink-0 items-center justify-center rounded-full hover:bg-border-light dark:hover:bg-border-dark transition-colors">
 <span class="material-symbols-outlined">arrow_back</span>
 </button>
 <h2 class="text-text-main-light dark:text-text-main-dark text-lg font-bold leading-tight flex-1 text-center pr-10">Settings</h2>
@@ -182,11 +182,11 @@
 <!-- Bottom Navigation -->
 <nav class="fixed bottom-0 left-0 right-0 border-t border-border-light dark:border-border-dark bg-surface-light dark:bg-surface-dark px-6 pb-6 pt-3 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)] z-20">
 <div class="flex justify-between items-center max-w-lg mx-auto">
-<a class="flex flex-col items-center justify-center gap-1 text-text-sub-light dark:text-text-sub-dark hover:text-primary dark:hover:text-primary transition-colors" href="#">
+<a id="nav-home" class="flex flex-col items-center justify-center gap-1 text-text-sub-light dark:text-text-sub-dark hover:text-primary dark:hover:text-primary transition-colors" href="#">
 <span class="material-symbols-outlined text-[28px]">home</span>
 <span class="text-[10px] font-medium tracking-wide">Home</span>
 </a>
-<a class="flex flex-col items-center justify-center gap-1 text-text-sub-light dark:text-text-sub-dark hover:text-primary dark:hover:text-primary transition-colors" href="#">
+<a id="nav-activity" class="flex flex-col items-center justify-center gap-1 text-text-sub-light dark:text-text-sub-dark hover:text-primary dark:hover:text-primary transition-colors" href="#">
 <span class="material-symbols-outlined text-[28px]">history</span>
 <span class="text-[10px] font-medium tracking-wide">Activity</span>
 </a>
@@ -195,11 +195,11 @@
 <span class="material-symbols-outlined text-[32px]">two_wheeler</span>
 </button>
 </div>
-<a class="flex flex-col items-center justify-center gap-1 text-text-sub-light dark:text-text-sub-dark hover:text-primary dark:hover:text-primary transition-colors" href="#">
+<a id="nav-wallet" class="flex flex-col items-center justify-center gap-1 text-text-sub-light dark:text-text-sub-dark hover:text-primary dark:hover:text-primary transition-colors" href="#">
 <span class="material-symbols-outlined text-[28px]">account_balance_wallet</span>
 <span class="text-[10px] font-medium tracking-wide">Wallet</span>
 </a>
-<a class="flex flex-col items-center justify-center gap-1 text-primary dark:text-primary" href="#">
+<a id="nav-profile" class="flex flex-col items-center justify-center gap-1 text-primary dark:text-primary" href="#">
 <span class="material-symbols-outlined text-[28px] fill-current font-variation-settings-fill">person</span>
 <span class="text-[10px] font-medium tracking-wide">Account</span>
 </a>
