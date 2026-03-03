@@ -17,6 +17,20 @@ interface AuthenticatedSocket extends Socket {
   userRole?: UserRole;
 }
 
+interface SubscribeToDeliveryData {
+  deliveryId: string;
+}
+
+interface UnsubscribeFromDeliveryData {
+  deliveryId: string;
+}
+
+interface UpdateLocationData {
+  deliveryId: string;
+  latitude: number;
+  longitude: number;
+}
+
 @Injectable()
 @WebSocketGateway({
   cors: {
@@ -32,7 +46,7 @@ export class DeliveryGateway implements OnGatewayConnection, OnGatewayDisconnect
 
   constructor(private readonly jwtService: JwtService) {}
 
-  async handleConnection(client: AuthenticatedSocket) {
+  async handleConnection(client: AuthenticatedSocket): Promise<void> {
     try {
       const token = client.handshake.auth.token || (client.handshake.query.token as string);
 
@@ -60,35 +74,35 @@ export class DeliveryGateway implements OnGatewayConnection, OnGatewayDisconnect
     }
   }
 
-  handleDisconnect(client: AuthenticatedSocket) {
+  async handleDisconnect(client: AuthenticatedSocket): Promise<void> {
     this.logger.log(`Client disconnected: ${client.userId}`);
   }
 
-  @SubscribeMessage('subscribe_to_delivery')
-  handleSubscribeToDelivery(
-    @MessageBody() data: { deliveryId: string },
+  @SubscribeMessage('subscribeToDelivery')
+  async handleSubscribeToDelivery(
+    @MessageBody() data: SubscribeToDeliveryData,
     @ConnectedSocket() client: AuthenticatedSocket,
-  ) {
+  ): Promise<{ success: boolean }> {
     client.join(`delivery_${data.deliveryId}`);
     this.logger.log(`User ${client.userId} subscribed to delivery ${data.deliveryId}`);
     return { success: true };
   }
 
-  @SubscribeMessage('unsubscribe_from_delivery')
-  handleUnsubscribeFromDelivery(
-    @MessageBody() data: { deliveryId: string },
+  @SubscribeMessage('unsubscribeFromDelivery')
+  async handleUnsubscribeFromDelivery(
+    @MessageBody() data: UnsubscribeFromDeliveryData,
     @ConnectedSocket() client: AuthenticatedSocket,
-  ) {
+  ): Promise<{ success: boolean }> {
     client.leave(`delivery_${data.deliveryId}`);
     this.logger.log(`User ${client.userId} unsubscribed from delivery ${data.deliveryId}`);
     return { success: true };
   }
 
-  @SubscribeMessage('update_location')
-  handleUpdateLocation(
-    @MessageBody() data: { deliveryId: string; latitude: number; longitude: number },
+  @SubscribeMessage('updateLocation')
+  async handleUpdateLocation(
+    @MessageBody() data: UpdateLocationData,
     @ConnectedSocket() client: AuthenticatedSocket,
-  ) {
+  ): Promise<{ success: boolean } | { error: string }> {
     // Only drivers can update location
     if (client.userRole !== UserRole.DRIVER) {
       return { error: 'Unauthorized' };
