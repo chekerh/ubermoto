@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Driver Earnings &amp; Payouts</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#f47b25",
+                        "primary-dark": "#d96616",
+                        "secondary": "#1e3a8a", 
+                        "background-light": "#f8f7f5",
+                        "background-dark": "#1a1a1a",
+                        "surface-dark": "#2d2d2d",
+                    },
+                    fontFamily: {
+                        "display": ["Plus Jakarta Sans", "sans-serif"]
+                    },
+                    borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "2xl": "1rem", "3xl": "1.5rem", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+<style>
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background-light dark:bg-background-dark font-display text-slate-900 dark:text-slate-100 antialiased min-h-screen pb-6">
+<header class="fixed top-0 w-full z-40 bg-background-light/90 dark:bg-background-dark/90 backdrop-blur-md pt-12 pb-4 px-6 border-b border-slate-200 dark:border-slate-800">
+<div class="flex items-center justify-between">
+<button class="p-2 -ml-2 rounded-full hover:bg-slate-200 dark:hover:bg-slate-800 transition-colors">
+<span class="material-symbols-outlined text-slate-800 dark:text-white">arrow_back</span>
+</button>
+<h1 class="text-lg font-bold text-slate-800 dark:text-white">Earnings &amp; Payouts</h1>
+<button class="p-2 -mr-2 rounded-full hover:bg-slate-200 dark:hover:bg-slate-800 transition-colors">
+<span class="material-symbols-outlined text-slate-800 dark:text-white">help</span>
+</button>
+</div>
+</header>
+<main class="pt-28 px-5 pb-24">
+<div class="relative w-full bg-gradient-to-br from-slate-900 to-slate-800 dark:from-surface-dark dark:to-black rounded-3xl p-6 shadow-xl shadow-slate-300 dark:shadow-none mb-6 overflow-hidden">
+<div class="absolute -right-10 -top-10 w-40 h-40 bg-primary/10 rounded-full blur-2xl"></div>
+<div class="relative z-10 flex flex-col items-center text-center gap-1">
+<span class="text-slate-400 text-sm font-medium">Available Balance</span>
+<h2 class="text-4xl font-extrabold text-white tracking-tight flex items-baseline gap-1">
+<span class="text-2xl text-slate-400">TND</span> 485.50
+                </h2>
+<div class="flex items-center gap-2 mt-1 text-green-400 text-sm font-medium bg-green-400/10 px-2 py-0.5 rounded-full">
+<span class="material-symbols-outlined text-sm">trending_up</span>
+                    +12.5% this week
+                </div>
+</div>
+<div class="mt-6 pt-6 border-t border-slate-700 grid grid-cols-2 divide-x divide-slate-700">
+<div class="text-center px-2">
+<div class="text-xs text-slate-400 uppercase tracking-wider mb-1">Last Payout</div>
+<div class="text-white font-semibold">TND 1,240.00</div>
+<div class="text-xs text-slate-500">Oct 24</div>
+</div>
+<div class="text-center px-2">
+<div class="text-xs text-slate-400 uppercase tracking-wider mb-1">Pending</div>
+<div class="text-white font-semibold">TND 45.00</div>
+<div class="text-xs text-slate-500">Processing</div>
+</div>
+</div>
+<button class="w-full mt-6 bg-primary hover:bg-primary-dark active:bg-primary-dark text-white font-bold py-3.5 rounded-xl shadow-lg shadow-primary/20 transition-all flex items-center justify-center gap-2">
+<span>Request Payout</span>
+<span class="material-symbols-outlined text-lg">payments</span>
+</button>
+</div>
+<div class="bg-white dark:bg-surface-dark rounded-2xl p-5 shadow-sm border border-slate-100 dark:border-slate-800 mb-6">
+<div class="flex justify-between items-center mb-6">
+<h3 class="font-bold text-slate-800 dark:text-white">Weekly Activity</h3>
+<select class="bg-slate-50 dark:bg-slate-800 border-none text-xs font-semibold text-slate-600 dark:text-slate-300 rounded-lg py-1.5 pl-3 pr-8 focus:ring-1 focus:ring-primary">
+<option>This Week</option>
+<option>Last Week</option>
+</select>
+</div>
+<div class="flex items-end justify-between h-40 gap-2 sm:gap-4 relative">
+<div class="absolute inset-0 flex flex-col justify-between pointer-events-none z-0">
+<div class="w-full h-px bg-slate-100 dark:bg-slate-700 dashed border-t border-dashed border-slate-200 dark:border-slate-700"></div>
+<div class="w-full h-px bg-slate-100 dark:bg-slate-700 dashed border-t border-dashed border-slate-200 dark:border-slate-700"></div>
+<div class="w-full h-px bg-slate-100 dark:bg-slate-700 dashed border-t border-dashed border-slate-200 dark:border-slate-700"></div>
+<div class="w-full h-px bg-slate-100 dark:bg-slate-700 dashed border-t border-dashed border-slate-200 dark:border-slate-700"></div>
+</div>
+<div class="flex flex-col items-center gap-2 flex-1 z-10 group cursor-pointer">
+<div class="w-full max-w-[24px] bg-slate-100 dark:bg-slate-700 rounded-t-lg h-[40%] relative group-hover:bg-primary/30 transition-colors">
+<div class="absolute -top-8 left-1/2 -translate-x-1/2 bg-slate-800 text-white text-[10px] px-1.5 py-0.5 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">40 TND</div>
+</div>
+<span class="text-xs text-slate-400 font-medium">Mo</span>
+</div>
+<div class="flex flex-col items-center gap-2 flex-1 z-10 group cursor-pointer">
+<div class="w-full max-w-[24px] bg-slate-100 dark:bg-slate-700 rounded-t-lg h-[65%] relative group-hover:bg-primary/30 transition-colors">
+<div class="absolute -top-8 left-1/2 -translate-x-1/2 bg-slate-800 text-white text-[10px] px-1.5 py-0.5 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">65 TND</div>
+</div>
+<span class="text-xs text-slate-400 font-medium">Tu</span>
+</div>
+<div class="flex flex-col items-center gap-2 flex-1 z-10 group cursor-pointer">
+<div class="w-full max-w-[24px] bg-slate-100 dark:bg-slate-700 rounded-t-lg h-[30%] relative group-hover:bg-primary/30 transition-colors">
+<div class="absolute -top-8 left-1/2 -translate-x-1/2 bg-slate-800 text-white text-[10px] px-1.5 py-0.5 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">30 TND</div>
+</div>
+<span class="text-xs text-slate-400 font-medium">We</span>
+</div>
+<div class="flex flex-col items-center gap-2 flex-1 z-10 group cursor-pointer">
+<div class="w-full max-w-[24px] bg-primary rounded-t-lg h-[85%] shadow-[0_0_15px_rgba(244,123,37,0.4)] relative">
+<div class="absolute -top-8 left-1/2 -translate-x-1/2 bg-slate-800 text-white text-[10px] px-1.5 py-0.5 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">85 TND</div>
+</div>
+<span class="text-xs text-slate-800 dark:text-white font-bold">Th</span>
+</div>
+<div class="flex flex-col items-center gap-2 flex-1 z-10 group cursor-pointer">
+<div class="w-full max-w-[24px] bg-slate-100 dark:bg-slate-700 rounded-t-lg h-[55%] relative group-hover:bg-primary/30 transition-colors">
+<div class="absolute -top-8 left-1/2 -translate-x-1/2 bg-slate-800 text-white text-[10px] px-1.5 py-0.5 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">55 TND</div>
+</div>
+<span class="text-xs text-slate-400 font-medium">Fr</span>
+</div>
+<div class="flex flex-col items-center gap-2 flex-1 z-10 group cursor-pointer">
+<div class="w-full max-w-[24px] bg-slate-100 dark:bg-slate-700 rounded-t-lg h-[90%] relative group-hover:bg-primary/30 transition-colors">
+<div class="absolute -top-8 left-1/2 -translate-x-1/2 bg-slate-800 text-white text-[10px] px-1.5 py-0.5 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">90 TND</div>
+</div>
+<span class="text-xs text-slate-400 font-medium">Sa</span>
+</div>
+<div class="flex flex-col items-center gap-2 flex-1 z-10 group cursor-pointer">
+<div class="w-full max-w-[24px] bg-slate-100 dark:bg-slate-700 rounded-t-lg h-[45%] relative group-hover:bg-primary/30 transition-colors">
+<div class="absolute -top-8 left-1/2 -translate-x-1/2 bg-slate-800 text-white text-[10px] px-1.5 py-0.5 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">45 TND</div>
+</div>
+<span class="text-xs text-slate-400 font-medium">Su</span>
+</div>
+</div>
+</div>
+<div class="flex justify-between items-center mb-4 mt-8">
+<h3 class="font-bold text-lg text-slate-800 dark:text-white">Recent Transactions</h3>
+<a class="text-primary text-sm font-semibold hover:text-primary-dark" href="#">View All</a>
+</div>
+<div class="flex flex-col gap-3">
+<div class="bg-white dark:bg-surface-dark p-4 rounded-xl shadow-sm border border-slate-100 dark:border-slate-800 flex items-center justify-between">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-full bg-blue-50 dark:bg-blue-900/30 flex items-center justify-center text-blue-600 dark:text-blue-400">
+<span class="material-symbols-outlined text-xl">two_wheeler</span>
+</div>
+<div>
+<h4 class="text-sm font-bold text-slate-800 dark:text-slate-100">Lac 2 to La Marsa</h4>
+<p class="text-xs text-slate-400 mt-0.5">Today, 10:23 AM</p>
+</div>
+</div>
+<div class="text-right">
+<p class="font-bold text-slate-800 dark:text-white">+ 12.50 TND</p>
+<div class="flex items-center justify-end gap-1 mt-0.5">
+<span class="w-1.5 h-1.5 rounded-full bg-green-500"></span>
+<span class="text-[10px] text-slate-400 font-medium uppercase">Completed</span>
+</div>
+</div>
+</div>
+<div class="bg-white dark:bg-surface-dark p-4 rounded-xl shadow-sm border border-slate-100 dark:border-slate-800 flex items-center justify-between">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-full bg-orange-50 dark:bg-orange-900/30 flex items-center justify-center text-primary">
+<span class="material-symbols-outlined text-xl">person</span>
+</div>
+<div>
+<h4 class="text-sm font-bold text-slate-800 dark:text-slate-100">Bardo to Centre Ville</h4>
+<p class="text-xs text-slate-400 mt-0.5">Today, 09:15 AM</p>
+</div>
+</div>
+<div class="text-right">
+<p class="font-bold text-slate-800 dark:text-white">+ 8.20 TND</p>
+<div class="flex items-center justify-end gap-1 mt-0.5">
+<span class="w-1.5 h-1.5 rounded-full bg-green-500"></span>
+<span class="text-[10px] text-slate-400 font-medium uppercase">Completed</span>
+</div>
+</div>
+</div>
+<div class="bg-white dark:bg-surface-dark p-4 rounded-xl shadow-sm border border-slate-100 dark:border-slate-800 flex items-center justify-between">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-full bg-yellow-50 dark:bg-yellow-900/20 flex items-center justify-center text-yellow-600 dark:text-yellow-500">
+<span class="material-symbols-outlined text-xl">star</span>
+</div>
+<div>
+<h4 class="text-sm font-bold text-slate-800 dark:text-slate-100">Customer Tip</h4>
+<p class="text-xs text-slate-400 mt-0.5">Yesterday, 18:45 PM</p>
+</div>
+</div>
+<div class="text-right">
+<p class="font-bold text-slate-800 dark:text-white">+ 2.00 TND</p>
+<div class="flex items-center justify-end gap-1 mt-0.5">
+<span class="w-1.5 h-1.5 rounded-full bg-green-500"></span>
+<span class="text-[10px] text-slate-400 font-medium uppercase">Received</span>
+</div>
+</div>
+</div>
+<div class="bg-white dark:bg-surface-dark p-4 rounded-xl shadow-sm border border-slate-100 dark:border-slate-800 flex items-center justify-between opacity-75">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-full bg-slate-100 dark:bg-slate-700 flex items-center justify-center text-slate-500 dark:text-slate-400">
+<span class="material-symbols-outlined text-xl">account_balance</span>
+</div>
+<div>
+<h4 class="text-sm font-bold text-slate-800 dark:text-slate-100">Payout to Bank</h4>
+<p class="text-xs text-slate-400 mt-0.5">Oct 24, 14:00 PM</p>
+</div>
+</div>
+<div class="text-right">
+<p class="font-bold text-slate-800 dark:text-white">- 1,240.00 TND</p>
+<div class="flex items-center justify-end gap-1 mt-0.5">
+<span class="w-1.5 h-1.5 rounded-full bg-slate-400"></span>
+<span class="text-[10px] text-slate-400 font-medium uppercase">Processed</span>
+</div>
+</div>
+</div>
+</div>
+</main>
+<nav class="fixed bottom-0 w-full bg-white dark:bg-surface-dark border-t border-slate-200 dark:border-slate-800 px-6 py-3 pb-8 z-50">
+<div class="flex justify-between items-center">
+<button class="flex flex-col items-center gap-1 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300">
+<span class="material-symbols-outlined">home</span>
+<span class="text-[10px] font-medium">Home</span>
+</button>
+<button class="flex flex-col items-center gap-1 text-primary">
+<span class="material-symbols-outlined fill-1">account_balance_wallet</span>
+<span class="text-[10px] font-medium">Earnings</span>
+</button>
+<button class="relative -top-6 bg-slate-900 dark:bg-primary text-white p-4 rounded-full shadow-lg shadow-primary/30 dark:shadow-black/50">
+<span class="material-symbols-outlined text-2xl">qr_code_scanner</span>
+</button>
+<button class="flex flex-col items-center gap-1 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300">
+<span class="material-symbols-outlined">history</span>
+<span class="text-[10px] font-medium">Activity</span>
+</button>
+<button class="flex flex-col items-center gap-1 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300">
+<span class="material-symbols-outlined">person</span>
+<span class="text-[10px] font-medium">Profile</span>
+</button>
+</div>
+</nav>
+
+</body></html>

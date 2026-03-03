@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+
+<html lang="fr"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Driver Training Hub - UberMoto</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Lexend:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#136dec",
+                        "background-light": "#f6f7f8",
+                        "background-dark": "#101822",
+                    },
+                    fontFamily: {
+                        "display": ["Lexend", "sans-serif"]
+                    },
+                    borderRadius: { "DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px" },
+                },
+            },
+        }
+    </script>
+<style>
+        .scrollbar-hide::-webkit-scrollbar {
+            display: none;
+        }
+        .scrollbar-hide {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background-light dark:bg-background-dark font-display text-slate-900 dark:text-slate-100 antialiased selection:bg-primary/30">
+<div class="relative flex h-full min-h-screen w-full flex-col overflow-hidden max-w-md mx-auto shadow-2xl bg-white dark:bg-slate-900">
+<!-- Header -->
+<div class="flex items-center p-4 pb-2 justify-between sticky top-0 z-10 bg-white/90 dark:bg-slate-900/90 backdrop-blur-sm border-b border-slate-100 dark:border-slate-800">
+<button class="text-slate-900 dark:text-white flex size-12 shrink-0 items-center justify-center rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">
+<span class="material-symbols-outlined text-2xl">arrow_back</span>
+</button>
+<h2 class="text-slate-900 dark:text-white text-lg font-bold leading-tight tracking-[-0.015em] flex-1 text-center">Centre d'apprentissage</h2>
+<button class="flex size-12 items-center justify-center rounded-full text-slate-900 dark:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">
+<span class="material-symbols-outlined text-2xl">info</span>
+</button>
+</div>
+<!-- Main Content -->
+<div class="flex-1 overflow-y-auto scrollbar-hide pb-20">
+<!-- Hero / Welcome -->
+<div class="px-4 py-6 bg-gradient-to-r from-primary to-[#4ba1ff] text-white rounded-b-3xl mb-6 shadow-lg relative overflow-hidden">
+<div class="absolute right-0 top-0 opacity-10 transform translate-x-10 -translate-y-10">
+<span class="material-symbols-outlined text-[180px]">two_wheeler</span>
+</div>
+<div class="relative z-10">
+<h1 class="text-2xl font-bold mb-1">Ahlan, Mohamed !</h1>
+<p class="text-blue-50 text-sm font-medium opacity-90">Devenez un pro d'UberMoto.</p>
+</div>
+</div>
+<!-- Progress Tracker -->
+<div class="px-4 mb-8">
+<div class="flex items-center justify-between mb-3">
+<h2 class="text-slate-900 dark:text-white text-xl font-bold">Votre progression</h2>
+<span class="text-primary font-bold bg-primary/10 px-3 py-1 rounded-full text-xs">Niveau 1</span>
+</div>
+<div class="bg-white dark:bg-slate-800 p-5 rounded-xl border border-slate-100 dark:border-slate-700 shadow-sm">
+<div class="flex gap-6 justify-between mb-3">
+<p class="text-slate-700 dark:text-slate-300 text-sm font-medium">3 modules sur 8 terminés</p>
+<span class="text-slate-500 dark:text-slate-400 text-sm font-bold">37%</span>
+</div>
+<div class="h-3 w-full rounded-full bg-slate-100 dark:bg-slate-700 overflow-hidden">
+<div class="h-full rounded-full bg-primary transition-all duration-500" style="width: 37%;"></div>
+</div>
+<p class="text-slate-500 dark:text-slate-400 text-xs mt-3 flex items-center gap-2">
+<span class="material-symbols-outlined text-base text-yellow-500">emoji_events</span>
+                        Continuez comme ça pour débloquer les bonus !
+                    </p>
+</div>
+</div>
+<!-- Video Modules -->
+<div class="px-4 mb-8">
+<div class="flex items-center justify-between mb-4">
+<h3 class="text-slate-900 dark:text-white text-xl font-bold">Modules vidéo</h3>
+<a class="text-primary text-sm font-medium hover:underline" href="#">Voir tout</a>
+</div>
+<div class="flex flex-col gap-4">
+<!-- Module 1 -->
+<div class="group flex gap-4 bg-white dark:bg-slate-800 p-3 rounded-xl border border-slate-100 dark:border-slate-700 shadow-sm hover:shadow-md transition-all cursor-pointer">
+<div class="relative w-28 h-20 shrink-0 rounded-lg overflow-hidden bg-slate-200">
+<img alt="Person driving a car safely" class="w-full h-full object-cover transition-transform group-hover:scale-105" data-alt="Person driving a car safely" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCfz17hUnvcgCe2eYIHKpyOt0USf64RzTHwOic0DiRpM01LLvbvyR1_NdWe0c58Nf1257-BtPwns624Gu0iKKtLKA8w2vQx4F9MMcMlHf1gpPLSgQL5eO1UcNCrUBuGNqvQwrdlpR81Xvy_pJ-yZcJ-s9BuuZkb10m1DWudzUsbq3SiPAAuQRNGKNPZk1OtJs2fvyd68e8CCgMxdH-ND0sWLjr4eEC5kYAj6DCIPxgwkyfjng0XXlUQ9yNsGlAwbSNd2gnI0QJyEw8"/>
+<div class="absolute inset-0 bg-black/20 flex items-center justify-center">
+<span class="material-symbols-outlined text-white bg-white/20 rounded-full p-1 backdrop-blur-sm">play_arrow</span>
+</div>
+</div>
+<div class="flex flex-col justify-between py-1">
+<div>
+<h4 class="text-slate-900 dark:text-white font-semibold text-sm line-clamp-2 leading-tight">Conseils de sécurité routière</h4>
+<p class="text-slate-500 dark:text-slate-400 text-xs mt-1">5 min • Obligatoire</p>
+</div>
+<span class="text-green-600 text-xs font-medium flex items-center gap-1">
+<span class="material-symbols-outlined text-sm">check_circle</span> Terminé
+                            </span>
+</div>
+</div>
+<!-- Module 2 -->
+<div class="group flex gap-4 bg-white dark:bg-slate-800 p-3 rounded-xl border border-slate-100 dark:border-slate-700 shadow-sm hover:shadow-md transition-all cursor-pointer">
+<div class="relative w-28 h-20 shrink-0 rounded-lg overflow-hidden bg-slate-200">
+<img alt="Hand holding smartphone with map app" class="w-full h-full object-cover transition-transform group-hover:scale-105" data-alt="Hand holding smartphone with map app" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDMmBTN7qquQ7EIWNfAq4sbbPHDT0nrZd3KWsV0KFhVpIitPfvyC50fjhKF0WPADLkuETitcRxexp_1hlAZ8N1Zh8HfgAmiahZMLCEB3OYqVxKBtIeTo8xTFDCJQ8tHxYjRrrDUdhF_5wcZC10Gnve2PYcghxWE-x8Az6lBv2kJYuVAMrJ7Q9MZzeKiZfBnUhm0Ko115j24oqtg_5bFInq-_eXC03yDwuhYoE0xJDd7XbhuqwR9HGJMjEvQFe2kWarEosuzpl_eEDk"/>
+<div class="absolute inset-0 bg-black/20 flex items-center justify-center">
+<span class="material-symbols-outlined text-white bg-white/20 rounded-full p-1 backdrop-blur-sm">play_arrow</span>
+</div>
+</div>
+<div class="flex flex-col justify-between py-1">
+<div>
+<h4 class="text-slate-900 dark:text-white font-semibold text-sm line-clamp-2 leading-tight">Tutoriel de l'application UberMoto</h4>
+<p class="text-slate-500 dark:text-slate-400 text-xs mt-1">12 min • Essentiel</p>
+</div>
+<div class="w-full bg-slate-100 dark:bg-slate-700 h-1.5 rounded-full mt-2">
+<div class="bg-primary h-full rounded-full w-1/2"></div>
+</div>
+</div>
+</div>
+<!-- Module 3 -->
+<div class="group flex gap-4 bg-white dark:bg-slate-800 p-3 rounded-xl border border-slate-100 dark:border-slate-700 shadow-sm hover:shadow-md transition-all cursor-pointer">
+<div class="relative w-28 h-20 shrink-0 rounded-lg overflow-hidden bg-slate-200">
+<img alt="Customer service interaction smiling" class="w-full h-full object-cover transition-transform group-hover:scale-105" data-alt="Customer service interaction smiling" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBY_Hqz2vNTE2ueRmPKJA9ByBlDFTvC9tyrYJllVmDk6hOjkX6wD3F0Gz03zrPLVJGpsG_QXX7QZ4XCpaiU93I368JEdPrcs5AgV5jo0n7vzUhj4Ln12evnQ98A_vCf808OsFtmNSknpaIwx6DsOdF2W2wHgaP3B5lMFdLK6t1R3lnPMZv7ao6mrU92ECs5xUE4tzZg1xeq3JajQi-ZA_IB4uwubFodzHv0rVPIrfPoS61kflH0hqbHbejD9o0kkmVxmt4_xl-cyhc"/>
+<div class="absolute inset-0 bg-black/20 flex items-center justify-center">
+<span class="material-symbols-outlined text-white bg-white/20 rounded-full p-1 backdrop-blur-sm">lock</span>
+</div>
+</div>
+<div class="flex flex-col justify-between py-1">
+<div>
+<h4 class="text-slate-900 dark:text-white font-semibold text-sm line-clamp-2 leading-tight">Service client &amp; Bonnes pratiques</h4>
+<p class="text-slate-500 dark:text-slate-400 text-xs mt-1">8 min • Recommandé</p>
+</div>
+<span class="text-slate-400 text-xs font-medium flex items-center gap-1">
+<span class="material-symbols-outlined text-sm">schedule</span> À venir
+                            </span>
+</div>
+</div>
+</div>
+</div>
+<!-- Quiz Section -->
+<div class="px-4 mb-8">
+<h3 class="text-slate-900 dark:text-white text-xl font-bold mb-4">Quiz de connaissances</h3>
+<div class="bg-gradient-to-br from-slate-800 to-slate-900 rounded-xl p-5 text-white relative overflow-hidden shadow-lg">
+<!-- Decorative Pattern -->
+<div class="absolute top-0 right-0 w-32 h-32 bg-white/5 rounded-full -mr-10 -mt-10 blur-2xl"></div>
+<div class="absolute bottom-0 left-0 w-24 h-24 bg-primary/20 rounded-full -ml-8 -mb-8 blur-xl"></div>
+<div class="relative z-10 flex gap-4 items-center">
+<div class="bg-white/10 p-3 rounded-full shrink-0">
+<span class="material-symbols-outlined text-2xl text-yellow-400">psychology</span>
+</div>
+<div class="flex-1">
+<h4 class="font-bold text-lg mb-1">Testez vos acquis</h4>
+<p class="text-slate-300 text-xs mb-3">Répondez à 5 questions pour valider votre badge de sécurité.</p>
+<button class="bg-primary hover:bg-primary/90 text-white text-xs font-bold py-2 px-4 rounded-lg transition-colors w-full sm:w-auto">
+                                Commencer le Quiz
+                            </button>
+</div>
+</div>
+</div>
+</div>
+<!-- Support Resources -->
+<div class="px-4 pb-8">
+<h3 class="text-slate-900 dark:text-white text-xl font-bold mb-4">Ressources utiles</h3>
+<div class="grid grid-cols-2 gap-3">
+<a class="flex flex-col items-center justify-center gap-2 p-4 rounded-xl bg-primary/5 hover:bg-primary/10 transition-colors border border-primary/10" href="#">
+<span class="material-symbols-outlined text-primary text-3xl">menu_book</span>
+<span class="text-slate-900 dark:text-white text-xs font-semibold">Guide PDF</span>
+</a>
+<a class="flex flex-col items-center justify-center gap-2 p-4 rounded-xl bg-primary/5 hover:bg-primary/10 transition-colors border border-primary/10" href="#">
+<span class="material-symbols-outlined text-primary text-3xl">support_agent</span>
+<span class="text-slate-900 dark:text-white text-xs font-semibold">Support Chauffeur</span>
+</a>
+</div>
+</div>
+</div>
+<!-- Bottom Navigation -->
+<div class="flex gap-2 border-t border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 px-4 pb-6 pt-3 sticky bottom-0 z-20">
+<a class="flex flex-1 flex-col items-center justify-end gap-1 text-slate-400 dark:text-slate-500 hover:text-primary transition-colors" href="#">
+<span class="material-symbols-outlined text-[24px]">home</span>
+<p class="text-xs font-medium leading-normal tracking-[0.015em]">Accueil</p>
+</a>
+<a class="flex flex-1 flex-col items-center justify-end gap-1 text-slate-400 dark:text-slate-500 hover:text-primary transition-colors" href="#">
+<span class="material-symbols-outlined text-[24px]">payments</span>
+<p class="text-xs font-medium leading-normal tracking-[0.015em]">Revenus</p>
+</a>
+<a class="flex flex-1 flex-col items-center justify-end gap-1 text-primary" href="#">
+<div class="bg-primary/10 px-5 py-1 rounded-full flex flex-col items-center">
+<span class="material-symbols-outlined text-[24px] font-variation-settings-fill">school</span>
+</div>
+<p class="text-xs font-medium leading-normal tracking-[0.015em]">Formation</p>
+</a>
+<a class="flex flex-1 flex-col items-center justify-end gap-1 text-slate-400 dark:text-slate-500 hover:text-primary transition-colors" href="#">
+<span class="material-symbols-outlined text-[24px]">person</span>
+<p class="text-xs font-medium leading-normal tracking-[0.015em]">Profil</p>
+</a>
+</div>
+</div>
+</body></html>

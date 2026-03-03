@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>UberMoto - Live Order Tracking</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#f47b25",
+                        "background-light": "#f8f7f5",
+                        "background-dark": "#221710",
+                    },
+                    fontFamily: {
+                        "display": ["Plus Jakarta Sans", "sans-serif"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "2xl": "1rem",
+                        "3xl": "1.5rem",
+                        "full": "9999px"
+                    },
+                },
+            },
+        }
+    </script>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background-light dark:bg-background-dark font-display text-slate-900 dark:text-slate-100 antialiased overflow-hidden h-screen flex flex-col">
+<!-- Main Content Area (Map + Bottom Sheet) -->
+<div class="relative flex-1 flex flex-col overflow-hidden">
+<!-- Header Overlay -->
+<div class="absolute top-0 left-0 w-full z-20 pt-12 pb-2 px-4 bg-gradient-to-b from-background-light/90 to-transparent dark:from-background-dark/90 pointer-events-none">
+<div class="flex items-center justify-between pointer-events-auto">
+<button class="flex size-10 items-center justify-center rounded-full bg-background-light dark:bg-background-dark shadow-md text-slate-900 dark:text-slate-100">
+<span class="material-symbols-outlined">arrow_back</span>
+</button>
+<h2 class="text-slate-900 dark:text-slate-100 text-lg font-bold">Order #8321</h2>
+<button class="px-4 py-2 bg-background-light dark:bg-background-dark rounded-full text-primary font-bold text-sm shadow-md">
+                    Help
+                </button>
+</div>
+</div>
+<!-- Map Area -->
+<div class="relative w-full h-[55%] bg-slate-200 dark:bg-slate-800 z-0">
+<!-- Simulated Map Background -->
+<div class="w-full h-full bg-cover bg-center opacity-80" data-alt="Map of Tunis showing streets and blocks" data-location="Tunis, Tunisia" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuB_Pj7MxdyCOEhdxC5iZRsgMO_KWOL__8LaiIYFHPVrr0HqH50co4J4neOsH7ugomcLBTa8LILEA9QUBPxmDuzEcRXv7g9zss5IyoFvpQ4g1wCHyMHzGZI0_hJm22cBB-XJpL5-MPCTuS9EgIIX_toV9F9qZQHdOuYCBJ9RMOWwlqp_ndaITQDvY9lkig0K2tij7eHW3Xs0NPhH8Jo6hDeC6OvUAroUHwc58BPWPJDplAc8BZnDAMJHAn3x191gji6EQdLJFa6jGXc');"></div>
+<!-- Map Elements -->
+<div class="absolute inset-0 pointer-events-none">
+<!-- Path/Route Line -->
+<svg class="absolute top-0 left-0 w-full h-full" style="z-index: 1;">
+<path d="M120 180 Q 200 250 280 320" fill="none" stroke="#f47b25" stroke-dasharray="10 6" stroke-linecap="round" stroke-width="6"></path>
+</svg>
+<!-- Current Location (Moto) -->
+<div class="absolute top-[160px] left-[100px] transform -translate-x-1/2 -translate-y-1/2 z-10 flex flex-col items-center">
+<div class="bg-primary text-white p-2 rounded-full shadow-lg border-2 border-white dark:border-background-dark animate-pulse">
+<span class="material-symbols-outlined text-xl">two_wheeler</span>
+</div>
+</div>
+<!-- Destination (House) -->
+<div class="absolute top-[320px] left-[280px] transform -translate-x-1/2 -translate-y-1/2 z-10 flex flex-col items-center">
+<div class="bg-slate-900 dark:bg-white text-white dark:text-slate-900 p-2 rounded-full shadow-lg border-2 border-white dark:border-background-dark">
+<span class="material-symbols-outlined text-xl">home</span>
+</div>
+<div class="bg-background-light dark:bg-background-dark px-2 py-1 rounded-md shadow mt-1 text-xs font-bold text-slate-800 dark:text-slate-200">
+                        15 min
+                    </div>
+</div>
+</div>
+<!-- Map Controls -->
+<div class="absolute right-4 bottom-8 flex flex-col gap-3 z-10">
+<div class="flex flex-col rounded-lg shadow-lg overflow-hidden">
+<button class="flex size-10 items-center justify-center bg-background-light dark:bg-slate-700 border-b border-slate-200 dark:border-slate-600 text-slate-700 dark:text-slate-200 active:bg-slate-100 dark:active:bg-slate-600">
+<span class="material-symbols-outlined">add</span>
+</button>
+<button class="flex size-10 items-center justify-center bg-background-light dark:bg-slate-700 text-slate-700 dark:text-slate-200 active:bg-slate-100 dark:active:bg-slate-600">
+<span class="material-symbols-outlined">remove</span>
+</button>
+</div>
+<button class="flex size-10 items-center justify-center rounded-lg bg-background-light dark:bg-slate-700 shadow-lg text-primary active:bg-slate-100 dark:active:bg-slate-600">
+<span class="material-symbols-outlined">my_location</span>
+</button>
+</div>
+</div>
+<!-- Bottom Sheet -->
+<div class="absolute bottom-0 left-0 w-full h-[50%] bg-background-light dark:bg-background-dark rounded-t-3xl shadow-[0_-4px_20px_rgba(0,0,0,0.1)] z-20 flex flex-col transform transition-transform duration-300 ease-in-out">
+<!-- Drag Handle -->
+<div class="w-full flex items-center justify-center pt-3 pb-1">
+<div class="w-12 h-1.5 rounded-full bg-slate-300 dark:bg-slate-600"></div>
+</div>
+<!-- Content Container -->
+<div class="flex-1 overflow-y-auto px-6 pb-24">
+<!-- Status Header -->
+<div class="flex items-center justify-between py-4">
+<div>
+<h2 class="text-2xl font-bold text-slate-900 dark:text-white">On the Way</h2>
+<p class="text-sm text-slate-500 dark:text-slate-400 mt-1">Arriving at 14:35</p>
+</div>
+<span class="bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wide">
+                        Live
+                    </span>
+</div>
+<!-- Progress Timeline -->
+<div class="relative py-4">
+<div class="absolute top-1/2 left-0 w-full h-1 bg-slate-200 dark:bg-slate-700 -translate-y-1/2 rounded-full"></div>
+<div class="absolute top-1/2 left-0 w-3/4 h-1 bg-primary -translate-y-1/2 rounded-full"></div>
+<div class="relative flex justify-between text-xs font-medium text-slate-500 dark:text-slate-400">
+<div class="flex flex-col items-center gap-2">
+<div class="w-4 h-4 rounded-full bg-primary ring-4 ring-background-light dark:ring-background-dark"></div>
+<span class="text-primary font-bold">Placed</span>
+</div>
+<div class="flex flex-col items-center gap-2">
+<div class="w-4 h-4 rounded-full bg-primary ring-4 ring-background-light dark:ring-background-dark"></div>
+<span class="text-primary font-bold">Picked</span>
+</div>
+<div class="flex flex-col items-center gap-2">
+<div class="w-5 h-5 rounded-full bg-primary ring-4 ring-background-light dark:ring-background-dark flex items-center justify-center shadow-lg transform scale-125">
+<div class="w-2 h-2 bg-white rounded-full animate-ping"></div>
+</div>
+<span class="text-slate-900 dark:text-white font-bold">Way</span>
+</div>
+<div class="flex flex-col items-center gap-2 opacity-50">
+<div class="w-4 h-4 rounded-full bg-slate-300 dark:bg-slate-600 ring-4 ring-background-light dark:ring-background-dark"></div>
+<span>Done</span>
+</div>
+</div>
+</div>
+<!-- Divider -->
+<div class="h-px w-full bg-slate-200 dark:bg-slate-700 my-4"></div>
+<!-- Driver Info Card -->
+<div class="flex items-center gap-4 py-2">
+<div class="relative">
+<div class="w-14 h-14 rounded-full bg-slate-200 dark:bg-slate-700 overflow-hidden border-2 border-white dark:border-slate-600 shadow-sm">
+<img alt="Driver profile photo" class="w-full h-full object-cover" data-alt="Portrait of a smiling man with short dark hair" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCddrwzQiSjkclGVxyfmoGn-ChecOe4Daeeeo62-XFumywPQNX8aS4qAYLPcCHitTds87mdEp_SOu-lk2sFXuzMVi5wKD-EsSAITPfdQFZlVna_H60mO-aggLvr1Te0OoUzxglR9sWfd7EpiYIpziT09rZ-kS1onBgwWoLGf4f9R3fGh7fV6r_7L16zoUrLgcL2td4QQEfbp-ZNnodQFRnpqK7mtLTmhv1K_y_5es_DVLvX7zULDTwXAlB4x5sdV3vmxHAyY6YlgF0"/>
+</div>
+<div class="absolute -bottom-1 -right-1 bg-primary text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full border border-white dark:border-background-dark flex items-center gap-0.5 shadow-sm">
+<span class="material-symbols-outlined text-[10px]">star</span> 4.9
+                        </div>
+</div>
+<div class="flex-1">
+<h3 class="text-lg font-bold text-slate-900 dark:text-white">Sami</h3>
+<p class="text-sm text-slate-500 dark:text-slate-400">Peugeot 103 • Blue</p>
+</div>
+<div class="flex gap-2">
+<button class="size-10 rounded-full bg-slate-100 dark:bg-slate-700 text-slate-900 dark:text-white flex items-center justify-center hover:bg-slate-200 dark:hover:bg-slate-600 transition-colors">
+<span class="material-symbols-outlined">chat</span>
+</button>
+<button class="size-10 rounded-full bg-primary text-white flex items-center justify-center shadow-lg shadow-primary/30 hover:bg-primary/90 transition-colors">
+<span class="material-symbols-outlined">call</span>
+</button>
+</div>
+</div>
+<!-- Smart Suggestion -->
+<div class="mt-6 p-4 rounded-xl bg-primary/10 border border-primary/20 flex items-center gap-3">
+<div class="size-10 rounded-lg bg-primary/20 flex items-center justify-center text-primary shrink-0">
+<span class="material-symbols-outlined">local_fire_department</span>
+</div>
+<div class="flex-1">
+<p class="text-sm font-semibold text-slate-900 dark:text-slate-100">Need more Harissa soon?</p>
+<p class="text-xs text-slate-500 dark:text-slate-400">Add to your next order for free delivery.</p>
+</div>
+<button class="text-primary font-bold text-sm">Add</button>
+</div>
+</div>
+</div>
+</div>
+<!-- Bottom Navigation Bar -->
+<div class="bg-background-light dark:bg-background-dark border-t border-slate-200 dark:border-slate-700 px-4 pb-6 pt-2 z-30 relative">
+<div class="flex justify-between items-end">
+<a class="flex flex-1 flex-col items-center justify-end gap-1 text-primary group" href="#">
+<span class="material-symbols-outlined text-2xl group-hover:scale-110 transition-transform">home</span>
+<p class="text-xs font-medium">Home</p>
+</a>
+<a class="flex flex-1 flex-col items-center justify-end gap-1 text-slate-400 dark:text-slate-500 hover:text-primary dark:hover:text-primary transition-colors group" href="#">
+<span class="material-symbols-outlined text-2xl group-hover:scale-110 transition-transform">history</span>
+<p class="text-xs font-medium">Activity</p>
+</a>
+<!-- Floating Action Button for New Order (implied center) -->
+<div class="relative -top-5">
+<button class="size-14 bg-primary rounded-full shadow-lg shadow-primary/40 flex items-center justify-center text-white transform hover:scale-105 transition-transform">
+<span class="material-symbols-outlined text-3xl">add</span>
+</button>
+</div>
+<a class="flex flex-1 flex-col items-center justify-end gap-1 text-slate-400 dark:text-slate-500 hover:text-primary dark:hover:text-primary transition-colors group" href="#">
+<span class="material-symbols-outlined text-2xl group-hover:scale-110 transition-transform">account_balance_wallet</span>
+<p class="text-xs font-medium">Wallet</p>
+</a>
+<a class="flex flex-1 flex-col items-center justify-end gap-1 text-slate-400 dark:text-slate-500 hover:text-primary dark:hover:text-primary transition-colors group" href="#">
+<span class="material-symbols-outlined text-2xl group-hover:scale-110 transition-transform">person</span>
+<p class="text-xs font-medium">Profile</p>
+</a>
+</div>
+</div>
+</body></html>

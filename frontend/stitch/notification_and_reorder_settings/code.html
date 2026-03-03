@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>UberMoto - Notification Settings</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script>
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            "primary": "#f47b25", // Vibrant orange, good for food/delivery
+            "primary-dark": "#d96615",
+            "background-light": "#fcfaf8", // Warm off-white
+            "background-dark": "#1c130d", // Deep brownish-black
+            "surface-light": "#ffffff",
+            "surface-dark": "#2a1e16",
+            "text-main-light": "#1c130d",
+            "text-main-dark": "#fcfaf8",
+            "text-sub-light": "#9c6c49",
+            "text-sub-dark": "#cbb09c",
+            "border-light": "#f4ece7",
+            "border-dark": "#3d2b20",
+          },
+          fontFamily: {
+            "display": ["Plus Jakarta Sans", "sans-serif"]
+          },
+          borderRadius: {
+            "DEFAULT": "0.25rem", 
+            "lg": "0.5rem", 
+            "xl": "0.75rem", 
+            "2xl": "1rem",
+            "full": "9999px"
+          },
+        },
+      },
+    }
+    </script>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background-light dark:bg-background-dark font-display antialiased min-h-screen flex flex-col">
+<!-- Header -->
+<div class="sticky top-0 z-10 flex items-center justify-between bg-surface-light dark:bg-surface-dark p-4 border-b border-border-light dark:border-border-dark shadow-sm">
+<button class="text-text-main-light dark:text-text-main-dark flex size-10 shrink-0 items-center justify-center rounded-full hover:bg-border-light dark:hover:bg-border-dark transition-colors">
+<span class="material-symbols-outlined">arrow_back</span>
+</button>
+<h2 class="text-text-main-light dark:text-text-main-dark text-lg font-bold leading-tight flex-1 text-center pr-10">Settings</h2>
+</div>
+<!-- Main Content -->
+<main class="flex-1 overflow-y-auto pb-24">
+<!-- Notification Preferences Section -->
+<div class="px-4 pt-6 pb-2">
+<h3 class="text-text-main-light dark:text-text-main-dark text-lg font-bold leading-tight mb-4">Notification Preferences</h3>
+<div class="space-y-3">
+<!-- Order Status Toggle -->
+<div class="flex items-center gap-4 bg-surface-light dark:bg-surface-dark p-4 rounded-xl shadow-sm border border-border-light dark:border-border-dark">
+<div class="text-primary flex items-center justify-center rounded-lg bg-primary/10 shrink-0 size-10">
+<span class="material-symbols-outlined">receipt_long</span>
+</div>
+<div class="flex-1">
+<p class="text-text-main-light dark:text-text-main-dark text-base font-medium">Order Status</p>
+<p class="text-text-sub-light dark:text-text-sub-dark text-xs mt-0.5">Updates on your delivery rider</p>
+</div>
+<div class="shrink-0">
+<label class="relative flex h-[31px] w-[51px] cursor-pointer items-center rounded-full border-none bg-border-light dark:bg-border-dark p-0.5 has-[:checked]:justify-end has-[:checked]:bg-primary transition-colors duration-200">
+<div class="h-full w-[27px] rounded-full bg-white shadow-sm transition-all"></div>
+<input checked="" class="invisible absolute" type="checkbox"/>
+</label>
+</div>
+</div>
+<!-- Smart Reorder Toggle -->
+<div class="flex items-center gap-4 bg-surface-light dark:bg-surface-dark p-4 rounded-xl shadow-sm border border-border-light dark:border-border-dark">
+<div class="text-primary flex items-center justify-center rounded-lg bg-primary/10 shrink-0 size-10">
+<span class="material-symbols-outlined">shopping_basket</span>
+</div>
+<div class="flex-1">
+<p class="text-text-main-light dark:text-text-main-dark text-base font-medium">Smart Reorder</p>
+<p class="text-text-sub-light dark:text-text-sub-dark text-xs mt-0.5">Reminders when Harissa is low</p>
+</div>
+<div class="shrink-0">
+<label class="relative flex h-[31px] w-[51px] cursor-pointer items-center rounded-full border-none bg-border-light dark:bg-border-dark p-0.5 has-[:checked]:justify-end has-[:checked]:bg-primary transition-colors duration-200">
+<div class="h-full w-[27px] rounded-full bg-white shadow-sm transition-all"></div>
+<input checked="" class="invisible absolute" type="checkbox"/>
+</label>
+</div>
+</div>
+<!-- Promotional Offers Toggle -->
+<div class="flex items-center gap-4 bg-surface-light dark:bg-surface-dark p-4 rounded-xl shadow-sm border border-border-light dark:border-border-dark">
+<div class="text-primary flex items-center justify-center rounded-lg bg-primary/10 shrink-0 size-10">
+<span class="material-symbols-outlined">local_offer</span>
+</div>
+<div class="flex-1">
+<p class="text-text-main-light dark:text-text-main-dark text-base font-medium">Promos &amp; Offers</p>
+<p class="text-text-sub-light dark:text-text-sub-dark text-xs mt-0.5">Discounts on local favorites</p>
+</div>
+<div class="shrink-0">
+<label class="relative flex h-[31px] w-[51px] cursor-pointer items-center rounded-full border-none bg-border-light dark:bg-border-dark p-0.5 has-[:checked]:justify-end has-[:checked]:bg-primary transition-colors duration-200">
+<div class="h-full w-[27px] rounded-full bg-white shadow-sm transition-all"></div>
+<input class="invisible absolute" type="checkbox"/>
+</label>
+</div>
+</div>
+</div>
+</div>
+<div class="h-px bg-border-light dark:bg-border-dark mx-4 my-4"></div>
+<!-- Quick Reorder Section -->
+<div class="px-4 pb-4">
+<div class="flex justify-between items-center mb-4">
+<h3 class="text-text-main-light dark:text-text-main-dark text-lg font-bold leading-tight">Quick Reorder</h3>
+<a class="text-primary text-sm font-medium hover:underline" href="#">View All</a>
+</div>
+<div class="grid grid-cols-1 gap-4">
+<!-- Reorder Item 1 -->
+<div class="flex items-center gap-4 bg-surface-light dark:bg-surface-dark p-3 rounded-xl border border-border-light dark:border-border-dark hover:border-primary/50 transition-colors cursor-pointer group">
+<div class="size-16 rounded-lg bg-gray-200 overflow-hidden shrink-0 relative">
+<!-- Abstract Gradient for image placeholder -->
+<div class="absolute inset-0 bg-gradient-to-br from-orange-100 to-orange-200 dark:from-orange-900 dark:to-orange-950 flex items-center justify-center">
+<span class="material-symbols-outlined text-primary/40 text-3xl">grocery</span>
+</div>
+</div>
+<div class="flex-1 min-w-0">
+<h4 class="text-text-main-light dark:text-text-main-dark font-bold text-sm truncate">Weekly Grocery Essentials</h4>
+<p class="text-text-sub-light dark:text-text-sub-dark text-xs truncate mt-1">Bread, Milk, Harissa, Eggs...</p>
+<div class="flex items-center gap-2 mt-2">
+<span class="text-xs font-semibold text-primary bg-primary/10 px-2 py-0.5 rounded-full">Last ordered: 3 days ago</span>
+</div>
+</div>
+<button class="size-10 rounded-full bg-primary text-white flex items-center justify-center shadow-md group-hover:bg-primary-dark transition-colors">
+<span class="material-symbols-outlined text-xl">add</span>
+</button>
+</div>
+<!-- Reorder Item 2 -->
+<div class="flex items-center gap-4 bg-surface-light dark:bg-surface-dark p-3 rounded-xl border border-border-light dark:border-border-dark hover:border-primary/50 transition-colors cursor-pointer group">
+<div class="size-16 rounded-lg bg-gray-200 overflow-hidden shrink-0 relative">
+<!-- Abstract Gradient for image placeholder -->
+<div class="absolute inset-0 bg-gradient-to-br from-yellow-100 to-amber-200 dark:from-yellow-900 dark:to-amber-950 flex items-center justify-center">
+<span class="material-symbols-outlined text-primary/40 text-3xl">lunch_dining</span>
+</div>
+</div>
+<div class="flex-1 min-w-0">
+<h4 class="text-text-main-light dark:text-text-main-dark font-bold text-sm truncate">Friday Family Cousins</h4>
+<p class="text-text-sub-light dark:text-text-sub-dark text-xs truncate mt-1">Couscous, Lamb, Vegetables</p>
+<div class="flex items-center gap-2 mt-2">
+<span class="text-xs font-semibold text-text-sub-light dark:text-text-sub-dark bg-border-light dark:bg-border-dark px-2 py-0.5 rounded-full">Last ordered: 1 week ago</span>
+</div>
+</div>
+<button class="size-10 rounded-full bg-primary text-white flex items-center justify-center shadow-md group-hover:bg-primary-dark transition-colors">
+<span class="material-symbols-outlined text-xl">add</span>
+</button>
+</div>
+<!-- Reorder Item 3 -->
+<div class="flex items-center gap-4 bg-surface-light dark:bg-surface-dark p-3 rounded-xl border border-border-light dark:border-border-dark hover:border-primary/50 transition-colors cursor-pointer group">
+<div class="size-16 rounded-lg bg-gray-200 overflow-hidden shrink-0 relative">
+<!-- Abstract Gradient for image placeholder -->
+<div class="absolute inset-0 bg-gradient-to-br from-blue-100 to-indigo-200 dark:from-blue-900 dark:to-indigo-950 flex items-center justify-center">
+<span class="material-symbols-outlined text-primary/40 text-3xl">water_drop</span>
+</div>
+</div>
+<div class="flex-1 min-w-0">
+<h4 class="text-text-main-light dark:text-text-main-dark font-bold text-sm truncate">Water &amp; Beverages Pack</h4>
+<p class="text-text-sub-light dark:text-text-sub-dark text-xs truncate mt-1">Safia 1.5L x6, Coca-Cola</p>
+<div class="flex items-center gap-2 mt-2">
+<span class="text-xs font-semibold text-text-sub-light dark:text-text-sub-dark bg-border-light dark:bg-border-dark px-2 py-0.5 rounded-full">Last ordered: 2 weeks ago</span>
+</div>
+</div>
+<button class="size-10 rounded-full bg-primary text-white flex items-center justify-center shadow-md group-hover:bg-primary-dark transition-colors">
+<span class="material-symbols-outlined text-xl">add</span>
+</button>
+</div>
+</div>
+</div>
+</main>
+<!-- Bottom Navigation -->
+<nav class="fixed bottom-0 left-0 right-0 border-t border-border-light dark:border-border-dark bg-surface-light dark:bg-surface-dark px-6 pb-6 pt-3 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)] z-20">
+<div class="flex justify-between items-center max-w-lg mx-auto">
+<a class="flex flex-col items-center justify-center gap-1 text-text-sub-light dark:text-text-sub-dark hover:text-primary dark:hover:text-primary transition-colors" href="#">
+<span class="material-symbols-outlined text-[28px]">home</span>
+<span class="text-[10px] font-medium tracking-wide">Home</span>
+</a>
+<a class="flex flex-col items-center justify-center gap-1 text-text-sub-light dark:text-text-sub-dark hover:text-primary dark:hover:text-primary transition-colors" href="#">
+<span class="material-symbols-outlined text-[28px]">history</span>
+<span class="text-[10px] font-medium tracking-wide">Activity</span>
+</a>
+<div class="relative -top-6">
+<button class="flex size-14 items-center justify-center rounded-full bg-primary text-white shadow-lg hover:bg-primary-dark hover:scale-105 transition-all">
+<span class="material-symbols-outlined text-[32px]">two_wheeler</span>
+</button>
+</div>
+<a class="flex flex-col items-center justify-center gap-1 text-text-sub-light dark:text-text-sub-dark hover:text-primary dark:hover:text-primary transition-colors" href="#">
+<span class="material-symbols-outlined text-[28px]">account_balance_wallet</span>
+<span class="text-[10px] font-medium tracking-wide">Wallet</span>
+</a>
+<a class="flex flex-col items-center justify-center gap-1 text-primary dark:text-primary" href="#">
+<span class="material-symbols-outlined text-[28px] fill-current font-variation-settings-fill">person</span>
+<span class="text-[10px] font-medium tracking-wide">Account</span>
+</a>
+</div>
+</nav>
+<style>
+        .font-variation-settings-fill {
+          font-variation-settings: 'FILL' 1;
+        }
+    </style>
+</body></html>

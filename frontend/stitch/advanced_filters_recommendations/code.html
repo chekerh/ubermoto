@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>UberMoto Marketplace</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#E85D04", 
+                        "primary-content": "#FFFFFF",
+                        "secondary": "#FAA307",
+                        "background-light": "#FDFBF7",
+                        "background-dark": "#1F1A17",
+                        "surface-light": "#FFFFFF",
+                        "surface-dark": "#2D2622",
+                        "border-light": "#EFEBE9",
+                        "border-dark": "#443C38",
+                        "text-main-light": "#3E2723",
+                        "text-main-dark": "#ECE0DD",
+                        "text-sub-light": "#8D6E63",
+                        "text-sub-dark": "#BCAAA4",
+                    },
+                    fontFamily: {
+                        "display": ["Plus Jakarta Sans", "sans-serif"]
+                    },
+                    borderRadius: { "DEFAULT": "0.5rem", "lg": "0.75rem", "xl": "1rem", "full": "9999px" },
+                },
+            },
+        }
+    </script>
+<style>
+        .scrollbar-hide::-webkit-scrollbar {
+            display: none;
+        }
+        .scrollbar-hide {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background-light dark:bg-background-dark font-display antialiased text-text-main-light dark:text-text-main-dark h-full min-h-screen flex flex-col">
+<!-- Header -->
+<header class="sticky top-0 z-30 bg-surface-light/95 dark:bg-surface-dark/95 backdrop-blur-sm border-b border-border-light dark:border-border-dark px-4 py-3">
+<div class="flex items-center justify-between gap-4">
+<button class="p-2 -ml-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors text-text-main-light dark:text-text-main-dark">
+<span class="material-symbols-outlined">arrow_back</span>
+</button>
+<div class="flex-1">
+<div class="relative group">
+<div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+<span class="material-symbols-outlined text-text-sub-light dark:text-text-sub-dark">search</span>
+</div>
+<input class="block w-full pl-10 pr-3 py-2.5 border-none rounded-xl bg-background-light dark:bg-background-dark text-text-main-light dark:text-text-main-dark placeholder-text-sub-light dark:placeholder-text-sub-dark ring-1 ring-border-light dark:ring-border-dark focus:ring-2 focus:ring-primary focus:outline-none transition-shadow text-sm" placeholder="Search dates, spices..." type="text"/>
+<button class="absolute inset-y-0 right-0 pr-2 flex items-center">
+<div class="bg-primary/10 dark:bg-primary/20 p-1.5 rounded-lg">
+<span class="material-symbols-outlined text-primary text-[20px]">tune</span>
+</div>
+</button>
+</div>
+</div>
+<button class="relative p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors text-text-main-light dark:text-text-main-dark">
+<span class="material-symbols-outlined">shopping_bag</span>
+<span class="absolute top-1.5 right-1.5 w-2 h-2 bg-primary rounded-full ring-2 ring-white dark:ring-surface-dark"></span>
+</button>
+</div>
+<!-- Quick Filters Row -->
+<div class="flex gap-2 mt-3 overflow-x-auto scrollbar-hide pb-1">
+<button class="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-primary text-white text-xs font-medium whitespace-nowrap shadow-sm border border-primary">
+<span class="material-symbols-outlined text-[16px]">tune</span>
+                Filters (2)
+            </button>
+<button class="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-surface-light dark:bg-surface-dark border border-border-light dark:border-border-dark text-text-main-light dark:text-text-main-dark text-xs font-medium whitespace-nowrap hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">
+                Price (TND)
+                <span class="material-symbols-outlined text-[16px]">expand_more</span>
+</button>
+<button class="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-surface-light dark:bg-surface-dark border border-border-light dark:border-border-dark text-text-main-light dark:text-text-main-dark text-xs font-medium whitespace-nowrap hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">
+<span class="material-symbols-outlined text-[16px] text-yellow-500 fill-current">star</span>
+                4.5+
+            </button>
+<button class="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-surface-light dark:bg-surface-dark border border-border-light dark:border-border-dark text-text-main-light dark:text-text-main-dark text-xs font-medium whitespace-nowrap hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">
+                Discount
+            </button>
+<button class="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-surface-light dark:bg-surface-dark border border-border-light dark:border-border-dark text-text-main-light dark:text-text-main-dark text-xs font-medium whitespace-nowrap hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">
+                New Arrivals
+            </button>
+</div>
+</header>
+<!-- Main Content -->
+<main class="flex-1 overflow-y-auto pb-24">
+<!-- Active Filters Display -->
+<div class="px-4 py-3 bg-background-light dark:bg-background-dark border-b border-border-light dark:border-border-dark">
+<div class="flex items-center justify-between mb-2">
+<h2 class="text-sm font-semibold text-text-main-light dark:text-text-main-dark">Active Filters</h2>
+<button class="text-xs font-medium text-primary hover:text-primary/80">Clear All</button>
+</div>
+<div class="flex flex-wrap gap-2">
+<div class="flex items-center gap-1 px-2 py-1 bg-primary/10 dark:bg-primary/20 rounded-lg text-primary text-xs font-medium">
+<span>Dates &amp; Spices</span>
+<button class="hover:text-primary/70"><span class="material-symbols-outlined text-[14px]">close</span></button>
+</div>
+<div class="flex items-center gap-1 px-2 py-1 bg-primary/10 dark:bg-primary/20 rounded-lg text-primary text-xs font-medium">
+<span>Under 50 TND</span>
+<button class="hover:text-primary/70"><span class="material-symbols-outlined text-[14px]">close</span></button>
+</div>
+</div>
+</div>
+<!-- AI Recommendation Section Header -->
+<div class="px-4 pt-6 pb-2">
+<div class="flex items-center gap-2 mb-1">
+<span class="material-symbols-outlined text-secondary">auto_awesome</span>
+<span class="text-xs font-bold text-secondary uppercase tracking-wider">AI Recommended</span>
+</div>
+<h1 class="text-2xl font-bold text-text-main-light dark:text-text-main-dark leading-tight">Ramadan Essentials <br/><span class="text-text-sub-light dark:text-text-sub-dark font-normal text-lg">Curated for your Iftar</span></h1>
+</div>
+<!-- Horizontal Scroll Recommendations -->
+<div class="relative w-full overflow-x-auto scrollbar-hide px-4 pb-6 pt-2 flex gap-4 snap-x">
+<!-- Card 1 -->
+<div class="snap-center shrink-0 w-[240px] bg-surface-light dark:bg-surface-dark rounded-2xl shadow-sm border border-border-light dark:border-border-dark overflow-hidden flex flex-col group">
+<div class="relative h-32 w-full overflow-hidden">
+<img class="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-500" data-alt="Close up of fresh dates in a bowl" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCU-JB1fsYZoh39jFXV_ucZieNTPr88k6JFRfT0yyinP_OUfhRM9C3ssc2Mg7X6-ydqxyIqPiXYjcUDc_I9pwbpx_HiAfNZfOHFObdN5jCMVkdavYBjBY1z2AIam_htpOvj6C5D_dJmfLWokY6gRJ5Rzqro6ChQTFfJ5U-a9WsNqqYImUHeDjidDaXpiZqNSoW7Y_La32I_6JAL91qBaIU5ZhV-JIITQcJUPbQ8F8G67nHN_3NSpPImecJ4qQocdwoipaKV57aCOGY"/>
+<div class="absolute top-2 left-2 bg-secondary text-white text-[10px] font-bold px-2 py-0.5 rounded-full">Top Rated</div>
+<button class="absolute top-2 right-2 w-7 h-7 bg-white/80 dark:bg-black/50 backdrop-blur-sm rounded-full flex items-center justify-center text-text-main-light dark:text-text-main-dark hover:bg-white dark:hover:bg-black transition-colors">
+<span class="material-symbols-outlined text-[16px]">favorite</span>
+</button>
+</div>
+<div class="p-3 flex flex-col flex-1">
+<div class="flex justify-between items-start mb-1">
+<h3 class="font-bold text-text-main-light dark:text-text-main-dark text-base truncate pr-2">Deglet Nour Dates</h3>
+<div class="flex items-center gap-0.5 text-xs font-medium text-text-main-light dark:text-text-main-dark bg-gray-100 dark:bg-gray-800 px-1.5 py-0.5 rounded">
+<span class="material-symbols-outlined text-[12px] text-yellow-500 fill-current">star</span> 4.9
+                        </div>
+</div>
+<p class="text-xs text-text-sub-light dark:text-text-sub-dark line-clamp-2 mb-3">Premium quality Tunisian dates from Tozeur.</p>
+<div class="mt-auto flex items-center justify-between">
+<span class="font-bold text-primary text-lg">12.5 <span class="text-xs font-normal text-text-sub-light">TND</span></span>
+<button class="w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center hover:bg-primary/90 transition-colors shadow-md shadow-primary/30">
+<span class="material-symbols-outlined text-[18px]">add</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Card 2 -->
+<div class="snap-center shrink-0 w-[240px] bg-surface-light dark:bg-surface-dark rounded-2xl shadow-sm border border-border-light dark:border-border-dark overflow-hidden flex flex-col group">
+<div class="relative h-32 w-full overflow-hidden">
+<img class="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-500" data-alt="Various colorful spices in bowls" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAmRMja9yLagoQimMxE9GUADyB4syT3U4XEdP7Vrq4iQ6Is6exJSnucsfrQ1FLJllmlTBgbCFGqqtCks1UCqs-qKYRUvaVngAtyEf6SoWRRpfGxGWq91c7Qu_V2nG5sVa5vOGwAwmXA0TFTb-Ohn-BNoaaU9vI742abRjzcKrJJgxExYKWLcKvebFD07dhysjjdUa1dJ_im9bRC27Oy8hF5K1iteGZyNGlBnX4DRwr5o3ElT1OKQvkxcUAYA-X8VJpv15stnr0Fd1k"/>
+<div class="absolute top-2 left-2 bg-red-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full">-15%</div>
+<button class="absolute top-2 right-2 w-7 h-7 bg-white/80 dark:bg-black/50 backdrop-blur-sm rounded-full flex items-center justify-center text-text-main-light dark:text-text-main-dark hover:bg-white dark:hover:bg-black transition-colors">
+<span class="material-symbols-outlined text-[16px]">favorite</span>
+</button>
+</div>
+<div class="p-3 flex flex-col flex-1">
+<div class="flex justify-between items-start mb-1">
+<h3 class="font-bold text-text-main-light dark:text-text-main-dark text-base truncate pr-2">Ras el Hanout</h3>
+<div class="flex items-center gap-0.5 text-xs font-medium text-text-main-light dark:text-text-main-dark bg-gray-100 dark:bg-gray-800 px-1.5 py-0.5 rounded">
+<span class="material-symbols-outlined text-[12px] text-yellow-500 fill-current">star</span> 4.7
+                        </div>
+</div>
+<p class="text-xs text-text-sub-light dark:text-text-sub-dark line-clamp-2 mb-3">Traditional blend of best spices for Couscous.</p>
+<div class="mt-auto flex items-center justify-between">
+<div class="flex flex-col">
+<span class="font-bold text-primary text-lg">8.0 <span class="text-xs font-normal text-text-sub-light">TND</span></span>
+<span class="text-[10px] text-text-sub-light line-through">9.5 TND</span>
+</div>
+<button class="w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center hover:bg-primary/90 transition-colors shadow-md shadow-primary/30">
+<span class="material-symbols-outlined text-[18px]">add</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Card 3 -->
+<div class="snap-center shrink-0 w-[240px] bg-surface-light dark:bg-surface-dark rounded-2xl shadow-sm border border-border-light dark:border-border-dark overflow-hidden flex flex-col group">
+<div class="relative h-32 w-full overflow-hidden">
+<img class="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-500" data-alt="Traditional patterned ceramic plate" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDYtwgEouLwzfT7V6CzVdU5xRhCoHSFD3IGeQef21ldMTACVa7B6KTUxfmwioN-6jDs_kZjLHBoXrxvNMg-hra9FsUGIYqkdY7TyryGozNOH76ckPtS35NasIgGpPKv_du1EH0ZJyPQcCns7RyPEa9aIFixT2rymT-5so_MD5WXDT-DWRQRrWI0SrMUQNGGuAJk6lkLt5OQ4fz16QawjCi9Z8lctUHm4FdiWn_9EmdSw5ujreIrn04kVorAIexw7P8EUEvXLrcpL6A"/>
+<button class="absolute top-2 right-2 w-7 h-7 bg-white/80 dark:bg-black/50 backdrop-blur-sm rounded-full flex items-center justify-center text-text-main-light dark:text-text-main-dark hover:bg-white dark:hover:bg-black transition-colors">
+<span class="material-symbols-outlined text-[16px]">favorite</span>
+</button>
+</div>
+<div class="p-3 flex flex-col flex-1">
+<div class="flex justify-between items-start mb-1">
+<h3 class="font-bold text-text-main-light dark:text-text-main-dark text-base truncate pr-2">Nabeul Ceramics</h3>
+<div class="flex items-center gap-0.5 text-xs font-medium text-text-main-light dark:text-text-main-dark bg-gray-100 dark:bg-gray-800 px-1.5 py-0.5 rounded">
+<span class="material-symbols-outlined text-[12px] text-yellow-500 fill-current">star</span> 4.8
+                        </div>
+</div>
+<p class="text-xs text-text-sub-light dark:text-text-sub-dark line-clamp-2 mb-3">Hand-painted serving bowl for Ramadan.</p>
+<div class="mt-auto flex items-center justify-between">
+<span class="font-bold text-primary text-lg">45.0 <span class="text-xs font-normal text-text-sub-light">TND</span></span>
+<button class="w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center hover:bg-primary/90 transition-colors shadow-md shadow-primary/30">
+<span class="material-symbols-outlined text-[18px]">add</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+<!-- All Products List -->
+<div class="px-4">
+<div class="flex items-center justify-between mb-4">
+<h2 class="text-lg font-bold text-text-main-light dark:text-text-main-dark">More Results</h2>
+<button class="text-xs font-medium text-primary flex items-center gap-0.5">
+                    View All <span class="material-symbols-outlined text-[16px]">arrow_forward</span>
+</button>
+</div>
+<div class="space-y-3">
+<!-- List Item 1 -->
+<div class="flex bg-surface-light dark:bg-surface-dark rounded-xl p-3 border border-border-light dark:border-border-dark shadow-sm">
+<div class="w-24 h-24 rounded-lg bg-gray-100 dark:bg-gray-800 overflow-hidden shrink-0">
+<img class="w-full h-full object-cover" data-alt="Healthy salad bowl" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAaf3VyIqPyp8eQxfRkgr7y9UxCknAM-87sb7VbMeFpX_6b-pCSvLUMYqcURfKVh6QacRgfoAjTxurcd1F8nM_k16hvM4rHI7wNkr5r96xIu8SLd2uMzLDxQovy35zxOc7sG3N_lKSyPD5TzuIU7uB2GXq91a5gukS5pzSN79lo_sM520VF3vSXhvgcwhNCJrEHW3enLmVJtooR14J-_CWW_YnhUFnnSrOfwNfcLmMn0belbNTk4_RDugO6-QlSzVkP5YTPTPIyxJc"/>
+</div>
+<div class="ml-3 flex-1 flex flex-col">
+<div class="flex justify-between items-start">
+<div>
+<h3 class="font-bold text-text-main-light dark:text-text-main-dark text-base">Organic Olive Oil</h3>
+<p class="text-xs text-text-sub-light dark:text-text-sub-dark mt-0.5">Tunisian Extra Virgin</p>
+</div>
+<div class="flex items-center gap-0.5">
+<span class="material-symbols-outlined text-[14px] text-yellow-500 fill-current">star</span>
+<span class="text-xs font-bold">4.6</span>
+</div>
+</div>
+<div class="mt-auto flex items-center justify-between">
+<span class="font-bold text-primary text-lg">22.0 <span class="text-xs font-normal text-text-sub-light">TND</span></span>
+<button class="text-primary hover:bg-primary/10 rounded-full p-1.5 transition-colors">
+<span class="material-symbols-outlined">add_shopping_cart</span>
+</button>
+</div>
+</div>
+</div>
+<!-- List Item 2 -->
+<div class="flex bg-surface-light dark:bg-surface-dark rounded-xl p-3 border border-border-light dark:border-border-dark shadow-sm">
+<div class="w-24 h-24 rounded-lg bg-gray-100 dark:bg-gray-800 overflow-hidden shrink-0">
+<img class="w-full h-full object-cover" data-alt="Traditional lantern glowing" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBjrOuvs2aXgGlYJcyLcz_HZV-JEwxHdmK7a4ZD5bZIHRbVajcmRR4u9dZ0phXTWbCWcwE5-ge_q3SoW6qVuvype01DzyllXdw00oCiy0NQyA9J3mF9K8sgYaupYREexkSazKUqIuiwpsJEXAQSbT6rIaGR8TvNoi22AHpsKPV2IC7XSdS1OTdaQHLw0H3wczFjAqWSmWiLN5lAwSHGq4Kw86hwN3sZ4FsQJmDOAqYKZtSTJ651iw00wrXjErBuEqV551qRireLuAg"/>
+</div>
+<div class="ml-3 flex-1 flex flex-col">
+<div class="flex justify-between items-start">
+<div>
+<h3 class="font-bold text-text-main-light dark:text-text-main-dark text-base">Brass Lantern</h3>
+<p class="text-xs text-text-sub-light dark:text-text-sub-dark mt-0.5">Handmade decoration</p>
+</div>
+<div class="flex items-center gap-0.5">
+<span class="material-symbols-outlined text-[14px] text-yellow-500 fill-current">star</span>
+<span class="text-xs font-bold">4.8</span>
+</div>
+</div>
+<div class="mt-auto flex items-center justify-between">
+<span class="font-bold text-primary text-lg">65.0 <span class="text-xs font-normal text-text-sub-light">TND</span></span>
+<button class="text-primary hover:bg-primary/10 rounded-full p-1.5 transition-colors">
+<span class="material-symbols-outlined">add_shopping_cart</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+</div>
+</main>
+<!-- Navigation Bar -->
+<nav class="fixed bottom-0 z-40 w-full bg-surface-light dark:bg-surface-dark border-t border-border-light dark:border-border-dark pb-safe pt-2 px-2">
+<div class="flex items-center justify-around pb-2">
+<a class="flex flex-col items-center gap-1 p-2 rounded-xl text-text-sub-light dark:text-text-sub-dark hover:text-primary dark:hover:text-primary transition-colors group" href="#">
+<span class="material-symbols-outlined group-hover:scale-110 transition-transform">home</span>
+<span class="text-[10px] font-medium">Home</span>
+</a>
+<a class="flex flex-col items-center gap-1 p-2 rounded-xl text-primary transition-colors" href="#">
+<span class="material-symbols-outlined fill-current">storefront</span>
+<span class="text-[10px] font-medium">Market</span>
+</a>
+<div class="relative -top-6">
+<button class="w-14 h-14 rounded-full bg-primary text-white shadow-lg shadow-primary/40 flex items-center justify-center transform hover:scale-105 transition-transform">
+<span class="material-symbols-outlined text-[28px]">sports_motorsports</span>
+</button>
+</div>
+<a class="flex flex-col items-center gap-1 p-2 rounded-xl text-text-sub-light dark:text-text-sub-dark hover:text-primary dark:hover:text-primary transition-colors group" href="#">
+<span class="material-symbols-outlined group-hover:scale-110 transition-transform">receipt_long</span>
+<span class="text-[10px] font-medium">Orders</span>
+</a>
+<a class="flex flex-col items-center gap-1 p-2 rounded-xl text-text-sub-light dark:text-text-sub-dark hover:text-primary dark:hover:text-primary transition-colors group" href="#">
+<span class="material-symbols-outlined group-hover:scale-110 transition-transform">account_circle</span>
+<span class="text-[10px] font-medium">Profile</span>
+</a>
+</div>
+</nav>
+<div class="h-20 w-full bg-background-light dark:bg-background-dark"></div> <!-- Spacer for fixed nav -->
+</body></html>

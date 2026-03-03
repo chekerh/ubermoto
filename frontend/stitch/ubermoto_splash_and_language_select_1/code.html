@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>UberMoto Splash and Language Select</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#f47b25",
+                        "background-light": "#f8f7f5",
+                        "background-dark": "#221710",
+                    },
+                    fontFamily: {
+                        "display": ["Plus Jakarta Sans"]
+                    },
+                    borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+<style>
+        /* Custom pattern for the desert feel */
+        .desert-pattern {
+            background-color: #f47b25;
+            background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.1'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background-light dark:bg-background-dark font-display text-slate-900 dark:text-slate-100 antialiased overflow-hidden">
+<div class="relative flex h-screen w-full flex-col justify-between bg-background-light dark:bg-background-dark overflow-hidden">
+<!-- Decorative Background Circle -->
+<div class="absolute -top-40 -right-40 w-96 h-96 bg-primary/20 rounded-full blur-3xl z-0 pointer-events-none"></div>
+<div class="absolute top-40 -left-20 w-72 h-72 bg-primary/10 rounded-full blur-3xl z-0 pointer-events-none"></div>
+<!-- Main Content Area: Logo and Title -->
+<div class="relative flex flex-col items-center justify-center flex-grow pt-20 px-6 z-10 gap-8">
+<!-- Logo Container with Pattern -->
+<div class="relative flex items-center justify-center w-40 h-40 rounded-full shadow-xl shadow-primary/30 desert-pattern overflow-hidden">
+<!-- Inner glow -->
+<div class="absolute inset-0 bg-gradient-to-tr from-black/10 to-transparent"></div>
+<!-- Motorcycle / U Icon Placeholder -->
+<span class="material-symbols-outlined text-white text-7xl drop-shadow-md">
+                    two_wheeler
+                </span>
+</div>
+<!-- Brand Name & Slogan -->
+<div class="flex flex-col items-center gap-2">
+<h1 class="text-4xl font-extrabold tracking-tight text-slate-900 dark:text-white">
+                    Uber<span class="text-primary">Moto</span>
+</h1>
+<p class="text-slate-500 dark:text-slate-400 text-lg font-medium tracking-wide">
+                    Your Ride, Your Way
+                </p>
+</div>
+<!-- Loading Spinner & Progress -->
+<div class="w-full max-w-[240px] mt-8 flex flex-col gap-4">
+<div class="flex justify-between items-center text-xs font-medium text-slate-400 dark:text-slate-500 uppercase tracking-wider">
+<span>Loading resources</span>
+<span>40%</span>
+</div>
+<div class="h-1.5 w-full bg-slate-200 dark:bg-slate-700 rounded-full overflow-hidden">
+<div class="h-full bg-primary rounded-full w-[40%] shadow-[0_0_10px_rgba(244,123,37,0.5)]"></div>
+</div>
+</div>
+</div>
+<!-- Bottom Section: Language Selector & Footer -->
+<div class="relative z-10 w-full bg-white/80 dark:bg-slate-800/80 backdrop-blur-md border-t border-slate-200 dark:border-slate-700 rounded-t-3xl pb-8 pt-6 px-6 shadow-[0_-10px_40px_rgba(0,0,0,0.05)]">
+<div class="flex flex-col gap-4 max-w-md mx-auto">
+<p class="text-slate-500 dark:text-slate-400 text-sm font-medium text-center mb-1">Select your preferred language</p>
+<!-- Language Toggle -->
+<div class="flex p-1.5 bg-slate-100 dark:bg-slate-700/50 rounded-xl overflow-x-auto no-scrollbar gap-1">
+<!-- Derja -->
+<label class="relative flex-1 min-w-[80px] cursor-pointer group">
+<input checked="" class="peer sr-only" name="language_select" type="radio" value="Derja"/>
+<div class="flex flex-col items-center justify-center py-2.5 px-3 rounded-lg transition-all duration-200 text-slate-500 dark:text-slate-400 hover:bg-white/50 dark:hover:bg-slate-600/50 peer-checked:bg-white dark:peer-checked:bg-slate-600 peer-checked:text-primary peer-checked:shadow-sm peer-checked:font-semibold">
+<span class="text-sm truncate">Derja</span>
+</div>
+</label>
+<!-- Arabic -->
+<label class="relative flex-1 min-w-[80px] cursor-pointer group">
+<input class="peer sr-only" name="language_select" type="radio" value="Arabic"/>
+<div class="flex flex-col items-center justify-center py-2.5 px-3 rounded-lg transition-all duration-200 text-slate-500 dark:text-slate-400 hover:bg-white/50 dark:hover:bg-slate-600/50 peer-checked:bg-white dark:peer-checked:bg-slate-600 peer-checked:text-primary peer-checked:shadow-sm peer-checked:font-semibold">
+<span class="text-sm truncate">العربية</span>
+</div>
+</label>
+<!-- French -->
+<label class="relative flex-1 min-w-[80px] cursor-pointer group">
+<input class="peer sr-only" name="language_select" type="radio" value="French"/>
+<div class="flex flex-col items-center justify-center py-2.5 px-3 rounded-lg transition-all duration-200 text-slate-500 dark:text-slate-400 hover:bg-white/50 dark:hover:bg-slate-600/50 peer-checked:bg-white dark:peer-checked:bg-slate-600 peer-checked:text-primary peer-checked:shadow-sm peer-checked:font-semibold">
+<span class="text-sm truncate">Français</span>
+</div>
+</label>
+<!-- English -->
+<label class="relative flex-1 min-w-[80px] cursor-pointer group">
+<input class="peer sr-only" name="language_select" type="radio" value="English"/>
+<div class="flex flex-col items-center justify-center py-2.5 px-3 rounded-lg transition-all duration-200 text-slate-500 dark:text-slate-400 hover:bg-white/50 dark:hover:bg-slate-600/50 peer-checked:bg-white dark:peer-checked:bg-slate-600 peer-checked:text-primary peer-checked:shadow-sm peer-checked:font-semibold">
+<span class="text-sm truncate">English</span>
+</div>
+</label>
+</div>
+<!-- Version Info -->
+<div class="pt-2 text-center">
+<p class="text-xs text-slate-400 dark:text-slate-500">
+                        Version 1.0.2 - Tunisia
+                    </p>
+</div>
+</div>
+<!-- Safe Area Spacer for iOS Home Indicator -->
+<div class="h-4 w-full"></div>
+</div>
+</div>
+</body></html>

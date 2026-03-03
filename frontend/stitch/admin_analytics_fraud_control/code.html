@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>UberMoto Admin Analytics</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#1152d4", // Deep Blue
+                        "secondary": "#f97316", // Orange for accents
+                        "background-light": "#f6f6f8",
+                        "background-dark": "#101622", // Deep dark blue background
+                        "surface-dark": "#1a2333", // Slightly lighter for cards
+                        "border-dark": "#2a3650",
+                    },
+                    fontFamily: {
+                        "display": ["Inter", "sans-serif"]
+                    },
+                    borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+<style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        /* Custom Scrollbar for hidden overflow */
+        .hide-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .hide-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background-light dark:bg-background-dark min-h-screen flex flex-col font-display text-slate-900 dark:text-slate-100 overflow-x-hidden">
+<!-- Header -->
+<header class="sticky top-0 z-10 flex items-center justify-between bg-background-dark/95 backdrop-blur-md px-4 py-4 border-b border-border-dark">
+<div class="flex items-center gap-3">
+<button class="text-slate-400 hover:text-white transition-colors">
+<span class="material-symbols-outlined">arrow_back</span>
+</button>
+<h1 class="text-lg font-bold text-white tracking-tight">Analytics &amp; Fraud</h1>
+</div>
+<div class="flex items-center gap-3">
+<button class="relative text-slate-400 hover:text-white transition-colors">
+<span class="material-symbols-outlined">notifications</span>
+<span class="absolute top-0 right-0 h-2 w-2 rounded-full bg-secondary"></span>
+</button>
+<div class="h-8 w-8 rounded-full overflow-hidden border border-slate-600">
+<img alt="Admin Profile" class="h-full w-full object-cover" data-alt="Admin user profile picture" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCun8RDTKMzpNfqP6GkSuHQwZp_IzJM7UcaEPk0SG99G5SK-6m8fWmgYS1OLTnyS-g-zekccJ2uHC6EubHiAmUzGsCa8qgoi0h_OuDgkM_2Sf4ok38nCdkPtJ3eqMQmCRD-yELGpeBraZy500y8CkHEdBGBdzbChCwFckx3X1pf0hzCzEzOy8c0sB0V6UcrfkEbEe_wNZ4e2AG6hlXvIGQYh3-wXwB1RbV68yVjFiMjt_VDaDcZzVS6Uirnc0Ae4GjZGYFMVPUgDzQ"/>
+</div>
+</div>
+</header>
+<!-- Main Content -->
+<main class="flex-1 flex flex-col gap-6 p-4 pb-24">
+<!-- Key Metrics Cards -->
+<section class="grid grid-cols-2 gap-3">
+<!-- Revenue Card -->
+<div class="bg-surface-dark border border-border-dark rounded-xl p-4 flex flex-col justify-between h-32 relative overflow-hidden group">
+<div class="absolute -right-4 -top-4 bg-primary/10 h-20 w-20 rounded-full group-hover:bg-primary/20 transition-all"></div>
+<div class="flex justify-between items-start z-10">
+<div class="p-1.5 bg-primary/20 rounded-lg text-primary">
+<span class="material-symbols-outlined text-[20px]">payments</span>
+</div>
+<span class="text-emerald-400 text-xs font-bold flex items-center bg-emerald-400/10 px-1.5 py-0.5 rounded">
+<span class="material-symbols-outlined text-[12px] mr-0.5">trending_up</span> +12%
+                    </span>
+</div>
+<div class="z-10 mt-2">
+<p class="text-slate-400 text-xs font-medium">Total Revenue</p>
+<p class="text-white text-xl font-bold mt-0.5">3,450 <span class="text-sm text-slate-400 font-normal">TND</span></p>
+</div>
+</div>
+<!-- Fraud Alert Card (Highlight) -->
+<div class="bg-surface-dark border border-secondary/30 rounded-xl p-4 flex flex-col justify-between h-32 relative overflow-hidden group">
+<div class="absolute -right-4 -top-4 bg-secondary/10 h-20 w-20 rounded-full group-hover:bg-secondary/20 transition-all"></div>
+<div class="flex justify-between items-start z-10">
+<div class="p-1.5 bg-secondary/20 rounded-lg text-secondary">
+<span class="material-symbols-outlined text-[20px]">gpp_maybe</span>
+</div>
+<span class="text-secondary text-xs font-bold flex items-center bg-secondary/10 px-1.5 py-0.5 rounded">
+                        Attention
+                    </span>
+</div>
+<div class="z-10 mt-2">
+<p class="text-slate-400 text-xs font-medium">Fraud Alerts</p>
+<p class="text-white text-xl font-bold mt-0.5">5 <span class="text-sm text-slate-400 font-normal">Flags</span></p>
+</div>
+</div>
+</section>
+<!-- Sales Trends Chart -->
+<section class="bg-surface-dark border border-border-dark rounded-xl p-5">
+<div class="flex justify-between items-end mb-6">
+<div>
+<h3 class="text-white text-sm font-semibold">Sales Trends</h3>
+<div class="flex items-baseline gap-2 mt-1">
+<span class="text-2xl font-bold text-white">12.5k TND</span>
+<span class="text-xs text-slate-400">Last 7 Days</span>
+</div>
+</div>
+<button class="text-primary text-xs font-medium bg-primary/10 px-3 py-1.5 rounded-full hover:bg-primary/20 transition-colors">
+                    View Report
+                </button>
+</div>
+<!-- Custom Line Chart Visualization using SVG -->
+<div class="relative h-40 w-full">
+<!-- Grid Lines -->
+<div class="absolute inset-0 flex flex-col justify-between text-slate-600 text-[10px]">
+<div class="border-b border-dashed border-slate-700 w-full h-0"></div>
+<div class="border-b border-dashed border-slate-700 w-full h-0"></div>
+<div class="border-b border-dashed border-slate-700 w-full h-0"></div>
+<div class="border-b border-dashed border-slate-700 w-full h-0"></div>
+</div>
+<!-- The Chart Path -->
+<svg class="absolute inset-0 w-full h-full overflow-visible" preserveaspectratio="none" viewbox="0 0 100 40">
+<defs>
+<lineargradient id="chartGradient" x1="0" x2="0" y1="0" y2="1">
+<stop offset="0%" stop-color="#1152d4" stop-opacity="0.5"></stop>
+<stop offset="100%" stop-color="#1152d4" stop-opacity="0"></stop>
+</lineargradient>
+</defs>
+<path d="M0,35 C10,35 15,25 25,28 C35,31 40,15 50,12 C60,9 65,20 75,18 C85,16 90,5 100,2 L100,40 L0,40 Z" fill="url(#chartGradient)"></path>
+<path d="M0,35 C10,35 15,25 25,28 C35,31 40,15 50,12 C60,9 65,20 75,18 C85,16 90,5 100,2" fill="none" stroke="#3b82f6" stroke-linecap="round" stroke-width="0.8"></path>
+<!-- Data Points -->
+<circle cx="25" cy="28" fill="#fff" r="1"></circle>
+<circle cx="50" cy="12" fill="#fff" r="1"></circle>
+<circle cx="75" cy="18" fill="#fff" r="1"></circle>
+<circle cx="100" cy="2" fill="#f97316" r="1.5" stroke="#fff" stroke-width="0.5"></circle>
+</svg>
+</div>
+<div class="flex justify-between text-[10px] text-slate-500 mt-2 font-medium">
+<span>Mon</span>
+<span>Tue</span>
+<span>Wed</span>
+<span>Thu</span>
+<span>Fri</span>
+<span>Sat</span>
+<span>Sun</span>
+</div>
+</section>
+<!-- Product Alerts List (Expiry) -->
+<section>
+<div class="flex items-center justify-between mb-3 px-1">
+<h3 class="text-white font-semibold text-base">Inventory Alerts</h3>
+<span class="text-xs text-secondary font-medium bg-secondary/10 px-2 py-1 rounded">Urgent Actions Needed</span>
+</div>
+<div class="flex flex-col gap-3">
+<!-- Alert Item 1 -->
+<div class="bg-surface-dark border border-secondary/30 rounded-xl p-3 flex items-center gap-4">
+<div class="h-12 w-12 rounded-lg bg-orange-900/20 flex items-center justify-center shrink-0 border border-orange-500/20">
+<span class="material-symbols-outlined text-secondary">warning</span>
+</div>
+<div class="flex-1 min-w-0">
+<p class="text-white text-sm font-medium truncate">Harissa Cans (Batch #402)</p>
+<p class="text-slate-400 text-xs">Expiring in 2 days • Warehouse Tunis Sud</p>
+</div>
+<button class="h-8 w-8 rounded-full bg-slate-800 flex items-center justify-center text-slate-300 hover:text-white hover:bg-slate-700">
+<span class="material-symbols-outlined text-[18px]">chevron_right</span>
+</button>
+</div>
+<!-- Alert Item 2 -->
+<div class="bg-surface-dark border border-border-dark rounded-xl p-3 flex items-center gap-4">
+<div class="h-12 w-12 rounded-lg bg-blue-900/20 flex items-center justify-center shrink-0 border border-blue-500/20">
+<span class="material-symbols-outlined text-blue-400">inventory_2</span>
+</div>
+<div class="flex-1 min-w-0">
+<p class="text-white text-sm font-medium truncate">Fresh Milk Supply</p>
+<p class="text-slate-400 text-xs">Stock low (15%) • Warehouse Ariana</p>
+</div>
+<button class="h-8 w-8 rounded-full bg-slate-800 flex items-center justify-center text-slate-300 hover:text-white hover:bg-slate-700">
+<span class="material-symbols-outlined text-[18px]">chevron_right</span>
+</button>
+</div>
+</div>
+</section>
+<!-- Delivery Efficiency (Bar Chart) -->
+<section class="bg-surface-dark border border-border-dark rounded-xl p-5">
+<div class="mb-4">
+<h3 class="text-white text-sm font-semibold">Delivery Efficiency</h3>
+<div class="flex items-center gap-2 mt-1">
+<span class="material-symbols-outlined text-emerald-400 text-[18px]">check_circle</span>
+<span class="text-2xl font-bold text-white tracking-tight">94%</span>
+<span class="text-sm text-slate-400">On Time</span>
+</div>
+</div>
+<div class="flex items-end justify-between h-32 gap-3 px-2">
+<!-- Bar 1 -->
+<div class="flex flex-col items-center gap-2 w-full group">
+<div class="w-full bg-slate-800 rounded-t-sm relative h-24 overflow-hidden">
+<div class="absolute bottom-0 w-full bg-slate-700 h-[40%] group-hover:bg-primary/60 transition-colors"></div>
+</div>
+<span class="text-[10px] text-slate-500 font-medium">Wk1</span>
+</div>
+<!-- Bar 2 -->
+<div class="flex flex-col items-center gap-2 w-full group">
+<div class="w-full bg-slate-800 rounded-t-sm relative h-24 overflow-hidden">
+<div class="absolute bottom-0 w-full bg-slate-700 h-[65%] group-hover:bg-primary/60 transition-colors"></div>
+</div>
+<span class="text-[10px] text-slate-500 font-medium">Wk2</span>
+</div>
+<!-- Bar 3 -->
+<div class="flex flex-col items-center gap-2 w-full group">
+<div class="w-full bg-slate-800 rounded-t-sm relative h-24 overflow-hidden">
+<div class="absolute bottom-0 w-full bg-primary h-[85%] shadow-[0_0_10px_rgba(17,82,212,0.5)]"></div>
+</div>
+<span class="text-[10px] text-white font-bold">Wk3</span>
+</div>
+<!-- Bar 4 -->
+<div class="flex flex-col items-center gap-2 w-full group">
+<div class="w-full bg-slate-800 rounded-t-sm relative h-24 overflow-hidden">
+<div class="absolute bottom-0 w-full bg-slate-700 h-[55%] group-hover:bg-primary/60 transition-colors"></div>
+</div>
+<span class="text-[10px] text-slate-500 font-medium">Wk4</span>
+</div>
+</div>
+</section>
+<!-- Driver List Preview -->
+<section>
+<div class="flex items-center justify-between mb-3 px-1">
+<h3 class="text-white font-semibold text-base">Recent Active Drivers</h3>
+<a class="text-xs text-primary hover:text-blue-400 font-medium" href="#">View All</a>
+</div>
+<div class="bg-surface-dark border border-border-dark rounded-xl overflow-hidden divide-y divide-border-dark">
+<!-- Driver 1 -->
+<div class="p-3 flex items-center justify-between">
+<div class="flex items-center gap-3">
+<div class="h-10 w-10 rounded-full overflow-hidden bg-slate-700">
+<img alt="Driver Ahmed" class="h-full w-full object-cover" data-alt="Driver profile picture" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBJNAeR6WlEDxX2vMoHhslN1zY7hA64tTcHr-zrFXBHdcdxIygFTEZz5Nb9UFAYnxufEAdF3EiNrsW7JCbNupYpYfxVwF8RkvfuuPNDi9gXTIIiDLyB6I5LcppaYp7YWvngw2vTLkXbmAQ-GGeU5qzK7EVJri5Ej53bVjvZN23mjAXEMrsXCaaLzB8sKednVsc5-21jOsQBEbGU5vhYo2wIj3SddJ-QRQG2BbcXv1AkJs1uXi09OfvHOP8fcNjSaTHiD_oqYXFzaAs"/>
+</div>
+<div>
+<p class="text-sm text-white font-medium">Ahmed Ben Ali</p>
+<div class="flex items-center gap-1">
+<span class="material-symbols-outlined text-yellow-500 text-[12px] fill">star</span>
+<span class="text-xs text-slate-400">4.9 • Tunis Centre</span>
+</div>
+</div>
+</div>
+<span class="text-xs font-medium text-emerald-400 bg-emerald-400/10 px-2 py-1 rounded-full">Active</span>
+</div>
+<!-- Driver 2 -->
+<div class="p-3 flex items-center justify-between">
+<div class="flex items-center gap-3">
+<div class="h-10 w-10 rounded-full overflow-hidden bg-slate-700">
+<img alt="Driver Sami" class="h-full w-full object-cover" data-alt="Driver profile picture" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBNlPi1YwqmostctlXGPR4uAcXET2Dk0-K36y-YzSnFEKbIAfHtrAnKgrRA2ItIfxmC87uQyXS_kEvAq1Dj04H7hF6Kz8bVdKUOda_tyUVrrcJ71c8ORWdJJEm9XV_gIPH7ubcUI9-fNwX4YAKu4uawH6FhAl-IBHGZnnjTFxFWFP05Y7opFwzbD8EHkyIkbM8-GCzeHpOW5luHUZVi3q59vnpzv1WHj8JrqjtTexUXyGBkc4LsJSmf55uzGtPjjoCvaDtxLTH__us"/>
+</div>
+<div>
+<p class="text-sm text-white font-medium">Sami Karoui</p>
+<div class="flex items-center gap-1">
+<span class="material-symbols-outlined text-yellow-500 text-[12px] fill">star</span>
+<span class="text-xs text-slate-400">4.7 • La Marsa</span>
+</div>
+</div>
+</div>
+<span class="text-xs font-medium text-slate-500 bg-slate-800 px-2 py-1 rounded-full">Offline</span>
+</div>
+</div>
+</section>
+</main>
+<!-- Bottom Navigation -->
+<nav class="fixed bottom-0 w-full bg-background-dark border-t border-border-dark px-6 pb-6 pt-3 z-50">
+<div class="flex justify-between items-center max-w-md mx-auto">
+<a class="flex flex-col items-center gap-1 text-primary group" href="#">
+<div class="p-1 rounded-full group-hover:bg-primary/10 transition-colors">
+<span class="material-symbols-outlined fill text-[24px]">dashboard</span>
+</div>
+<span class="text-[10px] font-medium">Dashboard</span>
+</a>
+<a class="flex flex-col items-center gap-1 text-slate-400 hover:text-white transition-colors group" href="#">
+<div class="p-1 rounded-full group-hover:bg-white/5 transition-colors">
+<span class="material-symbols-outlined text-[24px]">two_wheeler</span>
+</div>
+<span class="text-[10px] font-medium">Drivers</span>
+</a>
+<a class="flex flex-col items-center gap-1 text-slate-400 hover:text-white transition-colors group" href="#">
+<div class="p-1 rounded-full group-hover:bg-white/5 transition-colors">
+<span class="material-symbols-outlined text-[24px]">receipt_long</span>
+</div>
+<span class="text-[10px] font-medium">Orders</span>
+</a>
+<a class="flex flex-col items-center gap-1 text-slate-400 hover:text-white transition-colors group" href="#">
+<div class="p-1 rounded-full group-hover:bg-white/5 transition-colors">
+<span class="material-symbols-outlined text-[24px]">settings</span>
+</div>
+<span class="text-[10px] font-medium">Settings</span>
+</a>
+</div>
+</nav>
+</body></html>

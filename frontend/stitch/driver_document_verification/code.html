@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Driver Document Verification</title>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#f47b25",
+                        "primary-dark": "#d66210",
+                        "background-light": "#fcfaf8",
+                        "background-dark": "#221710",
+                        "surface-light": "#ffffff",
+                        "surface-dark": "#2e211a",
+                        "text-primary-light": "#1c130d",
+                        "text-primary-dark": "#ece0da",
+                        "text-secondary-light": "#9c6c49",
+                        "text-secondary-dark": "#bfa08a",
+                    },
+                    fontFamily: {
+                        "display": ["Manrope", "sans-serif"]
+                    },
+                    borderRadius: { "DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px" },
+                },
+            },
+        }
+    </script>
+<style>
+        /* Custom scrollbar for webkit */
+        ::-webkit-scrollbar {
+            width: 0px;
+            background: transparent;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background-light dark:bg-background-dark font-display antialiased overflow-x-hidden">
+<div class="relative flex h-full min-h-screen w-full flex-col bg-background-light dark:bg-background-dark group/design-root">
+<!-- Header -->
+<div class="sticky top-0 z-10 flex items-center bg-background-light dark:bg-background-dark p-4 pb-2 justify-between border-b border-primary/10 dark:border-primary/5">
+<div class="text-text-primary-light dark:text-text-primary-dark flex size-12 shrink-0 items-center cursor-pointer hover:bg-primary/10 rounded-full justify-center transition-colors">
+<span class="material-symbols-outlined">arrow_back</span>
+</div>
+<h2 class="text-text-primary-light dark:text-text-primary-dark text-lg font-bold leading-tight tracking-[-0.015em] flex-1 text-center pr-12">
+                Document Verification
+            </h2>
+</div>
+<!-- Progress Section -->
+<div class="flex flex-col gap-3 p-4 bg-background-light dark:bg-background-dark">
+<div class="flex gap-6 justify-between items-end">
+<p class="text-text-primary-light dark:text-text-primary-dark text-base font-bold leading-normal">
+                    Let's get you on the road
+                </p>
+<p class="text-primary text-sm font-bold leading-normal">33%</p>
+</div>
+<div class="rounded-full bg-primary/20 dark:bg-primary/10 h-2 w-full overflow-hidden">
+<div class="h-full rounded-full bg-primary transition-all duration-500 ease-out" style="width: 33%;"></div>
+</div>
+<p class="text-text-secondary-light dark:text-text-secondary-dark text-sm font-normal leading-normal">
+                1 of 3 documents uploaded. We need these to verify your identity and vehicle.
+            </p>
+</div>
+<!-- Info Banner (Tunisian Context - Helpful Tip) -->
+<div class="px-4 pb-2">
+<div class="bg-blue-50 dark:bg-blue-900/20 border border-blue-100 dark:border-blue-800 rounded-xl p-4 flex gap-3 items-start">
+<span class="material-symbols-outlined text-blue-600 dark:text-blue-400 shrink-0 mt-0.5">info</span>
+<div class="flex flex-col gap-1">
+<p class="text-blue-900 dark:text-blue-100 text-sm font-medium">Clear photos required</p>
+<p class="text-blue-700 dark:text-blue-300 text-xs">Ensure your CIN and Carte Grise are fully visible and glare-free for faster approval.</p>
+</div>
+</div>
+</div>
+<!-- Documents List -->
+<div class="flex flex-col flex-1 pb-24">
+<!-- Item 1: National ID (CIN) - Verified -->
+<div class="flex items-center gap-4 bg-background-light dark:bg-background-dark px-4 py-3 justify-between border-b border-primary/5 dark:border-primary/5 hover:bg-surface-light dark:hover:bg-surface-dark transition-colors group">
+<div class="flex items-center gap-4 flex-1">
+<div class="relative">
+<div class="text-green-600 dark:text-green-400 flex items-center justify-center rounded-xl bg-green-100 dark:bg-green-900/30 shrink-0 size-12">
+<span class="material-symbols-outlined">badge</span>
+</div>
+<div class="absolute -bottom-1 -right-1 bg-green-500 text-white rounded-full p-0.5 border-2 border-background-light dark:border-background-dark flex items-center justify-center size-5">
+<span class="material-symbols-outlined text-[12px] font-bold">check</span>
+</div>
+</div>
+<div class="flex flex-col justify-center">
+<p class="text-text-primary-light dark:text-text-primary-dark text-base font-bold leading-normal line-clamp-1">National ID (CIN)</p>
+<p class="text-green-600 dark:text-green-400 text-sm font-medium leading-normal">Verified</p>
+</div>
+</div>
+<div class="shrink-0">
+<button class="flex items-center justify-center rounded-lg h-9 px-3 text-text-secondary-light dark:text-text-secondary-dark text-sm font-medium leading-normal w-fit hover:bg-black/5 dark:hover:bg-white/5 transition-colors">
+<span class="truncate">Edit</span>
+</button>
+</div>
+</div>
+<!-- Item 2: Driving License - Pending -->
+<div class="flex items-center gap-4 bg-background-light dark:bg-background-dark px-4 py-3 justify-between border-b border-primary/5 dark:border-primary/5 hover:bg-surface-light dark:hover:bg-surface-dark transition-colors group">
+<div class="flex items-center gap-4 flex-1">
+<div class="relative">
+<div class="text-orange-500 dark:text-orange-400 flex items-center justify-center rounded-xl bg-orange-100 dark:bg-orange-900/30 shrink-0 size-12">
+<span class="material-symbols-outlined">commute</span>
+</div>
+<div class="absolute -bottom-1 -right-1 bg-orange-500 text-white rounded-full p-0.5 border-2 border-background-light dark:border-background-dark flex items-center justify-center size-5">
+<span class="material-symbols-outlined text-[12px] font-bold">schedule</span>
+</div>
+</div>
+<div class="flex flex-col justify-center">
+<p class="text-text-primary-light dark:text-text-primary-dark text-base font-bold leading-normal line-clamp-1">Driving License</p>
+<p class="text-orange-600 dark:text-orange-400 text-sm font-medium leading-normal">Pending Review</p>
+</div>
+</div>
+<div class="shrink-0">
+<button class="flex items-center justify-center rounded-lg h-9 px-3 text-text-secondary-light dark:text-text-secondary-dark text-sm font-medium leading-normal w-fit hover:bg-black/5 dark:hover:bg-white/5 transition-colors">
+<span class="truncate">View</span>
+</button>
+</div>
+</div>
+<!-- Item 3: Motorcycle Registration - Not Started -->
+<div class="flex items-center gap-4 bg-background-light dark:bg-background-dark px-4 py-3 justify-between border-b border-primary/5 dark:border-primary/5 hover:bg-surface-light dark:hover:bg-surface-dark transition-colors group">
+<div class="flex items-center gap-4 flex-1">
+<div class="relative">
+<div class="text-text-secondary-light dark:text-text-secondary-dark flex items-center justify-center rounded-xl bg-primary/10 dark:bg-primary/5 shrink-0 size-12">
+<span class="material-symbols-outlined">two_wheeler</span>
+</div>
+<!-- No badge for not started -->
+</div>
+<div class="flex flex-col justify-center">
+<p class="text-text-primary-light dark:text-text-primary-dark text-base font-bold leading-normal line-clamp-1">Motorcycle Registration</p>
+<p class="text-text-secondary-light dark:text-text-secondary-dark text-sm font-normal leading-normal">Required</p>
+</div>
+</div>
+<div class="shrink-0">
+<button class="flex min-w-[84px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-9 px-4 bg-primary text-white text-sm font-bold leading-normal w-fit shadow-sm shadow-primary/20 hover:bg-primary-dark transition-colors">
+<span class="truncate">Upload</span>
+</button>
+</div>
+</div>
+<!-- Item 4: Insurance - Not Started (Extra) -->
+<div class="flex items-center gap-4 bg-background-light dark:bg-background-dark px-4 py-3 justify-between border-b border-primary/5 dark:border-primary/5 hover:bg-surface-light dark:hover:bg-surface-dark transition-colors group">
+<div class="flex items-center gap-4 flex-1">
+<div class="relative">
+<div class="text-text-secondary-light dark:text-text-secondary-dark flex items-center justify-center rounded-xl bg-primary/10 dark:bg-primary/5 shrink-0 size-12">
+<span class="material-symbols-outlined">verified_user</span>
+</div>
+</div>
+<div class="flex flex-col justify-center">
+<p class="text-text-primary-light dark:text-text-primary-dark text-base font-bold leading-normal line-clamp-1">Insurance Certificate</p>
+<p class="text-text-secondary-light dark:text-text-secondary-dark text-sm font-normal leading-normal">Required</p>
+</div>
+</div>
+<div class="shrink-0">
+<button class="flex min-w-[84px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-9 px-4 bg-primary text-white text-sm font-bold leading-normal w-fit shadow-sm shadow-primary/20 hover:bg-primary-dark transition-colors">
+<span class="truncate">Upload</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Sticky Bottom Action -->
+<div class="fixed bottom-0 left-0 right-0 p-4 bg-background-light/90 dark:bg-background-dark/90 backdrop-blur-md border-t border-primary/10 dark:border-primary/5">
+<button class="w-full h-12 rounded-xl bg-gray-200 dark:bg-gray-700 text-gray-400 dark:text-gray-500 font-bold text-base flex items-center justify-center cursor-not-allowed" disabled="">
+                Submit Documents
+            </button>
+<p class="text-center text-xs text-text-secondary-light dark:text-text-secondary-dark mt-2">
+                Complete all required uploads to submit.
+            </p>
+</div>
+</div>
+</body></html>

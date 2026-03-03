@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+
+<html lang="fr"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>UberMoto - Customer Home</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#f47b25",
+                        "background-light": "#f8f7f5",
+                        "background-dark": "#221710",
+                        "surface-light": "#ffffff",
+                        "surface-dark": "#2d241e",
+                        "text-main-light": "#1c130d",
+                        "text-main-dark": "#f4ece7",
+                        "text-sub-light": "#9c6c49",
+                        "text-sub-dark": "#d6bba6",
+                    },
+                    fontFamily: {
+                        "display": ["Plus Jakarta Sans", "sans-serif"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "2xl": "1rem",
+                        "full": "9999px"
+                    },
+                },
+            },
+        }
+    </script>
+<style>
+        /* Hide scrollbar for Chrome, Safari and Opera */
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        /* Hide scrollbar for IE, Edge and Firefox */
+        .no-scrollbar {
+            -ms-overflow-style: none;  /* IE and Edge */
+            scrollbar-width: none;  /* Firefox */
+        }
+        .shimmer {
+            background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+            background-size: 200% 100%;
+            animation: shimmer 1.5s infinite;
+        }
+        @keyframes shimmer {
+            0% { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
+        }
+        .dark .shimmer {
+            background: linear-gradient(90deg, #2d241e 25%, #3d342e 50%, #2d241e 75%);
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background-light dark:bg-background-dark font-display text-text-main-light dark:text-text-main-dark transition-colors duration-200">
+<div class="relative flex min-h-screen w-full flex-col max-w-md mx-auto bg-background-light dark:bg-background-dark overflow-x-hidden shadow-2xl">
+<!-- Header -->
+<header class="flex items-center justify-between p-6 pb-2 sticky top-0 z-20 bg-background-light/95 dark:bg-background-dark/95 backdrop-blur-sm">
+<div>
+<p class="text-text-sub-light dark:text-text-sub-dark text-sm font-medium">Bienvenue,</p>
+<h2 class="text-2xl font-bold tracking-tight text-primary">Asslema, Ahmed!</h2>
+</div>
+<button class="flex items-center justify-center h-12 w-12 rounded-full bg-surface-light dark:bg-surface-dark shadow-sm border border-slate-100 dark:border-slate-800 relative overflow-hidden group">
+<img alt="User Profile" class="w-full h-full object-cover" data-alt="Portrait of a smiling young man" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAIABuQrpFoKwd77oAl1hjLlc0BZquq4RA54vqsA9YtvchamKdPTHfvZ2SR_uo1bBiltimoo4cKrW3Jc0J8RpDf6EVbsDIZf2AU0sDBGYcDk9iCQvk2u1m9ItFHkgl0QnGrRL9H2wtfU18ws8vRrm20URjnkRzgCHdc1jNmOi1FA0lIRrEKIP8luGVN7q4HTVTozJRyTV2mqWkEkvMwasr4q9lY4ju9TUuFUnOxuYkjq54hyPZh8EpSjOzot7qoyZCoe-fGVS7SZSc"/>
+</button>
+</header>
+<!-- Search Bar -->
+<div class="px-6 py-4">
+<div class="flex gap-3">
+<div class="flex-1 relative h-12">
+<div class="absolute inset-y-0 left-0 flex items-center pl-4 pointer-events-none text-text-sub-light dark:text-text-sub-dark">
+<span class="material-symbols-outlined">search</span>
+</div>
+<input class="w-full h-full rounded-xl bg-surface-light dark:bg-surface-dark border-none pl-12 pr-4 text-base placeholder:text-text-sub-light/60 dark:placeholder:text-text-sub-dark/60 focus:ring-2 focus:ring-primary/50 shadow-sm" placeholder="Rechercher couscous, harissa..." type="text"/>
+</div>
+<button class="h-12 w-12 flex items-center justify-center rounded-xl bg-primary text-white shadow-lg shadow-primary/30 active:scale-95 transition-transform">
+<span class="material-symbols-outlined">tune</span>
+</button>
+</div>
+</div>
+<!-- Categories Parallax-style Carousel -->
+<div class="flex flex-col gap-4 py-2">
+<div class="flex items-center justify-between px-6">
+<h3 class="text-lg font-bold">Catégories</h3>
+<a class="text-primary text-sm font-medium hover:underline" href="#">Voir tout</a>
+</div>
+<div class="flex gap-4 overflow-x-auto no-scrollbar px-6 pb-4 snap-x">
+<!-- Category 1 -->
+<a class="snap-start flex-shrink-0 flex flex-col gap-2 items-center group w-[80px]" href="#">
+<div class="h-16 w-16 rounded-2xl bg-orange-100 dark:bg-orange-900/20 flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-white transition-colors duration-300">
+<span class="material-symbols-outlined text-3xl">grocery</span>
+</div>
+<span class="text-xs font-medium text-center truncate w-full group-hover:text-primary transition-colors">Épicerie</span>
+</a>
+<!-- Category 2 -->
+<a class="snap-start flex-shrink-0 flex flex-col gap-2 items-center group w-[80px]" href="#">
+<div class="h-16 w-16 rounded-2xl bg-green-100 dark:bg-green-900/20 flex items-center justify-center text-green-600 dark:text-green-400 group-hover:bg-green-600 group-hover:text-white transition-colors duration-300">
+<span class="material-symbols-outlined text-3xl">nutrition</span>
+</div>
+<span class="text-xs font-medium text-center truncate w-full group-hover:text-green-600 transition-colors">Légumes</span>
+</a>
+<!-- Category 3 -->
+<a class="snap-start flex-shrink-0 flex flex-col gap-2 items-center group w-[80px]" href="#">
+<div class="h-16 w-16 rounded-2xl bg-red-100 dark:bg-red-900/20 flex items-center justify-center text-red-600 dark:text-red-400 group-hover:bg-red-600 group-hover:text-white transition-colors duration-300">
+<span class="material-symbols-outlined text-3xl">local_fire_department</span>
+</div>
+<span class="text-xs font-medium text-center truncate w-full group-hover:text-red-600 transition-colors">Épices</span>
+</a>
+<!-- Category 4 -->
+<a class="snap-start flex-shrink-0 flex flex-col gap-2 items-center group w-[80px]" href="#">
+<div class="h-16 w-16 rounded-2xl bg-blue-100 dark:bg-blue-900/20 flex items-center justify-center text-blue-600 dark:text-blue-400 group-hover:bg-blue-600 group-hover:text-white transition-colors duration-300">
+<span class="material-symbols-outlined text-3xl">water_drop</span>
+</div>
+<span class="text-xs font-medium text-center truncate w-full group-hover:text-blue-600 transition-colors">Boissons</span>
+</a>
+<!-- Category 5 -->
+<a class="snap-start flex-shrink-0 flex flex-col gap-2 items-center group w-[80px]" href="#">
+<div class="h-16 w-16 rounded-2xl bg-yellow-100 dark:bg-yellow-900/20 flex items-center justify-center text-yellow-600 dark:text-yellow-400 group-hover:bg-yellow-600 group-hover:text-white transition-colors duration-300">
+<span class="material-symbols-outlined text-3xl">bakery_dining</span>
+</div>
+<span class="text-xs font-medium text-center truncate w-full group-hover:text-yellow-600 transition-colors">Boulangerie</span>
+</a>
+</div>
+</div>
+<!-- Banner Promo -->
+<div class="px-6 mb-6">
+<div class="relative w-full h-40 rounded-2xl overflow-hidden bg-primary shadow-lg">
+<img alt="Tunisian food delivery background" class="absolute inset-0 w-full h-full object-cover mix-blend-overlay opacity-50" data-alt="Abstract Tunisian pattern background" src="https://lh3.googleusercontent.com/aida-public/AB6AXuC1UyX9OZtZfr_iltulb7RRvG2XLwmVycXBaqBQmITAbHAsl2lD7kVr8RiO-GQWNQ6mqkLqKiysT47Cty2rwHa89VZqWUl8AZBFFJzGjH5AZD5pBP2zeViLk-ww8smC_AL20XZD1NUzkozJnC36ZWU8XUs5WErHV2ej4VOrcZgcR44NzA4qPu7tC2bbL3_Zq63VLr09no1FCjrc0CgRFYLuVY1ZfiSAlFmkLQqIv-NwePtM9oFM_hx6dcZymjJNAvgSKct26l9lcg0"/>
+<div class="absolute inset-0 bg-gradient-to-r from-primary to-transparent opacity-90"></div>
+<div class="relative z-10 flex flex-col justify-center h-full px-6 text-white">
+<span class="text-sm font-semibold mb-1 opacity-90">Offre Spéciale</span>
+<h3 class="text-2xl font-bold mb-2 w-2/3 leading-tight">Livraison Gratuite sur votre 1ère commande!</h3>
+<button class="bg-white text-primary px-4 py-2 rounded-lg text-sm font-bold self-start shadow-md active:scale-95 transition-transform">Commander</button>
+</div>
+</div>
+</div>
+<!-- Popular Products Section -->
+<div class="flex-1 bg-surface-light dark:bg-surface-dark rounded-t-[32px] p-6 pb-24 shadow-[0_-4px_20px_rgba(0,0,0,0.05)] dark:shadow-none">
+<div class="flex items-center justify-between mb-6">
+<h2 class="text-xl font-bold">Populaire à Tunis</h2>
+<div class="flex gap-1">
+<span class="h-1.5 w-1.5 rounded-full bg-primary"></span>
+<span class="h-1.5 w-1.5 rounded-full bg-slate-300 dark:bg-slate-700"></span>
+<span class="h-1.5 w-1.5 rounded-full bg-slate-300 dark:bg-slate-700"></span>
+</div>
+</div>
+<div class="grid grid-cols-2 gap-4">
+<!-- Product Card 1 -->
+<div class="flex flex-col gap-2 group cursor-pointer">
+<div class="relative aspect-square rounded-2xl overflow-hidden bg-background-light dark:bg-background-dark">
+<img alt="Harissa Can" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" data-alt="Traditional Harissa spice jar" src="https://lh3.googleusercontent.com/aida-public/AB6AXuANljbrau7PDzD7_YiNrqQ_1M3eU3Ks2oRtuDDoBpey7tQoCGZjp24JaX4BDKhEdvQKLy9Z8AK3xT_1Wo7TEp-RHKn40jFhESz7SFEHTBJ3iRvv9YiO3Mz-bdRrNkkhFSHfa1MP5-Ja3yPTzcwQ8FN-wJ12eyhLJA-PZt6bC5c1OGI7J8DA50UGeQBKTQveb7BRhEvhotwBK7CfvGaYkTVm-NqjZLMKR1oVAdBxbqjTH5ckN2RRZHtojI9fmwdws6zvSUR2MM53dP4"/>
+<button class="absolute top-2 right-2 h-8 w-8 bg-white/80 dark:bg-black/50 backdrop-blur rounded-full flex items-center justify-center text-red-500 hover:bg-red-50 transition-colors">
+<span class="material-symbols-outlined text-lg">favorite</span>
+</button>
+</div>
+<div>
+<div class="flex justify-between items-start">
+<h4 class="font-bold text-base line-clamp-1">Harissa Sicam</h4>
+<span class="text-primary font-bold text-sm whitespace-nowrap">2.5 DT</span>
+</div>
+<p class="text-xs text-text-sub-light dark:text-text-sub-dark mt-0.5">Épices &amp; Condiments</p>
+</div>
+</div>
+<!-- Product Card 2 -->
+<div class="flex flex-col gap-2 group cursor-pointer">
+<div class="relative aspect-square rounded-2xl overflow-hidden bg-background-light dark:bg-background-dark">
+<img alt="Couscous Pack" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" data-alt="Packet of traditional Couscous" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAT2iQyz2C0-laySzWV8rn3aQUaJt6Edog8SSTjet8wHQ2FEQaunTRXt1HBedaqikhd97FH84jHQLCtxsxAuiPfaV8YSGua_Z9okmXtO-XXFK3VCOM690vXf7mm0VdOw4it3ZjSpODBAdk3X8ZwFwCaquhzFnR7PcUVlKYU9Kk3ieT5u4NgTqCqfdyNwzLeMReyDaILHCjX6qhunDIWOdj1JkfKV7jirT9gRZiuS-0AUSvOj8of65T5GRtXgMbGDmx5jlQulMIysu0"/>
+<button class="absolute top-2 right-2 h-8 w-8 bg-white/80 dark:bg-black/50 backdrop-blur rounded-full flex items-center justify-center text-slate-400 hover:text-red-500 transition-colors">
+<span class="material-symbols-outlined text-lg">favorite</span>
+</button>
+</div>
+<div>
+<div class="flex justify-between items-start">
+<h4 class="font-bold text-base line-clamp-1">Couscous Fin</h4>
+<span class="text-primary font-bold text-sm whitespace-nowrap">1.8 DT</span>
+</div>
+<p class="text-xs text-text-sub-light dark:text-text-sub-dark mt-0.5">Céréales</p>
+</div>
+</div>
+<!-- Product Card 3 (Shimmer Loading) -->
+<div class="flex flex-col gap-2">
+<div class="aspect-square rounded-2xl shimmer overflow-hidden relative">
+<!-- Placeholder content -->
+</div>
+<div class="flex flex-col gap-1 mt-1">
+<div class="h-4 w-2/3 bg-slate-200 dark:bg-slate-800 rounded shimmer"></div>
+<div class="h-3 w-1/2 bg-slate-200 dark:bg-slate-800 rounded shimmer"></div>
+</div>
+</div>
+<!-- Product Card 4 -->
+<div class="flex flex-col gap-2 group cursor-pointer">
+<div class="relative aspect-square rounded-2xl overflow-hidden bg-background-light dark:bg-background-dark">
+<img alt="Ramen Noodles" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" data-alt="Bowl of spicy ramen" src="https://lh3.googleusercontent.com/aida-public/AB6AXuALx9X92FJa37FQ9OVX09SBkzeWm6woCk5qqeY3nNsbY0sX5Zvjc_tf9kwkKTLtXAnQYsfITsEfM0mATrpJYE-FIYUbqD5JXj3m0-XpLUmf3MI6LIfxIy4QYGXjEELrDTafj44yeFUjILADLbgU854lt3lLO7d2OvjnFY4mAfLhBQCpDLX9TLeYcIjOFMwXsYKoNOIVmBo8D96pf6jXUYHVAv5bjPbdyln-xkXR_RS-c16M3vKyug3rTFxIY2zlWYoo-OF5l6XIeU0"/>
+<button class="absolute top-2 right-2 h-8 w-8 bg-white/80 dark:bg-black/50 backdrop-blur rounded-full flex items-center justify-center text-slate-400 hover:text-red-500 transition-colors">
+<span class="material-symbols-outlined text-lg">favorite</span>
+</button>
+<div class="absolute bottom-2 left-2 bg-primary text-white text-[10px] font-bold px-2 py-1 rounded-md">
+                            -20%
+                        </div>
+</div>
+<div>
+<div class="flex justify-between items-start">
+<h4 class="font-bold text-base line-clamp-1">Indomie Poulet</h4>
+<span class="text-primary font-bold text-sm whitespace-nowrap">1.2 DT</span>
+</div>
+<p class="text-xs text-text-sub-light dark:text-text-sub-dark mt-0.5">Pâtes Instantanées</p>
+</div>
+</div>
+</div>
+</div>
+<!-- Bottom Navigation Bar -->
+<nav class="fixed bottom-0 left-0 right-0 max-w-md mx-auto bg-surface-light dark:bg-surface-dark border-t border-slate-100 dark:border-slate-800 pb-safe pt-2 px-2 z-50">
+<div class="flex items-center justify-around pb-2">
+<!-- Home (Active) -->
+<a class="flex flex-col items-center justify-center gap-1 w-16 group" href="#">
+<div class="relative flex items-center justify-center h-10 w-10 bg-primary/10 rounded-full transition-all">
+<span class="material-symbols-outlined text-primary text-[24px]">home</span>
+</div>
+<span class="text-[10px] font-bold text-primary">Accueil</span>
+</a>
+<!-- Orders -->
+<a class="flex flex-col items-center justify-center gap-1 w-16 group" href="#">
+<div class="relative flex items-center justify-center h-10 w-10 hover:bg-slate-50 dark:hover:bg-white/5 rounded-full transition-all text-text-sub-light dark:text-text-sub-dark group-hover:text-primary">
+<span class="material-symbols-outlined text-[24px]">receipt_long</span>
+</div>
+<span class="text-[10px] font-medium text-text-sub-light dark:text-text-sub-dark group-hover:text-primary">Commandes</span>
+</a>
+<!-- Cart (Floating Center) -->
+<a class="flex flex-col items-center justify-center gap-1 w-16 -mt-8" href="#">
+<div class="flex items-center justify-center h-14 w-14 bg-primary text-white rounded-full shadow-lg shadow-primary/40 active:scale-95 transition-transform border-4 border-background-light dark:border-background-dark">
+<span class="material-symbols-outlined text-[28px]">shopping_cart</span>
+<div class="absolute top-3 right-3 h-3 w-3 bg-red-500 rounded-full border-2 border-primary"></div>
+</div>
+</a>
+<!-- Wallet -->
+<a class="flex flex-col items-center justify-center gap-1 w-16 group" href="#">
+<div class="relative flex items-center justify-center h-10 w-10 hover:bg-slate-50 dark:hover:bg-white/5 rounded-full transition-all text-text-sub-light dark:text-text-sub-dark group-hover:text-primary">
+<span class="material-symbols-outlined text-[24px]">account_balance_wallet</span>
+</div>
+<span class="text-[10px] font-medium text-text-sub-light dark:text-text-sub-dark group-hover:text-primary">Portefeuille</span>
+</a>
+<!-- Profile -->
+<a class="flex flex-col items-center justify-center gap-1 w-16 group" href="#">
+<div class="relative flex items-center justify-center h-10 w-10 hover:bg-slate-50 dark:hover:bg-white/5 rounded-full transition-all text-text-sub-light dark:text-text-sub-dark group-hover:text-primary">
+<span class="material-symbols-outlined text-[24px]">person</span>
+</div>
+<span class="text-[10px] font-medium text-text-sub-light dark:text-text-sub-dark group-hover:text-primary">Profil</span>
+</a>
+</div>
+</nav>
+</div>
+</body></html>

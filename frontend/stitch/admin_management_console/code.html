@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>UberMoto Admin Console</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#f47b25",
+                        "primary-dark": "#d66210",
+                        "background-light": "#f8f7f5",
+                        "background-dark": "#221710",
+                        "surface-light": "#ffffff",
+                        "surface-dark": "#2d2018",
+                        "text-main": "#1c130d",
+                        "text-muted": "#9c6c49",
+                        "header-bg": "#101822", // Darker blue header requested
+                    },
+                    fontFamily: {
+                        "display": ["Plus Jakarta Sans", "sans-serif"]
+                    },
+                    borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+<style>
+        /* Custom scrollbar for a cleaner look */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #e8d9ce;
+            border-radius: 3px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #d4c2b5;
+        }
+        .bg-pattern {
+            background-color: #f8f7f5;
+            background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23f47b25' fill-opacity='0.05'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background-light dark:bg-background-dark font-display text-text-main dark:text-slate-100 antialiased overflow-x-hidden">
+<!-- Main Container -->
+<div class="relative flex min-h-screen w-full flex-col bg-pattern dark:bg-background-dark pb-20">
+<!-- Header: Darker blue as requested -->
+<div class="sticky top-0 z-50 w-full bg-header-bg text-white shadow-md">
+<div class="flex items-center justify-between px-4 py-3">
+<div class="flex items-center gap-3">
+<button class="flex size-10 items-center justify-center rounded-full hover:bg-white/10 transition-colors">
+<span class="material-symbols-outlined text-white text-[24px]">menu</span>
+</button>
+<div>
+<h1 class="text-lg font-bold leading-none tracking-tight">UberMoto Admin</h1>
+<p class="text-xs text-slate-400 font-medium">Tunis Region • <span class="text-primary">Live</span></p>
+</div>
+</div>
+<div class="flex items-center gap-2">
+<button class="relative flex size-10 items-center justify-center rounded-full hover:bg-white/10 transition-colors">
+<span class="material-symbols-outlined text-white text-[24px]">notifications</span>
+<span class="absolute top-2 right-2 size-2 rounded-full bg-primary ring-2 ring-header-bg"></span>
+</button>
+<div class="size-8 rounded-full bg-white/20 overflow-hidden ring-2 ring-white/10" data-alt="Admin user profile picture">
+<img alt="Admin Profile" class="h-full w-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDo78oaBM7pvaVCOyIZS0Ddlv_KKlLMHL11ftfagcxxVApkL6Ukk2KC57GeBn_p1wgA09-q-oX4g-18XEJ_IUor87qFyJYaZ8YWCjo9sZDd0QRFALgbyMaQSJpWNtWSmCIFirGq0HDTwXrWmoVNDVGPq-F6wb-coLYt1iQD6jnZfOgv78RpiZWB5KukUK3-YxqH8ziq2fx-WAd2mM5UGylSHfjg7kYzEmFYC9kTaQAvQOdmjNallbSVSp7ddXkdW491ehF--AHb9RE"/>
+</div>
+</div>
+</div>
+</div>
+<!-- Dashboard Content -->
+<main class="flex flex-col gap-6 px-4 pt-6">
+<!-- Greeting -->
+<div class="flex flex-col">
+<h2 class="text-2xl font-bold text-slate-900 dark:text-white">Marhaba, Sami 👋</h2>
+<p class="text-sm text-text-muted dark:text-slate-400">Here is what's happening with your fleet today.</p>
+</div>
+<!-- Stats Cards (Orange Accent) -->
+<div class="grid grid-cols-2 gap-3 md:grid-cols-4">
+<!-- Card 1 -->
+<div class="col-span-2 flex flex-col justify-between rounded-xl bg-gradient-to-br from-primary to-orange-600 p-5 text-white shadow-lg shadow-primary/20">
+<div class="flex items-start justify-between">
+<div class="flex flex-col">
+<span class="text-sm font-medium opacity-90">Daily Orders</span>
+<span class="mt-1 text-3xl font-bold tracking-tight">1,240</span>
+</div>
+<div class="rounded-lg bg-white/20 p-2 backdrop-blur-sm">
+<span class="material-symbols-outlined text-[24px]">two_wheeler</span>
+</div>
+</div>
+<div class="mt-4 flex items-center gap-1 text-xs font-medium">
+<span class="flex items-center rounded-full bg-white/20 px-1.5 py-0.5 text-white">
+<span class="material-symbols-outlined mr-1 text-[12px]">trending_up</span> +12%
+                        </span>
+<span class="opacity-80">vs yesterday</span>
+</div>
+</div>
+<!-- Card 2 -->
+<div class="flex flex-col justify-between rounded-xl bg-surface-light dark:bg-surface-dark p-4 shadow-sm border border-slate-200 dark:border-slate-800">
+<div class="mb-2 rounded-full bg-green-100 dark:bg-green-900/30 p-2 w-fit text-green-600 dark:text-green-400">
+<span class="material-symbols-outlined text-[20px]">person_check</span>
+</div>
+<div>
+<span class="block text-2xl font-bold text-slate-900 dark:text-white">356</span>
+<span class="text-xs font-medium text-text-muted">Active Drivers</span>
+</div>
+</div>
+<!-- Card 3 -->
+<div class="flex flex-col justify-between rounded-xl bg-surface-light dark:bg-surface-dark p-4 shadow-sm border border-orange-200 dark:border-orange-900/30 relative overflow-hidden group">
+<div class="absolute -right-4 -top-4 size-16 rounded-full bg-primary/10 transition-transform group-hover:scale-150"></div>
+<div class="mb-2 rounded-full bg-orange-100 dark:bg-orange-900/30 p-2 w-fit text-primary">
+<span class="material-symbols-outlined text-[20px]">pending_actions</span>
+</div>
+<div class="relative z-10">
+<span class="block text-2xl font-bold text-slate-900 dark:text-white">12</span>
+<span class="text-xs font-medium text-text-muted">Pending</span>
+</div>
+</div>
+</div>
+<!-- Quick Actions / Catalog Management Shortcut -->
+<div class="flex items-center justify-between rounded-xl bg-surface-light dark:bg-surface-dark p-4 shadow-sm border border-slate-200 dark:border-slate-800">
+<div class="flex items-center gap-3">
+<div class="flex size-10 items-center justify-center rounded-lg bg-indigo-50 dark:bg-indigo-900/20 text-indigo-600 dark:text-indigo-400">
+<span class="material-symbols-outlined text-[24px]">category</span>
+</div>
+<div class="flex flex-col">
+<span class="font-bold text-slate-900 dark:text-white text-sm">Catalog Management</span>
+<span class="text-xs text-text-muted">Manage vehicle types &amp; pricing</span>
+</div>
+</div>
+<button class="flex size-8 items-center justify-center rounded-full bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors">
+<span class="material-symbols-outlined text-[20px]">chevron_right</span>
+</button>
+</div>
+<!-- Verification Queue Section -->
+<div class="flex flex-col gap-4">
+<div class="flex items-center justify-between">
+<h3 class="text-lg font-bold text-slate-900 dark:text-white">Verification Queue</h3>
+<button class="text-xs font-bold text-primary hover:text-primary-dark">View All</button>
+</div>
+<div class="flex flex-col gap-3">
+<!-- Driver Item 1 -->
+<div class="flex flex-col gap-3 rounded-xl bg-surface-light dark:bg-surface-dark p-4 shadow-sm border border-slate-200 dark:border-slate-800">
+<div class="flex items-start justify-between gap-3">
+<div class="flex items-center gap-3">
+<div class="size-12 overflow-hidden rounded-lg bg-slate-200" data-alt="Portrait of Ahmed Ben Ali">
+<img alt="Ahmed Ben Ali" class="h-full w-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDaAcGjNP4lZ4_TLmqvvnz9eoBkG4cWBcykeqWGnSJJM4xN1rqk5X0Ir2OweKKz8Q4cgHnrJgqpvIqtDB602XCXmcmNxR5-d5QYx00gIfBTHLravaauPEfDQBBcSxo64cOa79_MdaZqmLQY32s-9Ms-kJ5GbS3-T4gcpEhp_cqbseV_4_JOe0Nli3XtOELH8SI5VaL6gXFqF48klAqYxP_KfJUmdElfwXg5FQ3W_8ocGohpUM0UoGGjH3pKKpkN1aYqZ3a4mDN8M9I"/>
+</div>
+<div class="flex flex-col">
+<h4 class="text-sm font-bold text-slate-900 dark:text-white">Ahmed Ben Ali</h4>
+<span class="text-xs text-text-muted">Submitted 2h ago</span>
+</div>
+</div>
+<span class="rounded-full bg-yellow-100 dark:bg-yellow-900/30 px-2 py-1 text-[10px] font-bold uppercase tracking-wide text-yellow-700 dark:text-yellow-500">New</span>
+</div>
+<div class="flex items-center justify-between gap-4 rounded-lg bg-slate-50 dark:bg-slate-800/50 px-3 py-2">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-slate-400 text-[18px]">badge</span>
+<span class="text-xs font-medium text-slate-700 dark:text-slate-300">Lic: 19283746</span>
+</div>
+<div class="h-4 w-px bg-slate-300 dark:bg-slate-700"></div>
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-slate-400 text-[18px]">motorcycle</span>
+<span class="text-xs font-medium text-slate-700 dark:text-slate-300">Yamaha YBR</span>
+</div>
+</div>
+<div class="flex gap-2 pt-1">
+<button class="flex h-9 flex-1 items-center justify-center rounded-lg bg-slate-100 dark:bg-slate-700 text-sm font-bold text-slate-700 dark:text-slate-200 hover:bg-slate-200 dark:hover:bg-slate-600 transition-colors">
+                                Details
+                            </button>
+<button class="flex h-9 flex-1 items-center justify-center rounded-lg bg-primary text-sm font-bold text-white shadow-sm shadow-primary/30 hover:bg-primary-dark transition-colors">
+                                Review
+                            </button>
+</div>
+</div>
+<!-- Driver Item 2 -->
+<div class="flex flex-col gap-3 rounded-xl bg-surface-light dark:bg-surface-dark p-4 shadow-sm border border-slate-200 dark:border-slate-800">
+<div class="flex items-start justify-between gap-3">
+<div class="flex items-center gap-3">
+<div class="size-12 overflow-hidden rounded-lg bg-slate-200" data-alt="Portrait of Fatma Jaziri">
+<img alt="Fatma Jaziri" class="h-full w-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDVP-JhyXdiTHKWoL31dQNlg5tVhR2Pw1jmWcOENE147E5lMVd4Ut7XnjM5Gfyd8VcASuCeujV1QSNObwkWeMk6r0Xc7j1aX6gJpW2azGT0scBMG-6_i1bzUQALtkbpx-1vItlVAK7_Yx8GLrsTr7h2qiwt1BSHFiTAq7Uow4X_JhbdIwEHVl0kdFJ6P9FZAR_iuyCHlaINOlNcPO_Fs8-vKhWpNxSrsKxdvkibMPY91gmhXpMlpnPFPIdOuFOx7gryRrCzA1rPoQ8"/>
+</div>
+<div class="flex flex-col">
+<h4 class="text-sm font-bold text-slate-900 dark:text-white">Fatma Jaziri</h4>
+<span class="text-xs text-text-muted">Submitted 5h ago</span>
+</div>
+</div>
+<span class="rounded-full bg-orange-100 dark:bg-orange-900/30 px-2 py-1 text-[10px] font-bold uppercase tracking-wide text-primary">Pending</span>
+</div>
+<div class="flex items-center justify-between gap-4 rounded-lg bg-slate-50 dark:bg-slate-800/50 px-3 py-2">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-slate-400 text-[18px]">badge</span>
+<span class="text-xs font-medium text-slate-700 dark:text-slate-300">Lic: 82736451</span>
+</div>
+<div class="h-4 w-px bg-slate-300 dark:bg-slate-700"></div>
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-slate-400 text-[18px]">motorcycle</span>
+<span class="text-xs font-medium text-slate-700 dark:text-slate-300">Sym Symphony</span>
+</div>
+</div>
+<div class="flex gap-2 pt-1">
+<button class="flex h-9 flex-1 items-center justify-center rounded-lg bg-slate-100 dark:bg-slate-700 text-sm font-bold text-slate-700 dark:text-slate-200 hover:bg-slate-200 dark:hover:bg-slate-600 transition-colors">
+                                Details
+                            </button>
+<button class="flex h-9 flex-1 items-center justify-center rounded-lg bg-primary text-sm font-bold text-white shadow-sm shadow-primary/30 hover:bg-primary-dark transition-colors">
+                                Review
+                            </button>
+</div>
+</div>
+<!-- Driver Item 3 -->
+<div class="flex flex-col gap-3 rounded-xl bg-surface-light dark:bg-surface-dark p-4 shadow-sm border border-slate-200 dark:border-slate-800 opacity-80">
+<div class="flex items-start justify-between gap-3">
+<div class="flex items-center gap-3">
+<div class="size-12 overflow-hidden rounded-lg bg-slate-200" data-alt="Portrait of Khaled M.">
+<img alt="Khaled M." class="h-full w-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCnDCubtnNAqMoszvDiKjepBmc-9Qcn5XV5E3NNDyeC7UHE6y16fDrdGtuNg7UA3pKH5bYl4qIEr5SfDk9oKREXNtt0DdZmL15Pt1jCNp4Hi2yYgC_24bm_GAHqgIIpJ7lZMOQ2w07se8PS2ol3xzRFaPftC3WG4xc7irJFOCtXDxVZSB5UPVmAUbBQuQBhOdBckPAKtVt87OzSfr4qLgihtLwPwrAq4gFaeJmKMdykA-O-ChjhBFA-06jvhYZOPFHeUXTYU9Kwa54"/>
+</div>
+<div class="flex flex-col">
+<h4 class="text-sm font-bold text-slate-900 dark:text-white">Khaled M.</h4>
+<span class="text-xs text-text-muted">Submitted 8h ago</span>
+</div>
+</div>
+<span class="rounded-full bg-slate-100 dark:bg-slate-800 px-2 py-1 text-[10px] font-bold uppercase tracking-wide text-slate-500">In Review</span>
+</div>
+<div class="flex items-center justify-between gap-4 rounded-lg bg-slate-50 dark:bg-slate-800/50 px-3 py-2">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-slate-400 text-[18px]">badge</span>
+<span class="text-xs font-medium text-slate-700 dark:text-slate-300">Lic: 99887766</span>
+</div>
+<div class="h-4 w-px bg-slate-300 dark:bg-slate-700"></div>
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-slate-400 text-[18px]">motorcycle</span>
+<span class="text-xs font-medium text-slate-700 dark:text-slate-300">Forza 300</span>
+</div>
+</div>
+<div class="flex gap-2 pt-1">
+<button class="flex h-9 flex-1 items-center justify-center rounded-lg bg-slate-100 dark:bg-slate-700 text-sm font-bold text-slate-700 dark:text-slate-200 hover:bg-slate-200 dark:hover:bg-slate-600 transition-colors">
+                                Details
+                            </button>
+<button class="flex h-9 flex-1 items-center justify-center rounded-lg border border-primary text-sm font-bold text-primary hover:bg-primary/5 transition-colors">
+                                Continue
+                            </button>
+</div>
+</div>
+</div>
+</div>
+<!-- Quick Map Overview (Optional context filler) -->
+<div class="mt-2 rounded-xl bg-surface-light dark:bg-surface-dark p-4 shadow-sm border border-slate-200 dark:border-slate-800">
+<div class="mb-3 flex items-center justify-between">
+<h3 class="text-sm font-bold text-slate-900 dark:text-white">Live Map</h3>
+<span class="flex items-center gap-1 text-[10px] text-green-600 font-bold uppercase tracking-wider">
+<span class="size-2 rounded-full bg-green-500 animate-pulse"></span> Live
+                    </span>
+</div>
+<div class="h-32 w-full overflow-hidden rounded-lg bg-slate-100 relative" data-alt="Map of Tunis city center showing driver density" data-location="Tunis" style="">
+<img alt="Tunis Map" class="h-full w-full object-cover opacity-60" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCWLIr1qtctTPSvJcgO7XI3mPl3neFnPlKRXA4pw-h2ewnhfRbQuoImAziR6Cg7RV_BBbCIFCGMXZW0dTVnPqT4dj_OqavzVUGJNrRGX9XgP7rkCdO6yOFzluaPbMUtTMJP0L1AegugCvce38-xQPIPbI3XUzmMKiiwgpAI32fLKOlYZn2dx9GNza1r_wrI3pfFqgFmEp2A36E8U8URDlRQRRbH0wTLqGrzQv2HHAnFDduGXw1tAbewgG3LJuyytOqYftBloYtVNEQ"/>
+<!-- Decorative Map pins -->
+<div class="absolute top-1/2 left-1/3 size-3 rounded-full bg-primary ring-2 ring-white"></div>
+<div class="absolute top-1/4 left-1/2 size-3 rounded-full bg-primary ring-2 ring-white"></div>
+<div class="absolute bottom-1/3 right-1/4 size-3 rounded-full bg-primary ring-2 ring-white"></div>
+</div>
+</div>
+</main>
+</div>
+</body></html>

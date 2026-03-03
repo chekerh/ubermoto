@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>UberMoto AI Voice Command</title>
+<!-- Fonts -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300..700&amp;display=swap" rel="stylesheet"/>
+<!-- Material Symbols -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<!-- Theme Config -->
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "primary": "#2b6cee",
+              "background-light": "#f6f6f8",
+              "background-dark": "#101622",
+            },
+            fontFamily: {
+              "display": ["Space Grotesk", "sans-serif"]
+            },
+            borderRadius: {"DEFAULT": "1rem", "lg": "2rem", "xl": "3rem", "full": "9999px"},
+          },
+        },
+      }
+    </script>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background-light dark:bg-background-dark font-display text-slate-900 dark:text-slate-100 antialiased overflow-hidden">
+<div class="relative flex h-screen w-full flex-col overflow-hidden max-w-md mx-auto shadow-2xl">
+<!-- Header -->
+<div class="absolute top-0 left-0 w-full z-20 flex items-center justify-between p-6 pt-12 bg-transparent">
+<button class="flex h-10 w-10 items-center justify-center rounded-full bg-black/20 backdrop-blur-md text-white hover:bg-black/30 transition">
+<span class="material-symbols-outlined text-2xl">arrow_back</span>
+</button>
+<h2 class="text-white text-lg font-bold tracking-tight">AI Assistant</h2>
+<button class="flex h-10 w-10 items-center justify-center rounded-full bg-black/20 backdrop-blur-md text-white hover:bg-black/30 transition">
+<span class="material-symbols-outlined text-2xl">more_vert</span>
+</button>
+</div>
+<!-- Main Content (Gradient Background) -->
+<div class="relative flex flex-1 flex-col items-center justify-center bg-gradient-to-b from-primary via-[#4b47f0] to-[#e66c35] px-6 text-center">
+<!-- Transcription Area -->
+<div class="flex flex-col items-center gap-2 z-10 mt-10">
+<span class="inline-flex items-center gap-2 rounded-full bg-white/10 px-4 py-1.5 text-xs font-medium text-white backdrop-blur-md border border-white/20">
+<span class="material-symbols-outlined text-sm animate-pulse">auto_awesome</span>
+                    Listening &amp; Learning...
+                </span>
+<h1 class="mt-6 text-4xl font-bold leading-tight text-white drop-shadow-sm">
+                    "Nheb nekhou 2 Harissa w hlib..."
+                </h1>
+<p class="mt-4 text-white/80 text-sm max-w-[280px]">
+                    Checking <span class="text-white font-semibold">Leila's favorite Harissa</span> from your history.
+                </p>
+</div>
+<!-- Visualizer / Microphone Area -->
+<div class="relative mt-12 mb-8 flex flex-1 w-full items-center justify-center">
+<!-- Animated Rings (Static representation of pulsing) -->
+<div class="absolute flex items-center justify-center">
+<div class="h-64 w-64 rounded-full border border-white/10 bg-white/5 blur-xl"></div>
+</div>
+<div class="absolute flex items-center justify-center">
+<div class="h-48 w-48 rounded-full border border-white/20 bg-white/5"></div>
+</div>
+<div class="absolute flex items-center justify-center">
+<div class="h-32 w-32 rounded-full border border-white/30 bg-white/10"></div>
+</div>
+<!-- Main Button -->
+<button class="relative z-10 flex h-20 w-20 items-center justify-center rounded-full bg-white shadow-[0_0_40px_-10px_rgba(255,255,255,0.6)] transition transform active:scale-95">
+<span class="material-symbols-outlined text-4xl text-primary font-bold">mic</span>
+</button>
+</div>
+<!-- Suggestions -->
+<div class="w-full pb-8 z-10">
+<div class="flex gap-3 overflow-x-auto pb-4 no-scrollbar justify-center">
+<button class="whitespace-nowrap rounded-full bg-black/20 px-4 py-2 text-sm font-medium text-white backdrop-blur-md border border-white/10 hover:bg-black/30">
+                        Add Bread 🥖
+                    </button>
+<button class="whitespace-nowrap rounded-full bg-black/20 px-4 py-2 text-sm font-medium text-white backdrop-blur-md border border-white/10 hover:bg-black/30">
+                        Confirm Order
+                    </button>
+<button class="whitespace-nowrap rounded-full bg-black/20 px-4 py-2 text-sm font-medium text-white backdrop-blur-md border border-white/10 hover:bg-black/30">
+                        Cancel
+                    </button>
+</div>
+</div>
+<!-- Background Texture/Pattern Overlay -->
+<div class="absolute inset-0 z-0 opacity-10 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] mix-blend-overlay"></div>
+</div>
+<!-- Bottom Navigation -->
+<div class="flex items-center justify-between border-t border-[#232f48] bg-background-dark px-4 pb-6 pt-3 z-20">
+<a class="flex flex-1 flex-col items-center justify-end gap-1 text-slate-400 hover:text-primary transition-colors" href="#">
+<span class="material-symbols-outlined text-[24px]">home</span>
+<span class="text-[10px] font-medium leading-normal tracking-wide">Home</span>
+</a>
+<a class="flex flex-1 flex-col items-center justify-end gap-1 text-slate-400 hover:text-primary transition-colors" href="#">
+<span class="material-symbols-outlined text-[24px]">receipt_long</span>
+<span class="text-[10px] font-medium leading-normal tracking-wide">Orders</span>
+</a>
+<!-- Active State for Voice/Center Button -->
+<a class="relative -top-6 flex flex-col items-center justify-end gap-1" href="#">
+<div class="flex h-14 w-14 items-center justify-center rounded-full bg-primary text-white shadow-lg shadow-primary/40 ring-4 ring-background-dark">
+<span class="material-symbols-outlined text-[28px]">mic</span>
+</div>
+</a>
+<a class="flex flex-1 flex-col items-center justify-end gap-1 text-slate-400 hover:text-primary transition-colors" href="#">
+<span class="material-symbols-outlined text-[24px]">account_balance_wallet</span>
+<span class="text-[10px] font-medium leading-normal tracking-wide">Wallet</span>
+</a>
+<a class="flex flex-1 flex-col items-center justify-end gap-1 text-slate-400 hover:text-primary transition-colors" href="#">
+<span class="material-symbols-outlined text-[24px]">person</span>
+<span class="text-[10px] font-medium leading-normal tracking-wide">Account</span>
+</a>
+</div>
+</div>
+</body></html>

@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+
+<html lang="fr"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>UberMoto - Notation Chauffeur</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script>
+    tailwind.config = {
+        darkMode: "class",
+        theme: {
+            extend: {
+                colors: {
+                    "primary": "#f47b25",
+                    "primary-light": "#fff0e3",
+                    "background-light": "#f8f7f5",
+                    "background-dark": "#221710",
+                    "text-dark": "#1c130d",
+                    "text-muted": "#9c6c49",
+                },
+                fontFamily: {
+                    "display": ["Plus Jakarta Sans", "sans-serif"]
+                },
+                borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "2xl": "1rem", "full": "9999px"},
+                boxShadow: {
+                    'up': '0 -4px 6px -1px rgba(0, 0, 0, 0.1), 0 -2px 4px -1px rgba(0, 0, 0, 0.06)',
+                }
+            },
+        },
+    }
+    </script>
+<style>
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+        }
+        /* Custom scrollbar hide for cleaner UI */
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-gray-200 h-screen w-full flex justify-center items-center overflow-hidden">
+<!-- Mobile Container -->
+<div class="relative flex h-full max-h-[850px] w-full max-w-[400px] flex-col bg-background-light shadow-2xl overflow-hidden rounded-[0px] md:rounded-[32px]">
+<!-- Header / Map Background Area -->
+<div class="flex-1 relative w-full bg-cover bg-center" data-location="Tunis, Tunisia" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuACs3FtaAW2oOWyks_VuZ4w3nHQ9gxqz17DXh68nUkt2ZpkOEopqhbGlEVwesAePvte1r9Nt6BOTjeZub-RJpmvWru-JwWNblq56e5QrrxPDiKswj1x2_egadvmklDHDMplfV9EtXCjovoF9FIJSEtIQewOv2b3Q3x98j2NJzM-9BeIbp1l8Ih_qvwJOjq8dadSdoZkJwvb7Z9EjlWwGBCJKKqCJes2ens8DJIK8Qpb-ITTsl1xv4AFX3fFCUjA3bV1KEgS5H2Uvq0');">
+<div class="absolute inset-0 bg-black/30"></div>
+<!-- Top Bar -->
+<div class="relative z-10 flex justify-between items-center p-4 pt-12 text-white">
+<div class="h-10 w-10 flex items-center justify-center rounded-full bg-white/20 backdrop-blur-md">
+<span class="material-symbols-outlined">menu</span>
+</div>
+<div class="font-bold text-lg">UberMoto</div>
+<div class="h-10 w-10 flex items-center justify-center rounded-full bg-white/20 backdrop-blur-md">
+<span class="material-symbols-outlined">notifications</span>
+</div>
+</div>
+<!-- Route Info Overlay -->
+<div class="absolute top-28 left-4 right-4 bg-white/90 backdrop-blur-sm rounded-xl p-3 shadow-lg flex items-center gap-3">
+<div class="bg-primary/10 p-2 rounded-full text-primary">
+<span class="material-symbols-outlined">check_circle</span>
+</div>
+<div>
+<p class="text-xs text-text-muted font-medium uppercase tracking-wider">Destination atteinte</p>
+<p class="text-text-dark font-bold text-sm">Av. Habib Bourguiba, Tunis</p>
+</div>
+</div>
+</div>
+<!-- Bottom Sheet Modal for Rating -->
+<div class="absolute bottom-0 left-0 right-0 z-20 bg-background-light rounded-t-3xl shadow-up transition-transform duration-300 ease-out translate-y-0 pb-[80px]">
+<!-- Drag Handle -->
+<div class="w-full flex justify-center pt-3 pb-1">
+<div class="w-12 h-1.5 bg-gray-300 rounded-full"></div>
+</div>
+<!-- Modal Content -->
+<div class="px-6 pt-2 pb-6 overflow-y-auto max-h-[70vh] no-scrollbar">
+<!-- Driver Profile -->
+<div class="flex flex-col items-center -mt-8 mb-4">
+<div class="relative">
+<div class="h-20 w-20 rounded-full border-4 border-background-light bg-cover bg-center shadow-md" data-alt="Portrait of a smiling Tunisian man" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuDReEpdEb1XDBF2Hh0fmGzEr0lSjzpzhaUrFAE9WesWkIzL9xIeBcRmF5XID6K1VcUaxuBdzIMiqxZn1zA48azqnrThh3qVwu3ctsGNMl-sTyNlFJLy1LpufISu8Lh0WqhghFTERguAKkUXvQmkp-FfrHGhimjZXbGdaz-ECEPdrTq2fyOfolE0SwABuwqil7M27VMm5PdASRKMzYM073SOeXGv98JRiPZv6AtCwzFwzf200ccjfN3iTEGhmnlxrmx-QRhwNauuEP0');"></div>
+<div class="absolute bottom-0 right-0 bg-green-500 border-2 border-white w-5 h-5 rounded-full"></div>
+</div>
+<h2 class="text-xl font-bold text-text-dark mt-2">Ahmed Ben Ali</h2>
+<p class="text-sm text-text-muted">Honda PCX 125 • <span class="text-primary font-medium">4.9 ★</span></p>
+</div>
+<!-- Star Rating -->
+<div class="text-center mb-6">
+<h3 class="text-lg font-bold text-text-dark mb-3">Comment s'est passée votre course ?</h3>
+<div class="flex justify-center gap-2">
+<button class="text-primary hover:scale-110 transition-transform focus:outline-none">
+<span class="material-symbols-outlined text-[40px] fill-current" style="font-variation-settings: 'FILL' 1;">star</span>
+</button>
+<button class="text-primary hover:scale-110 transition-transform focus:outline-none">
+<span class="material-symbols-outlined text-[40px] fill-current" style="font-variation-settings: 'FILL' 1;">star</span>
+</button>
+<button class="text-primary hover:scale-110 transition-transform focus:outline-none">
+<span class="material-symbols-outlined text-[40px] fill-current" style="font-variation-settings: 'FILL' 1;">star</span>
+</button>
+<button class="text-primary hover:scale-110 transition-transform focus:outline-none">
+<span class="material-symbols-outlined text-[40px] fill-current" style="font-variation-settings: 'FILL' 1;">star</span>
+</button>
+<button class="text-gray-300 hover:text-primary hover:scale-110 transition-transform focus:outline-none">
+<span class="material-symbols-outlined text-[40px]" style="font-variation-settings: 'FILL' 1;">star</span>
+</button>
+</div>
+<p class="text-sm text-text-muted mt-2 font-medium">Bien</p>
+</div>
+<!-- Feedback Tags -->
+<div class="mb-6">
+<p class="text-xs font-bold text-text-muted uppercase tracking-wider mb-3 text-center">Qu'avez-vous apprécié ?</p>
+<div class="flex flex-wrap justify-center gap-2">
+<button class="px-4 py-2 rounded-full bg-primary-light border border-primary text-primary text-sm font-semibold transition-colors flex items-center gap-1.5">
+<span class="material-symbols-outlined text-lg">schedule</span>
+                            Ponctuel
+                        </button>
+<button class="px-4 py-2 rounded-full bg-white border border-gray-200 text-text-dark text-sm font-medium hover:border-primary hover:text-primary transition-colors flex items-center gap-1.5">
+<span class="material-symbols-outlined text-lg">sentiment_satisfied</span>
+                            Poli
+                        </button>
+<button class="px-4 py-2 rounded-full bg-white border border-gray-200 text-text-dark text-sm font-medium hover:border-primary hover:text-primary transition-colors flex items-center gap-1.5">
+<span class="material-symbols-outlined text-lg">security</span>
+                            Conduite sûre
+                        </button>
+<button class="px-4 py-2 rounded-full bg-white border border-gray-200 text-text-dark text-sm font-medium hover:border-primary hover:text-primary transition-colors flex items-center gap-1.5">
+<span class="material-symbols-outlined text-lg">clean_hands</span>
+                            Propre
+                        </button>
+</div>
+</div>
+<!-- Comment Box -->
+<div class="mb-6">
+<div class="relative">
+<textarea class="w-full bg-white border border-gray-200 rounded-xl p-4 text-sm text-text-dark placeholder:text-gray-400 focus:ring-2 focus:ring-primary focus:border-transparent outline-none resize-none min-h-[80px]" placeholder="Dites-nous en plus (optionnel)..."></textarea>
+</div>
+</div>
+<!-- Actions -->
+<div class="flex flex-col gap-3">
+<button class="w-full bg-primary hover:bg-orange-600 text-white font-bold py-3.5 rounded-xl shadow-lg shadow-orange-200 transition-all active:scale-[0.98]">
+                        Envoyer l'avis
+                    </button>
+<button class="w-full bg-transparent text-text-muted font-medium text-sm py-2 hover:text-text-dark transition-colors">
+                        Passer
+                    </button>
+</div>
+</div>
+</div>
+<!-- Bottom Navigation Bar (Partially obscured but visible) -->
+<div class="absolute bottom-0 w-full z-30 bg-[#fcfaf8] border-t border-[#f4ece7]">
+<div class="flex justify-around items-center px-4 pb-5 pt-3">
+<a class="flex flex-1 flex-col items-center justify-end gap-1 text-[#9c6c49] opacity-50" href="#">
+<span class="material-symbols-outlined text-2xl">home</span>
+<p class="text-[10px] font-medium leading-normal">Accueil</p>
+</a>
+<a class="flex flex-1 flex-col items-center justify-end gap-1 text-[#1c130d] opacity-50" href="#">
+<span class="material-symbols-outlined text-2xl font-bold">history</span>
+<p class="text-[10px] font-medium leading-normal">Activité</p>
+</a>
+<a class="flex flex-1 flex-col items-center justify-end gap-1 text-[#9c6c49] opacity-50" href="#">
+<span class="material-symbols-outlined text-2xl">credit_card</span>
+<p class="text-[10px] font-medium leading-normal">Paiement</p>
+</a>
+<a class="flex flex-1 flex-col items-center justify-end gap-1 text-[#9c6c49] opacity-50" href="#">
+<span class="material-symbols-outlined text-2xl">person</span>
+<p class="text-[10px] font-medium leading-normal">Compte</p>
+</a>
+</div>
+</div>
+</div>
+</body></html>

@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Motorcycle Selection - UberMoto</title>
+<!-- Fonts -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;700;800&amp;display=swap" rel="stylesheet"/>
+<!-- Material Symbols -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<!-- Theme Configuration -->
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#f47b25",
+                        "background-light": "#f8f7f5",
+                        "background-dark": "#221710",
+                    },
+                    fontFamily: {
+                        "display": ["Plus Jakarta Sans"]
+                    },
+                    borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+<style>
+        /* Custom Pattern Background */
+        .tunisian-pattern {
+            background-color: #f8f7f5;
+            background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23f47b25' fill-opacity='0.05'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+        }
+        .dark .tunisian-pattern {
+            background-color: #221710;
+            background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23f47b25' fill-opacity='0.05'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 font-display antialiased tunisian-pattern min-h-screen flex flex-col overflow-hidden relative">
+<!-- Top App Bar -->
+<div class="sticky top-0 z-50 flex items-center justify-between p-4 bg-background-light/90 dark:bg-background-dark/90 backdrop-blur-md border-b border-primary/10">
+<button class="flex size-10 shrink-0 items-center justify-center rounded-full hover:bg-black/5 dark:hover:bg-white/5 transition-colors text-slate-900 dark:text-slate-100">
+<span class="material-symbols-outlined">arrow_back</span>
+</button>
+<h2 class="text-lg font-bold leading-tight tracking-[-0.015em] text-center">Select Your Vehicle</h2>
+<div class="size-10"></div> <!-- Spacer for alignment -->
+</div>
+<!-- Main Content -->
+<main class="flex-1 flex flex-col px-4 pt-6 pb-24 overflow-y-auto">
+<!-- Header Text -->
+<div class="text-center mb-8">
+<h1 class="text-3xl font-extrabold text-slate-900 dark:text-white mb-2">Choose your ride</h1>
+<p class="text-slate-600 dark:text-slate-400 text-base max-w-xs mx-auto">Select the model of your motorcycle to continue your registration.</p>
+</div>
+<!-- Slider Container -->
+<div class="flex overflow-x-auto snap-x snap-mandatory [-ms-scrollbar-style:none] [scrollbar-width:none] [&amp;::-webkit-scrollbar]:hidden -mx-4 px-4 pb-8 pt-2 gap-4">
+<!-- Card 1: Peugeot 103 (Active/Selected State Example) -->
+<div class="snap-center shrink-0 w-[80vw] max-w-sm flex flex-col rounded-2xl bg-white dark:bg-[#2c221c] shadow-lg border-2 border-primary ring-4 ring-primary/10 transition-transform hover:scale-[1.02] duration-300 relative overflow-hidden group">
+<div class="absolute top-3 right-3 z-10 bg-primary text-white text-xs font-bold px-2 py-1 rounded-full flex items-center gap-1 shadow-sm">
+<span class="material-symbols-outlined text-[16px]">check_circle</span> Selected
+                </div>
+<div class="w-full aspect-[4/3] bg-gradient-to-b from-orange-50 to-white dark:from-[#3a2e26] dark:to-[#2c221c] p-6 flex items-center justify-center relative">
+<!-- Decorative Circle behind bike -->
+<div class="absolute w-48 h-48 rounded-full bg-primary/10 blur-2xl"></div>
+<div class="w-full h-full bg-center bg-contain bg-no-repeat z-10 transition-transform group-hover:scale-105 duration-500" data-alt="Vintage blue moped side view" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuDMWw7XThOZ35hG7mNWZeCCruMA_wWRnq5tJyFXVmm12ZBPCYYjIA-JEKB4tKxP5tIx8XT1MbaOmr9AvI3TQF0c90EjrwHpqRvb_8_nMyup3nb7fRTG7RU5ljPmyX62zad2T-5BQi7IdfkjkR_-1q3GBZw2uvpsxLHc92LbHw4KW8BYgdapixRykmlISKOj0KY-L5viihnJvyt481sJLNE4_viL_hrCQ4MprTojR3qiHvHzuc2o_szys8XUsedht77hjvqd7DYMB0M');"></div>
+</div>
+<div class="p-5 flex flex-col gap-2 border-t border-slate-100 dark:border-white/5">
+<div class="flex justify-between items-start">
+<div>
+<h3 class="text-xl font-bold text-slate-900 dark:text-white">Peugeot 103</h3>
+<p class="text-primary font-medium text-sm">Classic Edition</p>
+</div>
+<div class="flex items-center gap-1 text-slate-500 dark:text-slate-400 bg-slate-100 dark:bg-white/5 px-2 py-1 rounded-lg">
+<span class="material-symbols-outlined text-[18px]">local_gas_station</span>
+<span class="text-xs font-bold">50cc</span>
+</div>
+</div>
+<div class="mt-2 flex gap-2">
+<span class="text-xs text-slate-500 dark:text-slate-400 bg-slate-50 dark:bg-white/5 px-2 py-1 rounded border border-slate-100 dark:border-white/5">2 Stroke</span>
+<span class="text-xs text-slate-500 dark:text-slate-400 bg-slate-50 dark:bg-white/5 px-2 py-1 rounded border border-slate-100 dark:border-white/5">Air Cooled</span>
+</div>
+</div>
+</div>
+<!-- Card 2: Yamaha YBR 125 -->
+<div class="snap-center shrink-0 w-[80vw] max-w-sm flex flex-col rounded-2xl bg-white dark:bg-[#2c221c] shadow-sm border border-slate-200 dark:border-white/5 transition-all hover:shadow-lg hover:border-primary/50 relative overflow-hidden group">
+<div class="w-full aspect-[4/3] bg-gradient-to-b from-slate-50 to-white dark:from-[#332822] dark:to-[#2c221c] p-6 flex items-center justify-center relative">
+<div class="w-full h-full bg-center bg-contain bg-no-repeat z-10 transition-transform group-hover:scale-105 duration-500 opacity-90 group-hover:opacity-100" data-alt="Black street motorcycle side view" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuCexih-kCtR_67uVEhA-r1jpYMBBGYujBliOPQUm8puEwA2WY4D-rJMAE9M-oS4UIlYSauYIX27G_WR-GghNNYFgQymZJM9P0lhW1tSkjdmjPqcog-lotGn7ilEDQLfQiAQ7xlSr0oFxxUi9dnvbD6covydpvZpy-gbPPabgeCUmGgkBOcSRRrKzPxXYReDerqqgpu1qWByJ6yyTj53cOCgYMfKpEVHdU9EmS5NGXTW4uzVAGFJJS_JEw96McdNsiN55Jmdoa18xhA');"></div>
+</div>
+<div class="p-5 flex flex-col gap-2 border-t border-slate-100 dark:border-white/5">
+<div class="flex justify-between items-start">
+<div>
+<h3 class="text-xl font-bold text-slate-900 dark:text-white">Yamaha YBR</h3>
+<p class="text-slate-500 dark:text-slate-400 font-medium text-sm">Street Standard</p>
+</div>
+<div class="flex items-center gap-1 text-slate-500 dark:text-slate-400 bg-slate-100 dark:bg-white/5 px-2 py-1 rounded-lg">
+<span class="material-symbols-outlined text-[18px]">speed</span>
+<span class="text-xs font-bold">125cc</span>
+</div>
+</div>
+<div class="mt-2 flex gap-2">
+<span class="text-xs text-slate-500 dark:text-slate-400 bg-slate-50 dark:bg-white/5 px-2 py-1 rounded border border-slate-100 dark:border-white/5">4 Stroke</span>
+<span class="text-xs text-slate-500 dark:text-slate-400 bg-slate-50 dark:bg-white/5 px-2 py-1 rounded border border-slate-100 dark:border-white/5">Electric Start</span>
+</div>
+</div>
+</div>
+<!-- Card 3: Vespa GTS -->
+<div class="snap-center shrink-0 w-[80vw] max-w-sm flex flex-col rounded-2xl bg-white dark:bg-[#2c221c] shadow-sm border border-slate-200 dark:border-white/5 transition-all hover:shadow-lg hover:border-primary/50 relative overflow-hidden group">
+<div class="w-full aspect-[4/3] bg-gradient-to-b from-slate-50 to-white dark:from-[#332822] dark:to-[#2c221c] p-6 flex items-center justify-center relative">
+<div class="w-full h-full bg-center bg-contain bg-no-repeat z-10 transition-transform group-hover:scale-105 duration-500 opacity-90 group-hover:opacity-100" data-alt="Red italian scooter side view" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuDIPa1bcUQOjo2TiP9aXYgNq0AlgkFuY5mQ6k4LAFH0FV1NDSpLIvdqCF1s6CPV3a07In34tBlULh4BA64fQWKrwrx5mdCFP1lD4dQW6Y_ZjccFOKDqnfkHU7idMSji9azFT6pFsuZJ6c6NUXlYKTt2qJ3Z8M7tcaut5kz_gdd8L2SuygdFz2Z3O1rUBJM6h9Xbpg2u63Nl3NWX_W43WxOjJlmQ__epH_-_BWxnT9Wsx1LXQKHH4AOuYS_Ko3nzgaEGaFSaMiEMZfc');"></div>
+</div>
+<div class="p-5 flex flex-col gap-2 border-t border-slate-100 dark:border-white/5">
+<div class="flex justify-between items-start">
+<div>
+<h3 class="text-xl font-bold text-slate-900 dark:text-white">Vespa GTS</h3>
+<p class="text-slate-500 dark:text-slate-400 font-medium text-sm">Modern Scooter</p>
+</div>
+<div class="flex items-center gap-1 text-slate-500 dark:text-slate-400 bg-slate-100 dark:bg-white/5 px-2 py-1 rounded-lg">
+<span class="material-symbols-outlined text-[18px]">bolt</span>
+<span class="text-xs font-bold">300cc</span>
+</div>
+</div>
+<div class="mt-2 flex gap-2">
+<span class="text-xs text-slate-500 dark:text-slate-400 bg-slate-50 dark:bg-white/5 px-2 py-1 rounded border border-slate-100 dark:border-white/5">Automatic</span>
+<span class="text-xs text-slate-500 dark:text-slate-400 bg-slate-50 dark:bg-white/5 px-2 py-1 rounded border border-slate-100 dark:border-white/5">ABS</span>
+</div>
+</div>
+</div>
+<!-- Card 4: Generic Moped -->
+<div class="snap-center shrink-0 w-[80vw] max-w-sm flex flex-col rounded-2xl bg-white dark:bg-[#2c221c] shadow-sm border border-slate-200 dark:border-white/5 transition-all hover:shadow-lg hover:border-primary/50 relative overflow-hidden group">
+<div class="w-full aspect-[4/3] bg-gradient-to-b from-slate-50 to-white dark:from-[#332822] dark:to-[#2c221c] p-6 flex items-center justify-center relative">
+<div class="w-full h-full bg-center bg-contain bg-no-repeat z-10 transition-transform group-hover:scale-105 duration-500 opacity-90 group-hover:opacity-100" data-alt="Modern silver maxi scooter side view" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuC5H5tZbeAo0F-_4PXDGPO07s-fx3vnFxL5ZGs1AO8ZOq12objcrO_W64vmhhRRaooqK3NVJjBUvJ2ryWkJQhnqR53wgJhW4-qy6oJLooCIzyWqBmBSRcuuzS2GueN1FfHZO5v3eamB6co7Xt9NYtr6FMc_gXdbHzk1fARPOMYCAa5oJKHGUhaVC6U8wa8kTEN1lN3osDGAzX3UFE29vBJzL5eiQ8V0VLfqslBubRNCpDOyHu2QzhUcd_uE4bh1KfPtU7HXjB6l3Aw');"></div>
+</div>
+<div class="p-5 flex flex-col gap-2 border-t border-slate-100 dark:border-white/5">
+<div class="flex justify-between items-start">
+<div>
+<h3 class="text-xl font-bold text-slate-900 dark:text-white">Forza 300</h3>
+<p class="text-slate-500 dark:text-slate-400 font-medium text-sm">Maxi Scooter</p>
+</div>
+<div class="flex items-center gap-1 text-slate-500 dark:text-slate-400 bg-slate-100 dark:bg-white/5 px-2 py-1 rounded-lg">
+<span class="material-symbols-outlined text-[18px]">local_gas_station</span>
+<span class="text-xs font-bold">279cc</span>
+</div>
+</div>
+<div class="mt-2 flex gap-2">
+<span class="text-xs text-slate-500 dark:text-slate-400 bg-slate-50 dark:bg-white/5 px-2 py-1 rounded border border-slate-100 dark:border-white/5">Automatic</span>
+<span class="text-xs text-slate-500 dark:text-slate-400 bg-slate-50 dark:bg-white/5 px-2 py-1 rounded border border-slate-100 dark:border-white/5">Storage</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Slider Pagination Indicators -->
+<div class="flex justify-center gap-2 mt-4 mb-4">
+<div class="w-8 h-1.5 rounded-full bg-primary"></div>
+<div class="w-1.5 h-1.5 rounded-full bg-slate-300 dark:bg-white/20"></div>
+<div class="w-1.5 h-1.5 rounded-full bg-slate-300 dark:bg-white/20"></div>
+<div class="w-1.5 h-1.5 rounded-full bg-slate-300 dark:bg-white/20"></div>
+</div>
+</main>
+<!-- Bottom Action Bar -->
+<div class="fixed bottom-0 left-0 right-0 p-4 bg-background-light dark:bg-background-dark border-t border-slate-200 dark:border-white/5 backdrop-blur-xl bg-opacity-95 z-50">
+<div class="max-w-md mx-auto">
+<button class="w-full flex items-center justify-center gap-2 h-14 rounded-xl bg-primary hover:bg-orange-600 text-white text-lg font-bold shadow-lg shadow-primary/25 transition-all active:scale-[0.98]">
+<span>Confirm Selection</span>
+<span class="material-symbols-outlined">arrow_forward</span>
+</button>
+</div>
+</div>
+</body></html>

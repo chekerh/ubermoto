@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Admin Catalog Management - UberMoto</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#1152d4",
+                        "accent": "#f97316", // Orange accent for the user request
+                        "background-light": "#f6f6f8",
+                        "background-dark": "#101622",
+                        "surface-dark": "#1a2332",
+                        "surface-light": "#ffffff"
+                    },
+                    fontFamily: {
+                        "display": ["Inter", "sans-serif"]
+                    },
+                    borderRadius: { "DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px" },
+                },
+            },
+        }
+    </script>
+<style>
+        /* Custom scrollbar for horizontal scrolling */
+        .hide-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .hide-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 font-display antialiased min-h-screen flex flex-col overflow-hidden">
+<!-- Top Navigation / Header -->
+<header class="sticky top-0 z-20 bg-background-light dark:bg-background-dark/95 backdrop-blur-sm border-b border-slate-200 dark:border-slate-800 pt-10 pb-4 px-4">
+<div class="flex items-center justify-between mb-4">
+<button class="flex items-center justify-center w-10 h-10 rounded-full hover:bg-slate-200 dark:hover:bg-slate-800 text-slate-500 dark:text-slate-400 transition-colors">
+<span class="material-symbols-outlined">arrow_back</span>
+</button>
+<h1 class="text-lg font-bold text-center flex-1">Catalog Management</h1>
+<button class="flex items-center justify-center w-10 h-10 rounded-full hover:bg-slate-200 dark:hover:bg-slate-800 text-slate-500 dark:text-slate-400 transition-colors">
+<span class="material-symbols-outlined">more_vert</span>
+</button>
+</div>
+<!-- Search Bar -->
+<div class="relative">
+<div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+<span class="material-symbols-outlined text-slate-400">search</span>
+</div>
+<input class="block w-full pl-10 pr-3 py-3 border-none rounded-xl bg-surface-light dark:bg-surface-dark text-slate-900 dark:text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-primary shadow-sm" placeholder="Search products, SKUs..." type="text" value=""/>
+</div>
+<!-- Filter Chips -->
+<div class="flex gap-3 mt-4 overflow-x-auto hide-scrollbar pb-1">
+<button class="flex-shrink-0 px-4 py-2 rounded-full bg-primary text-white text-sm font-medium shadow-md shadow-primary/20">
+                All
+            </button>
+<button class="flex-shrink-0 px-4 py-2 rounded-full bg-surface-light dark:bg-surface-dark border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 text-sm font-medium hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">
+                Grocery
+            </button>
+<button class="flex-shrink-0 px-4 py-2 rounded-full bg-surface-light dark:bg-surface-dark border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 text-sm font-medium hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">
+                Spices
+            </button>
+<button class="flex-shrink-0 px-4 py-2 rounded-full bg-surface-light dark:bg-surface-dark border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 text-sm font-medium hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">
+                Fresh Produce
+            </button>
+<button class="flex-shrink-0 px-4 py-2 rounded-full bg-surface-light dark:bg-surface-dark border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 text-sm font-medium hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">
+                Beverages
+            </button>
+</div>
+</header>
+<!-- Main Content: Product List -->
+<main class="flex-1 overflow-y-auto px-4 py-2 pb-24 space-y-4">
+<!-- Product Item 1 -->
+<div class="group relative flex items-center gap-4 p-3 rounded-2xl bg-surface-light dark:bg-surface-dark border border-slate-200 dark:border-slate-800 shadow-sm transition-transform active:scale-[0.99]">
+<div class="relative h-20 w-20 shrink-0 overflow-hidden rounded-xl bg-slate-100 dark:bg-slate-800">
+<img alt="Jar of red harissa paste" class="h-full w-full object-cover" data-alt="Harissa paste jar" src="https://lh3.googleusercontent.com/aida-public/AB6AXuB0c0ktYAIk9gVnnWxgOYEm6zx5SxfgxYr0WJeOpyQrYYf2zXZMb-1wAr7DzJRxYkGDl4kX8I13b09QmIKM9B1mD8EUHWD87QZToLhzvT21sA7mptklbzZMVRMnWI_LN9T5nk4NttwJUhp5J6upMdIenceeShCX0Xy4DpUqfrkYALHU8H5cSTKDFBo4gv4x1JSS2HL-TegNXJVZpwhxnu5frapLzKWwgdRHVzqPPZXT-8zSP_am9sk1jyiKA1aWfXOq4cDokzgKgpc"/>
+<div class="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent"></div>
+</div>
+<div class="flex flex-1 flex-col justify-center min-w-0">
+<div class="flex justify-between items-start">
+<h3 class="text-base font-semibold text-slate-900 dark:text-white truncate pr-2">Harissa du Cap Bon</h3>
+<span class="inline-flex items-center rounded-md bg-green-500/10 px-2 py-1 text-xs font-medium text-green-500 ring-1 ring-inset ring-green-500/20">In Stock</span>
+</div>
+<p class="mt-1 text-sm text-slate-500 dark:text-slate-400">Unit: 70g tube</p>
+<div class="mt-2 flex items-center gap-3">
+<p class="text-sm font-medium text-primary">145 units</p>
+<span class="h-1 w-1 rounded-full bg-slate-400"></span>
+<p class="text-sm text-slate-500">Spices</p>
+</div>
+</div>
+<div class="flex flex-col gap-2 shrink-0">
+<button class="p-2 text-slate-400 hover:text-primary transition-colors rounded-full hover:bg-primary/10">
+<span class="material-symbols-outlined text-[20px]">edit</span>
+</button>
+</div>
+</div>
+<!-- Product Item 2 -->
+<div class="group relative flex items-center gap-4 p-3 rounded-2xl bg-surface-light dark:bg-surface-dark border border-slate-200 dark:border-slate-800 shadow-sm transition-transform active:scale-[0.99]">
+<div class="relative h-20 w-20 shrink-0 overflow-hidden rounded-xl bg-slate-100 dark:bg-slate-800">
+<img alt="Premium olive oil bottle" class="h-full w-full object-cover" data-alt="Olive oil bottle" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDN_0j3mfBR026AL3OLsV4HS5zV8psbKaz1Kw93foBZBnISpRL957ZuOa7EPdPUSjDS4yrnYW2EpNAMn9QmBtRs17_VHSnpvGKBSdoTPqMObZxn1jGXrwlkc7mVXHIbPJJf6DpBEbws-J0FOPhwN63gTCY_D3FXLjOkAUdlbAQ2gBE5-AQEJXkDpZe5_T9R9ZbxRPxf_aQh8lRulQFTzQYZbhN_50AnzhX4iW8AXMKqW52KUWpNjdaWj-u_iEVI_2fkQbZXVYwI7aQ"/>
+</div>
+<div class="flex flex-1 flex-col justify-center min-w-0">
+<div class="flex justify-between items-start">
+<h3 class="text-base font-semibold text-slate-900 dark:text-white truncate pr-2">Zitouna Virgin Oil</h3>
+<span class="inline-flex items-center rounded-md bg-orange-500/10 px-2 py-1 text-xs font-medium text-orange-500 ring-1 ring-inset ring-orange-500/20">Low Stock</span>
+</div>
+<p class="mt-1 text-sm text-slate-500 dark:text-slate-400">Unit: 1L Bottle</p>
+<div class="mt-2 flex items-center gap-3">
+<p class="text-sm font-medium text-orange-500">12 units</p>
+<span class="h-1 w-1 rounded-full bg-slate-400"></span>
+<p class="text-sm text-slate-500">Grocery</p>
+</div>
+</div>
+<div class="flex flex-col gap-2 shrink-0">
+<button class="p-2 text-slate-400 hover:text-primary transition-colors rounded-full hover:bg-primary/10">
+<span class="material-symbols-outlined text-[20px]">edit</span>
+</button>
+</div>
+</div>
+<!-- Product Item 3 -->
+<div class="group relative flex items-center gap-4 p-3 rounded-2xl bg-surface-light dark:bg-surface-dark border border-slate-200 dark:border-slate-800 shadow-sm transition-transform active:scale-[0.99]">
+<div class="relative h-20 w-20 shrink-0 overflow-hidden rounded-xl bg-slate-100 dark:bg-slate-800">
+<img alt="Fresh mangoes stacked" class="h-full w-full object-cover" data-alt="Fresh mangoes" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD40EGr-RGCUDO8Nbgd5X-tFaSD3dZqndDYuFY8M6K-w0x8an9lYCMJ6_TTAV1sOYOwsoMqUXB89VufzDMIrjJ5vJz7L5Sb9tU6lu4li2ml4NwctlQm8vJbUuq6XFz-ndVKlHlPSOg1ZrPthobVfzvwkpJQ0v8zEBtcl_ujox_MZURnameeiEDd77W_QjslyHD-oCLdYTn11hf7va_tlopWzE8AoHmxLlXJoB7Kl-D2rbzgeRERcxuSgxyMMc4WO6TMM-TpgdFDFKI"/>
+</div>
+<div class="flex flex-1 flex-col justify-center min-w-0">
+<div class="flex justify-between items-start">
+<h3 class="text-base font-semibold text-slate-900 dark:text-white truncate pr-2">Fresh Mangoes</h3>
+<span class="inline-flex items-center rounded-md bg-green-500/10 px-2 py-1 text-xs font-medium text-green-500 ring-1 ring-inset ring-green-500/20">In Stock</span>
+</div>
+<p class="mt-1 text-sm text-slate-500 dark:text-slate-400">Unit: 1kg</p>
+<div class="mt-2 flex items-center gap-3">
+<p class="text-sm font-medium text-primary">85 units</p>
+<span class="h-1 w-1 rounded-full bg-slate-400"></span>
+<p class="text-sm text-slate-500">Fresh Produce</p>
+</div>
+</div>
+<div class="flex flex-col gap-2 shrink-0">
+<button class="p-2 text-slate-400 hover:text-primary transition-colors rounded-full hover:bg-primary/10">
+<span class="material-symbols-outlined text-[20px]">edit</span>
+</button>
+</div>
+</div>
+<!-- Product Item 4 (Out of Stock) -->
+<div class="group relative flex items-center gap-4 p-3 rounded-2xl bg-surface-light dark:bg-surface-dark border border-slate-200 dark:border-slate-800 shadow-sm opacity-75">
+<div class="relative h-20 w-20 shrink-0 overflow-hidden rounded-xl bg-slate-100 dark:bg-slate-800 grayscale">
+<img alt="Tunisian dates box" class="h-full w-full object-cover" data-alt="Tunisian dates" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDiSu0c3WKUETkh_sO9RddCCuUn4iJx4Euo39Z6kAx5F15fqCqwNqRLcIeCFpTWF9mBexuvRxben5WjEmYaEPyQ9TiHaFqOcaUy0_v__zV175Nk41KoxasUdbfIRGtnQhlo_-5P6O-zRDqO68k7EH1wo7v3R2WjZ0LnyiRf4KQSK3xcFKaZCYWYqVyjPPdqgp9fFrwa_j80XEVirp0s5NZUefVEUI04AGTLrB5b8RzxQh0EfSKn3RsEri5YevDZARYLpF0LqIiRBWk"/>
+</div>
+<div class="flex flex-1 flex-col justify-center min-w-0">
+<div class="flex justify-between items-start">
+<h3 class="text-base font-semibold text-slate-900 dark:text-white truncate pr-2">Deglet Nour Dates</h3>
+<span class="inline-flex items-center rounded-md bg-red-500/10 px-2 py-1 text-xs font-medium text-red-500 ring-1 ring-inset ring-red-500/20">Out of Stock</span>
+</div>
+<p class="mt-1 text-sm text-slate-500 dark:text-slate-400">Unit: 500g Box</p>
+<div class="mt-2 flex items-center gap-3">
+<p class="text-sm font-medium text-red-500">0 units</p>
+<span class="h-1 w-1 rounded-full bg-slate-400"></span>
+<p class="text-sm text-slate-500">Grocery</p>
+</div>
+</div>
+<div class="flex flex-col gap-2 shrink-0">
+<button class="p-2 text-slate-400 hover:text-primary transition-colors rounded-full hover:bg-primary/10">
+<span class="material-symbols-outlined text-[20px]">edit</span>
+</button>
+</div>
+</div>
+<!-- Product Item 5 -->
+<div class="group relative flex items-center gap-4 p-3 rounded-2xl bg-surface-light dark:bg-surface-dark border border-slate-200 dark:border-slate-800 shadow-sm transition-transform active:scale-[0.99]">
+<div class="relative h-20 w-20 shrink-0 overflow-hidden rounded-xl bg-slate-100 dark:bg-slate-800">
+<img alt="Fresh vegetables basket" class="h-full w-full object-cover" data-alt="Fresh vegetables" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAaOsvoD1-TDnSLQpxvr6VRYqIUpLG6tNtRIOU6JtOlmecP3m5k2KhBIrNNHpxUWyywsVXwxBFE2x2GiQK8zZRG5g7Oc5MTx815Hrfcj53nuKcgyuzwHDBw2EXnuBuimAaSjwFFjacbNTNIKSN3b3yKsn0P7R6UE41ejKpsyC7patL2jpQ-XaPVdBqXpC33pPHNmVj51oX631y369MDEmmPVH-quPEMzdsR0aXoabwEq7M_cdQzN8w5tLmSepSo8_ahutm1bm7Zlpw"/>
+</div>
+<div class="flex flex-1 flex-col justify-center min-w-0">
+<div class="flex justify-between items-start">
+<h3 class="text-base font-semibold text-slate-900 dark:text-white truncate pr-2">Local Tomatoes</h3>
+<span class="inline-flex items-center rounded-md bg-green-500/10 px-2 py-1 text-xs font-medium text-green-500 ring-1 ring-inset ring-green-500/20">In Stock</span>
+</div>
+<p class="mt-1 text-sm text-slate-500 dark:text-slate-400">Unit: 1kg</p>
+<div class="mt-2 flex items-center gap-3">
+<p class="text-sm font-medium text-primary">200+ units</p>
+<span class="h-1 w-1 rounded-full bg-slate-400"></span>
+<p class="text-sm text-slate-500">Fresh Produce</p>
+</div>
+</div>
+<div class="flex flex-col gap-2 shrink-0">
+<button class="p-2 text-slate-400 hover:text-primary transition-colors rounded-full hover:bg-primary/10">
+<span class="material-symbols-outlined text-[20px]">edit</span>
+</button>
+</div>
+</div>
+</main>
+<!-- Floating Action Button -->
+<div class="fixed bottom-24 right-4 z-30">
+<button class="flex items-center justify-center h-14 w-14 rounded-full bg-accent hover:bg-orange-600 text-white shadow-lg shadow-orange-500/30 transition-all active:scale-95">
+<span class="material-symbols-outlined text-[28px]">add</span>
+</button>
+</div>
+<!-- Bottom Navigation -->
+<nav class="fixed bottom-0 w-full z-40 border-t border-slate-200 dark:border-slate-800 bg-background-light dark:bg-background-dark pb-6 pt-3 px-6 safe-area-bottom">
+<div class="flex justify-between items-end">
+<a class="flex flex-col items-center gap-1 text-slate-400 dark:text-slate-500 hover:text-primary transition-colors group" href="#">
+<span class="material-symbols-outlined group-hover:scale-110 transition-transform">dashboard</span>
+<span class="text-[10px] font-medium">Dashboard</span>
+</a>
+<a class="flex flex-col items-center gap-1 text-primary hover:text-primary transition-colors group relative" href="#">
+<div class="absolute -top-3 w-8 h-1 bg-primary rounded-full shadow-[0_0_10px_2px_rgba(17,82,212,0.5)]"></div>
+<span class="material-symbols-outlined group-hover:scale-110 transition-transform filled">sell</span>
+<span class="text-[10px] font-medium">Catalog</span>
+</a>
+<a class="flex flex-col items-center gap-1 text-slate-400 dark:text-slate-500 hover:text-primary transition-colors group" href="#">
+<span class="material-symbols-outlined group-hover:scale-110 transition-transform">package_2</span>
+<span class="text-[10px] font-medium">Orders</span>
+</a>
+<a class="flex flex-col items-center gap-1 text-slate-400 dark:text-slate-500 hover:text-primary transition-colors group" href="#">
+<span class="material-symbols-outlined group-hover:scale-110 transition-transform">settings</span>
+<span class="text-[10px] font-medium">Settings</span>
+</a>
+</div>
+</nav>
+<!-- Overlay Gradient for Bottom Nav -->
+<div class="fixed bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-background-light dark:from-background-dark via-background-light/80 dark:via-background-dark/80 to-transparent pointer-events-none z-10"></div>
+</body></html>

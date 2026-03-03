@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>UberMoto Checkout</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#f47b25",
+                        "background-light": "#f8f7f5",
+                        "background-dark": "#221710",
+                    },
+                    fontFamily: {
+                        "display": ["Plus Jakarta Sans", "sans-serif"]
+                    },
+                    borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+<style>
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+        }
+        .hide-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .hide-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 min-h-screen flex justify-center">
+<div class="relative flex h-full min-h-screen w-full max-w-md flex-col overflow-x-hidden bg-background-light dark:bg-background-dark shadow-2xl">
+<!-- Header -->
+<div class="sticky top-0 z-10 flex items-center justify-between bg-background-light/95 dark:bg-background-dark/95 backdrop-blur-md p-4 pb-2">
+<button class="flex size-10 items-center justify-center rounded-full bg-white dark:bg-stone-800 shadow-sm text-slate-800 dark:text-slate-200 transition-transform active:scale-95">
+<span class="material-symbols-outlined">arrow_back</span>
+</button>
+<h2 class="text-lg font-bold leading-tight tracking-[-0.015em] flex-1 text-center pr-10">Checkout</h2>
+</div>
+<!-- Scrollable Content -->
+<div class="flex-1 overflow-y-auto pb-24 hide-scrollbar">
+<!-- Delivery Location -->
+<div class="px-4 py-4">
+<h3 class="text-sm font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-3 ml-1">Delivery Location</h3>
+<div class="flex items-center gap-4 rounded-xl bg-white dark:bg-stone-800 p-4 shadow-sm border border-stone-100 dark:border-stone-700 cursor-pointer active:bg-stone-50 dark:active:bg-stone-700 transition-colors">
+<div class="flex items-center justify-center rounded-full bg-primary/10 text-primary shrink-0 size-12">
+<span class="material-symbols-outlined">location_on</span>
+</div>
+<div class="flex flex-col justify-center flex-1">
+<div class="flex items-center gap-2">
+<p class="text-slate-900 dark:text-slate-100 text-base font-bold leading-normal">Home</p>
+<span class="px-2 py-0.5 bg-primary/20 text-primary text-[10px] font-bold rounded-full uppercase">Default</span>
+</div>
+<p class="text-slate-500 dark:text-slate-400 text-sm font-medium leading-normal line-clamp-1">15 Avenue Habib Bourguiba, Tunis</p>
+</div>
+<div class="shrink-0 text-primary">
+<span class="material-symbols-outlined">edit</span>
+</div>
+</div>
+</div>
+<!-- Order Summary -->
+<div class="px-4 pt-2 pb-4">
+<h3 class="text-sm font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-3 ml-1">Order Summary</h3>
+<div class="flex flex-col gap-3">
+<!-- Item 1 -->
+<div class="flex items-center gap-4 rounded-xl bg-white dark:bg-stone-800 p-3 shadow-sm border border-stone-100 dark:border-stone-700">
+<div class="bg-center bg-no-repeat aspect-square bg-cover rounded-lg size-16 shrink-0 bg-stone-100 dark:bg-stone-700" data-alt="Spicy red Harissa paste in a jar" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuDyojQoQsWs7_N9ZMywTlKuF75WYjGje6GgTzFWzIZfneoSX9s49taMdwl3poDt1dPUSu68Jh8XhTZydhOzhjichyJLdmFn74HqTTEn3tsnfC_Ffxb4tN9tAd2efHfNvsowyGOGSZj0f5bUL25-nFGFiTPPPgEdsRyjRUBzgsW_QMqFVQSfxJbIqT65aWUrLBeTPcxpIIqGV2arH8UaSiVsdQGPCkwywtaWEIEgkm-qRexGtbTYjnh9-yq-nzM_LeVMC0knJl3fZ6E");'></div>
+<div class="flex flex-col justify-center flex-1">
+<p class="text-slate-900 dark:text-slate-100 text-base font-bold leading-normal line-clamp-1">Harissa du Cap Bon</p>
+<p class="text-slate-500 dark:text-slate-400 text-sm font-medium">Spicy Tunisian Paste</p>
+</div>
+<div class="flex flex-col items-end gap-1">
+<p class="text-primary text-base font-bold">3.500 DT</p>
+<p class="text-xs text-slate-400 font-medium">x 1</p>
+</div>
+</div>
+<!-- Item 2 -->
+<div class="flex items-center gap-4 rounded-xl bg-white dark:bg-stone-800 p-3 shadow-sm border border-stone-100 dark:border-stone-700">
+<div class="bg-center bg-no-repeat aspect-square bg-cover rounded-lg size-16 shrink-0 bg-stone-100 dark:bg-stone-700" data-alt="Carton of fresh milk" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuD2b9xRQ-MN9TZyXqoFffM4_6gYMm3iJVeISZ65t01TVi4eH3jVMF1HjusQe5CjnUJ5OeCtZ0629A9J_1Pv0s04_5bKl_tpaPzKy7gZ1z-1TxQyLUkScEhW-3M6TyEwS5m8sIINfIl4CNlbJwVJZYhqhTapgsImPR3SC-ykj3kLrnz3XRhG32YfN4UXv44Do5vvY_yls5d8fFU1ECr7E9Bzmspp1KokNLlo7RavCzwn4It31bsAP8iLMRmb3-GmWrvDxb8MRIZX1uE");'></div>
+<div class="flex flex-col justify-center flex-1">
+<p class="text-slate-900 dark:text-slate-100 text-base font-bold leading-normal line-clamp-1">Délice Milk</p>
+<p class="text-slate-500 dark:text-slate-400 text-sm font-medium">Full Cream, 1L</p>
+</div>
+<div class="flex flex-col items-end gap-1">
+<p class="text-primary text-base font-bold">1.400 DT</p>
+<p class="text-xs text-slate-400 font-medium">x 2</p>
+</div>
+</div>
+</div>
+</div>
+<!-- Payment Methods -->
+<div class="px-4 py-2">
+<h3 class="text-sm font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-3 ml-1">Payment Method</h3>
+<div class="flex flex-col gap-3">
+<!-- Cash (Active) -->
+<label class="flex items-center gap-4 rounded-xl bg-primary/5 border-2 border-primary p-4 cursor-pointer relative overflow-hidden transition-all">
+<div class="absolute right-0 top-0 rounded-bl-xl bg-primary px-2 py-1">
+<span class="material-symbols-outlined text-white text-[16px]">check</span>
+</div>
+<div class="flex items-center justify-center rounded-full bg-primary text-white shrink-0 size-10 shadow-sm">
+<span class="material-symbols-outlined">payments</span>
+</div>
+<div class="flex flex-col justify-center flex-1">
+<p class="text-slate-900 dark:text-slate-100 text-base font-bold leading-normal">Cash on Delivery</p>
+<p class="text-slate-500 dark:text-slate-400 text-sm font-medium">Pay when you receive</p>
+</div>
+<input checked="" class="hidden" name="payment" type="radio"/>
+</label>
+<!-- Stripe (Disabled) -->
+<div class="flex items-center gap-4 rounded-xl bg-stone-50 dark:bg-stone-800/50 p-4 border border-stone-100 dark:border-stone-800 opacity-60 relative grayscale">
+<div class="absolute right-3 top-3 rounded-full bg-stone-200 dark:bg-stone-700 px-2 py-0.5">
+<span class="text-[10px] font-bold text-stone-500 dark:text-stone-400 uppercase">Coming Soon</span>
+</div>
+<div class="flex items-center justify-center rounded-full bg-stone-200 dark:bg-stone-700 text-stone-500 shrink-0 size-10">
+<span class="material-symbols-outlined">credit_card</span>
+</div>
+<div class="flex flex-col justify-center flex-1">
+<p class="text-stone-500 dark:text-stone-400 text-base font-bold leading-normal">Card Payment</p>
+<p class="text-stone-400 dark:text-stone-500 text-sm font-medium">Visa, Mastercard</p>
+</div>
+</div>
+<!-- PayPal (Disabled) -->
+<div class="flex items-center gap-4 rounded-xl bg-stone-50 dark:bg-stone-800/50 p-4 border border-stone-100 dark:border-stone-800 opacity-60 relative grayscale">
+<div class="absolute right-3 top-3 rounded-full bg-stone-200 dark:bg-stone-700 px-2 py-0.5">
+<span class="text-[10px] font-bold text-stone-500 dark:text-stone-400 uppercase">Coming Soon</span>
+</div>
+<div class="flex items-center justify-center rounded-full bg-stone-200 dark:bg-stone-700 text-stone-500 shrink-0 size-10">
+<span class="material-symbols-outlined">account_balance_wallet</span>
+</div>
+<div class="flex flex-col justify-center flex-1">
+<p class="text-stone-500 dark:text-stone-400 text-base font-bold leading-normal">PayPal</p>
+</div>
+</div>
+</div>
+</div>
+<!-- Total Calculation -->
+<div class="px-4 py-6">
+<div class="bg-white dark:bg-stone-800 rounded-xl p-5 border border-stone-100 dark:border-stone-700 shadow-sm space-y-3">
+<div class="flex justify-between items-center text-sm">
+<span class="text-slate-500 dark:text-slate-400 font-medium">Subtotal</span>
+<span class="text-slate-900 dark:text-slate-100 font-bold">6.300 DT</span>
+</div>
+<div class="flex justify-between items-center text-sm">
+<span class="text-slate-500 dark:text-slate-400 font-medium">Delivery Fee</span>
+<span class="text-slate-900 dark:text-slate-100 font-bold">2.000 DT</span>
+</div>
+<div class="h-px bg-stone-100 dark:bg-stone-700 my-2"></div>
+<div class="flex justify-between items-center text-lg">
+<span class="text-slate-900 dark:text-slate-100 font-bold">Total</span>
+<span class="text-primary font-bold text-xl">8.300 DT</span>
+</div>
+</div>
+</div>
+<div class="h-10"></div> <!-- Spacer -->
+</div>
+<!-- Floating Bottom Action -->
+<div class="fixed bottom-[88px] left-0 right-0 p-4 max-w-md mx-auto z-20">
+<button class="w-full bg-primary hover:bg-orange-600 text-white font-bold py-4 px-6 rounded-full shadow-lg shadow-orange-500/30 flex items-center justify-between group active:scale-[0.98] transition-all">
+<span class="text-lg">Confirm Order</span>
+<div class="bg-white/20 rounded-full p-1.5 group-hover:bg-white/30 transition-colors">
+<span class="material-symbols-outlined text-white">arrow_forward</span>
+</div>
+</button>
+</div>
+<!-- Bottom Nav Bar -->
+<div class="flex gap-2 border-t border-stone-200 dark:border-stone-800 bg-background-light dark:bg-background-dark px-4 pb-6 pt-3 z-30 sticky bottom-0">
+<a class="flex flex-1 flex-col items-center justify-end gap-1 text-slate-400 hover:text-primary transition-colors" href="#">
+<span class="material-symbols-outlined text-[24px]">home</span>
+<p class="text-xs font-medium leading-normal">Home</p>
+</a>
+<a class="flex flex-1 flex-col items-center justify-end gap-1 text-primary" href="#">
+<span class="material-symbols-outlined text-[24px] font-variation-settings-'FILL'1">shopping_bag</span>
+<p class="text-xs font-bold leading-normal">Cart</p>
+</a>
+<a class="flex flex-1 flex-col items-center justify-end gap-1 text-slate-400 hover:text-primary transition-colors" href="#">
+<span class="material-symbols-outlined text-[24px]">receipt_long</span>
+<p class="text-xs font-medium leading-normal">Orders</p>
+</a>
+<a class="flex flex-1 flex-col items-center justify-end gap-1 text-slate-400 hover:text-primary transition-colors" href="#">
+<span class="material-symbols-outlined text-[24px]">person</span>
+<p class="text-xs font-medium leading-normal">Account</p>
+</a>
+</div>
+</div>
+</body></html>

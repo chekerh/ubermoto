@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="fr"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>UberMoto Registration</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#f47b25",
+                        "primary-light": "#fff1e6",
+                        "background-light": "#fcfaf8",
+                        "background-dark": "#221710",
+                        "surface-light": "#ffffff",
+                        "surface-dark": "#2c1e16",
+                        "text-main": "#1c130d",
+                        "text-muted": "#9c6c49",
+                        "border-color": "#e8d9ce",
+                    },
+                    fontFamily: {
+                        "display": ["Plus Jakarta Sans", "sans-serif"]
+                    },
+                    borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+<style>
+        body {
+            font-family: "Plus Jakarta Sans", sans-serif;
+        }.no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background-light dark:bg-background-dark text-text-main dark:text-slate-100 min-h-screen flex flex-col font-display overflow-x-hidden">
+<div class="sticky top-0 z-50 flex items-center bg-background-light dark:bg-background-dark p-4 pb-2 justify-between border-b border-border-color/30 dark:border-white/10">
+<div class="text-text-main dark:text-slate-100 flex size-12 shrink-0 items-center justify-center rounded-full hover:bg-black/5 dark:hover:bg-white/10 transition-colors cursor-pointer">
+<span class="material-symbols-outlined">arrow_back</span>
+</div>
+<h2 class="text-text-main dark:text-slate-100 text-lg font-bold leading-tight tracking-[-0.015em] flex-1 text-center pr-12">Créer un compte</h2>
+</div>
+<div class="flex w-full flex-row items-center justify-center gap-3 py-5 bg-background-light dark:bg-background-dark">
+<div class="h-2 w-8 rounded-full bg-primary"></div>
+<div class="h-2 w-2 rounded-full bg-border-color dark:bg-white/20"></div>
+<div class="h-2 w-2 rounded-full bg-border-color dark:bg-white/20"></div>
+</div>
+<main class="flex-1 flex flex-col px-4 pb-24 max-w-md mx-auto w-full">
+<h1 class="text-text-main dark:text-slate-100 text-[26px] font-bold leading-tight tracking-[-0.015em] text-left pb-2 pt-2">Bienvenue sur UberMoto!</h1>
+<p class="text-text-muted dark:text-slate-400 text-base font-normal leading-normal pb-6">Remplissez vos informations pour commencer à rouler ou livrer en Tunisie.</p>
+<form class="space-y-5" onsubmit="event.preventDefault();">
+<label class="flex flex-col w-full">
+<p class="text-text-main dark:text-slate-200 text-sm font-semibold leading-normal pb-2 ml-1">Nom complet</p>
+<div class="relative">
+<div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-text-muted">
+<span class="material-symbols-outlined text-[20px]">person</span>
+</div>
+<input id="register-name" class="form-input flex w-full min-w-0 resize-none overflow-hidden rounded-xl text-text-main dark:text-white focus:outline-0 focus:ring-2 focus:ring-primary/20 border border-border-color dark:border-white/10 bg-surface-light dark:bg-surface-dark focus:border-primary h-14 placeholder:text-text-muted/70 pl-11 pr-4 text-base font-normal leading-normal transition-all" placeholder="Foulen Ben Foulen" type="text" value=""/>
+</div>
+</label>
+<label class="flex flex-col w-full">
+<p class="text-text-main dark:text-slate-200 text-sm font-semibold leading-normal pb-2 ml-1">Numéro de téléphone</p>
+<div class="relative flex items-center">
+<div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none z-10">
+<span class="text-text-main dark:text-white font-medium mr-1">🇹🇳</span>
+<span class="text-text-muted text-sm font-medium border-r border-border-color dark:border-white/10 pr-2 mr-2">+216</span>
+</div>
+<input id="register-phone" class="form-input flex w-full min-w-0 resize-none overflow-hidden rounded-xl text-text-main dark:text-white focus:outline-0 focus:ring-2 focus:ring-primary/20 border border-border-color dark:border-white/10 bg-surface-light dark:bg-surface-dark focus:border-primary h-14 placeholder:text-text-muted/70 pl-[5.5rem] pr-4 text-base font-normal leading-normal transition-all" placeholder="XX XXX XXX" type="tel" value=""/>
+</div>
+</label>
+<label class="flex flex-col w-full">
+<p class="text-text-main dark:text-slate-200 text-sm font-semibold leading-normal pb-2 ml-1">Email</p>
+<div class="relative">
+<div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-text-muted">
+<span class="material-symbols-outlined text-[20px]">mail</span>
+</div>
+<input id="register-email" class="form-input flex w-full min-w-0 resize-none overflow-hidden rounded-xl text-text-main dark:text-white focus:outline-0 focus:ring-2 focus:ring-primary/20 border border-border-color dark:border-white/10 bg-surface-light dark:bg-surface-dark focus:border-primary h-14 placeholder:text-text-muted/70 pl-11 pr-4 text-base font-normal leading-normal transition-all" placeholder="exemple@email.com" type="email" value=""/>
+</div>
+</label>
+<label class="flex flex-col w-full">
+<p class="text-text-main dark:text-slate-200 text-sm font-semibold leading-normal pb-2 ml-1">Mot de passe</p>
+<div class="relative">
+<div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-text-muted">
+<span class="material-symbols-outlined text-[20px]">lock</span>
+</div>
+<input id="register-password" class="form-input flex w-full min-w-0 resize-none overflow-hidden rounded-xl text-text-main dark:text-white focus:outline-0 focus:ring-2 focus:ring-primary/20 border border-border-color dark:border-white/10 bg-surface-light dark:bg-surface-dark focus:border-primary h-14 placeholder:text-text-muted/70 pl-11 pr-12 text-base font-normal leading-normal transition-all" placeholder="Minimum 8 caractères" type="password" value=""/>
+<button class="absolute inset-y-0 right-0 pr-4 flex items-center text-text-muted hover:text-primary transition-colors" type="button">
+<span class="material-symbols-outlined text-[20px]">visibility_off</span>
+</button>
+</div>
+</label>
+<label class="flex flex-col w-full">
+<p class="text-text-main dark:text-slate-200 text-sm font-semibold leading-normal pb-2 ml-1">Numéro de permis (driver)</p>
+<div class="relative">
+<div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-text-muted">
+<span class="material-symbols-outlined text-[20px]">badge</span>
+</div>
+<input id="register-license" class="form-input flex w-full min-w-0 resize-none overflow-hidden rounded-xl text-text-main dark:text-white focus:outline-0 focus:ring-2 focus:ring-primary/20 border border-border-color dark:border-white/10 bg-surface-light dark:bg-surface-dark focus:border-primary h-14 placeholder:text-text-muted/70 pl-11 pr-4 text-base font-normal leading-normal transition-all" placeholder="DRV-123456" type="text" value=""/>
+</div>
+</label>
+<div class="pt-6">
+<p class="text-text-main dark:text-slate-200 text-sm font-semibold leading-normal pb-4 ml-1">Choisissez votre rôle</p>
+<div class="grid grid-cols-1 gap-5">
+<label class="relative group cursor-pointer">
+<input checked="" class="peer sr-only" name="role" type="radio" value="client"/>
+<div class="flex items-center p-4 rounded-xl border-2 border-border-color dark:border-white/10 bg-surface-light dark:bg-surface-dark peer-checked:border-primary peer-checked:bg-primary/5 transition-all hover:bg-background-light dark:hover:bg-white/5">
+<div class="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center text-primary shrink-0 mr-4">
+<span class="material-symbols-outlined">person</span>
+</div>
+<div class="flex-1">
+<div class="flex justify-between items-center mb-1">
+<h3 class="font-bold text-text-main dark:text-white">Client</h3>
+<span class="text-xs font-medium text-primary bg-primary/10 px-2 py-0.5 rounded-full">Populaire</span>
+</div>
+<p class="text-sm text-text-muted dark:text-slate-400">Pour commander des courses.</p>
+<p class="text-xs text-primary font-medium mt-1 italic">"Bch netanakel w neshel 3la rouhi"</p>
+</div>
+<div class="w-6 h-6 rounded-full border-2 border-border-color dark:border-white/30 peer-checked:border-primary peer-checked:bg-primary flex items-center justify-center ml-2 transition-all">
+<span class="material-symbols-outlined text-white text-[16px] opacity-0 peer-checked:opacity-100">check</span>
+</div>
+</div>
+</label>
+<label class="relative group cursor-pointer">
+<input class="peer sr-only" name="role" type="radio" value="driver"/>
+<div class="flex items-center p-4 rounded-xl border-2 border-border-color dark:border-white/10 bg-surface-light dark:bg-surface-dark peer-checked:border-primary peer-checked:bg-primary/5 transition-all hover:bg-background-light dark:hover:bg-white/5">
+<div class="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center text-primary shrink-0 mr-4">
+<span class="material-symbols-outlined">two_wheeler</span>
+</div>
+<div class="flex-1">
+<h3 class="font-bold text-text-main dark:text-white mb-1">Chauffeur</h3>
+<p class="text-sm text-text-muted dark:text-slate-400">Pour conduire et gagner de l'argent.</p>
+<p class="text-xs text-primary font-medium mt-1 italic">"Nheb nekhdem w ndawar douro"</p>
+</div>
+<div class="w-6 h-6 rounded-full border-2 border-border-color dark:border-white/30 peer-checked:border-primary peer-checked:bg-primary flex items-center justify-center ml-2 transition-all">
+<span class="material-symbols-outlined text-white text-[16px] opacity-0 peer-checked:opacity-100">check</span>
+</div>
+</div>
+</label>
+<label class="relative group cursor-pointer">
+<input class="peer sr-only" name="role" type="radio" value="admin"/>
+<div class="flex items-center p-4 rounded-xl border-2 border-border-color dark:border-white/10 bg-surface-light dark:bg-surface-dark peer-checked:border-primary peer-checked:bg-primary/5 transition-all hover:bg-background-light dark:hover:bg-white/5">
+<div class="h-12 w-12 rounded-full bg-slate-100 dark:bg-slate-700 flex items-center justify-center text-slate-700 dark:text-slate-200 shrink-0 mr-4">
+<span class="material-symbols-outlined">admin_panel_settings</span>
+</div>
+<div class="flex-1">
+<h3 class="font-bold text-text-main dark:text-white mb-1">Admin</h3>
+<p class="text-sm text-text-muted dark:text-slate-400">Dashboard access (approval required).</p>
+</div>
+<div class="w-6 h-6 rounded-full border-2 border-border-color dark:border-white/30 peer-checked:border-primary peer-checked:bg-primary flex items-center justify-center ml-2 transition-all">
+<span class="material-symbols-outlined text-white text-[16px] opacity-0 peer-checked:opacity-100">check</span>
+</div>
+</div>
+</label>
+</div>
+</div>
+</form>
+</main>
+<div class="fixed bottom-0 left-0 right-0 bg-background-light dark:bg-background-dark p-4 border-t border-border-color/30 dark:border-white/10 backdrop-blur-md bg-opacity-95 z-40">
+<div class="max-w-md mx-auto w-full flex flex-col gap-3">
+<button id="register-submit-btn" class="flex w-full items-center justify-center rounded-full bg-primary hover:bg-orange-600 transition-colors h-14 px-5">
+<span class="text-white text-base font-bold leading-normal">Suivant</span>
+<span class="material-symbols-outlined text-white ml-2">arrow_forward</span>
+</button>
+<p class="text-center text-sm text-text-muted dark:text-slate-500">
+                Déjà un compte? <a id="register-login-link" class="text-primary font-semibold hover:underline" href="#">Se connecter</a>
+</p>
+</div>
+</div>
+<div class="h-[120px]"></div>
+
+</body></html>
