@@ -13,6 +13,12 @@ import { DocumentsModule } from './documents/documents.module';
 import { AdminModule } from './admin/admin.module';
 import { WebSocketModule } from './websocket/websocket.module';
 import { CoreModule } from './core/core.module';
+import { FirebaseModule } from './firebase/firebase.module';
+import { SurgeModule } from './surge/surge.module';
+import { CatalogModule } from './catalog/catalog.module';
+import { OrdersModule } from './orders/orders.module';
+import { RecommendationsModule } from './recommendations/recommendations.module';
+import { NotificationsModule } from './notifications/notifications.module';
 import { DatabaseConfigService } from './config/database-config.service';
 
 @Module({
@@ -35,6 +41,12 @@ import { DatabaseConfigService } from './config/database-config.service';
     DocumentsModule,
     AdminModule,
     WebSocketModule,
+    FirebaseModule,
+    SurgeModule,
+    CatalogModule,
+    OrdersModule,
+    RecommendationsModule,
+    NotificationsModule,
   ],
   providers: [DatabaseConfigService],
 })
