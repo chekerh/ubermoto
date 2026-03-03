@@ -50,6 +50,19 @@ export class DeliveriesController {
     return this.deliveriesService.findAll(userId);
   }
 
+  // Static routes MUST come before :id param routes
+  @Get('driver/available')
+  @Roles(UserRole.DRIVER)
+  getAvailableDeliveries(): Promise<unknown> {
+    return this.deliveriesService.getAvailableDeliveries();
+  }
+
+  @Get('driver/active')
+  @Roles(UserRole.DRIVER)
+  getDriverDeliveries(@Request() req: AuthenticatedRequest): Promise<unknown> {
+    return this.deliveriesService.getDriverDeliveries(req.user.sub);
+  }
+
   @Get(':id')
   findOne(@Param('id') id: string): Promise<unknown> {
     return this.deliveriesService.findOne(id);
@@ -67,9 +80,9 @@ export class DeliveriesController {
   @Post(':id/calculate-cost')
   calculateCost(
     @Param('id') id: string,
-    @Body() body: { distance: number; motorcycleId: string },
+    @Body() body: { distance: number; motorcycleId: string; region?: string },
   ): Promise<number> {
-    return this.deliveriesService.calculateCost(id, body.distance, body.motorcycleId);
+    return this.deliveriesService.calculateCost(id, body.distance, body.motorcycleId, body.region);
   }
 
   @Post(':id/accept')
@@ -94,15 +107,11 @@ export class DeliveriesController {
     return this.deliveriesService.completeDelivery(id, req.user.sub, body.actualCost);
   }
 
-  @Get('driver/available')
-  @Roles(UserRole.DRIVER)
-  getAvailableDeliveries(): Promise<unknown> {
-    return this.deliveriesService.getAvailableDeliveries();
-  }
-
-  @Get('driver/active')
-  @Roles(UserRole.DRIVER)
-  getDriverDeliveries(@Request() req: AuthenticatedRequest): Promise<unknown> {
-    return this.deliveriesService.getDriverDeliveries(req.user.sub);
+  @Post(':id/cancel')
+  cancelDelivery(
+    @Param('id') id: string,
+    @Request() req: AuthenticatedRequest,
+  ): Promise<unknown> {
+    return this.deliveriesService.cancelDelivery(id, req.user.sub);
   }
 }

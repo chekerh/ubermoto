@@ -108,21 +108,25 @@ export class DeliveryMatchingService {
 
     // Make driver available again and increment delivery count
     if (delivery.driverId) {
-      await this.driverModel
-        .findByIdAndUpdate(delivery.driverId, {
-          isAvailable: true,
-          $inc: { totalDeliveries: 1 },
-        })
-        .exec();
-
-      // Emit driver availability update
-      this.deliveryGateway.emitDriverAvailable(delivery.driverId.toString());
+      await this.makeDriverAvailableAfterDelivery(delivery.driverId.toString());
     }
 
     // Emit delivery status update
     this.deliveryGateway.emitDeliveryStatusUpdate(deliveryId, delivery);
 
     return delivery;
+  }
+
+  async makeDriverAvailableAfterDelivery(driverId: string): Promise<void> {
+    await this.driverModel
+      .findByIdAndUpdate(driverId, {
+        isAvailable: true,
+        $inc: { totalDeliveries: 1 },
+      })
+      .exec();
+
+    // Emit driver availability update
+    this.deliveryGateway.emitDriverAvailable(driverId);
   }
 
   async cancelDelivery(deliveryId: string): Promise<DeliveryDocument> {

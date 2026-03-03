@@ -21,4 +21,8 @@ export class CreateDeliveryDto {
   @IsString()
   @IsOptional()
   motorcycleId?: string;
+
+  @IsString()
+  @IsOptional()
+  region?: string;
 }

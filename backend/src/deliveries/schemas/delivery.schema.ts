@@ -50,6 +50,15 @@ export class Delivery {
 
   @Prop()
   estimatedTime?: number; // Estimated time in minutes
+
+  @Prop()
+  region?: string;
+
+  @Prop({ default: 1 })
+  surgeMultiplier?: number;
+
+  @Prop({ type: Types.ObjectId, ref: 'Order' })
+  orderId?: Types.ObjectId;
 }
 
 export const DeliverySchema = SchemaFactory.createForClass(Delivery);

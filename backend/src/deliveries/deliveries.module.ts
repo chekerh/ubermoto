@@ -9,6 +9,8 @@ import { User, UserSchema } from '../users/schemas/user.schema';
 import { MotorcyclesModule } from '../motorcycles/motorcycles.module';
 import { CoreModule } from '../core/core.module';
 import { WebSocketModule } from '../websocket/websocket.module';
+import { SurgeModule } from '../surge/surge.module';
+import { DriversModule } from '../drivers/drivers.module';
 
 @Module({
   imports: [
@@ -20,6 +22,8 @@ import { WebSocketModule } from '../websocket/websocket.module';
     MotorcyclesModule,
     CoreModule,
     WebSocketModule,
+    SurgeModule,
+    DriversModule,
   ],
   controllers: [DeliveriesController],
   providers: [DeliveriesService, DeliveryMatchingService],
