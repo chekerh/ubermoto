@@ -42,7 +42,6 @@ export class AuthService {
     );
 
     const userId = user._id.toString();
-    console.log('Created user:', { id: userId, email: user.email, role: user.role });
 
     return this.generateToken(userId, user.email, user.role);
   }
@@ -65,7 +64,6 @@ export class AuthService {
     );
 
     const driverUserId = user._id.toString();
-    console.log('Created driver user:', { id: driverUserId, email: user.email, role: user.role });
 
     // Create driver profile
     await this.driversService.create({
@@ -83,41 +81,36 @@ export class AuthService {
   }
 
   async login(loginDto: LoginDto): Promise<AuthResponse> {
-    console.log('Login attempt for email:', loginDto.email);
+    const identifier = loginDto.email.trim();
+    const isEmailLogin = identifier.includes('@');
 
-    const user = await this.usersService.findByEmail(loginDto.email);
-    console.log('User found:', user ? { id: user._id.toString(), email: user.email } : 'null');
+    const user = isEmailLogin
+      ? await this.usersService.findByEmail(identifier)
+      : await this.usersService.findByPhoneNumber(identifier);
 
     if (!user) {
-      console.log('No user found with email:', loginDto.email);
       throw new UnauthorizedException('Invalid credentials');
     }
 
     const isPasswordValid = await bcrypt.compare(loginDto.password, user.password);
-    console.log('Password valid:', isPasswordValid);
 
     if (!isPasswordValid) {
-      console.log('Invalid password for user:', user.email);
       throw new UnauthorizedException('Invalid credentials');
     }
 
     const loginUserId = user._id.toString();
-    console.log('Login successful for user:', { id: loginUserId, email: user.email });
     return this.generateToken(loginUserId, user.email, user.role);
   }
 
   async validateUser(payload: JwtPayload): Promise<unknown> {
-    console.log('Validating user with payload:', payload);
-
     const user = await this.usersService.findById(payload.sub);
-    console.log('Found user:', user ? { id: user._id.toString(), email: user.email } : 'null');
 
     if (!user) {
-      console.log('User not found for ID:', payload.sub);
       throw new UnauthorizedException('User not found');
     }
 
     return {
+      sub: user._id.toString(),
       id: user._id.toString(),
       email: user.email,
       name: user.name,
