@@ -308,7 +308,12 @@ class _StitchViewerState extends ConsumerState<StitchViewer> {
   // ═══════════════════════════════════════════════════════════════════
 
   Future<void> _injectSplash1Bindings() async {
-    // Splash 1 only has radio buttons + double-tap. Radios work natively.
+    await _controller.runJavaScript(r'''
+      (() => {
+        const getStarted = document.getElementById('splash-get-started');
+        stitchBind(getStarted, 'open_login');
+      })();
+    ''');
   }
 
   Future<void> _injectSplash2Bindings() async {
@@ -535,58 +540,37 @@ class _StitchViewerState extends ConsumerState<StitchViewer> {
   Future<void> _injectCustomerHomeBindings() async {
     await _controller.runJavaScript(r'''
       (() => {
-        // Profile avatar
-        const avatar = document.querySelector('img[class*="rounded-full"]');
-        if (avatar) stitchBind(avatar.closest('a') || avatar.closest('button') || avatar, 'open_notifications');
+        // Profile button
+        stitchBind(document.getElementById('home-profile-btn'), 'open_notifications');
 
         // Filter button
-        const filterBtn = stitchFindByIcon('tune') || stitchFindByIcon('filter_list');
-        stitchBind(filterBtn, 'open_filters');
+        stitchBind(document.getElementById('home-filter-btn'), 'open_filters');
 
-        // "Commander" / order button
-        const orderBtn = stitchFindByText('button,a', ['commander', 'order now', 'order']);
-        stitchBind(orderBtn, 'open_product');
+        // Promo banner
+        stitchBind(document.getElementById('home-promo-btn'), 'show_info', { message: 'Check back for seasonal promotions and discounts!' });
 
-        // All product cards
-        const productCards = document.querySelectorAll('.group[class*="cursor-pointer"], [class*="product-card"]');
-        productCards.forEach(card => stitchBind(card, 'open_product'));
+        // Product cards
+        stitchBind(document.getElementById('product-card-harissa'), 'open_product');
+        stitchBind(document.getElementById('product-card-couscous'), 'open_product');
+        stitchBind(document.getElementById('product-card-indomie'), 'open_product');
 
-        // Favorite buttons
-        const favBtns = Array.from(document.querySelectorAll('button')).filter(el => {
-          const icon = el.querySelector('.material-symbols-outlined, .material-symbols-rounded');
-          return icon && (icon.textContent || '').trim() === 'favorite_border';
-        });
-        favBtns.forEach(btn => stitchBind(btn, 'open_product'));
-
-        // Category links
-        const categoryLinks = document.querySelectorAll('[class*="category"] a, [class*="categor"] button');
-        categoryLinks.forEach(link => stitchBind(link, 'open_filters'));
-
-        // Search input → filters
-        const searchInput = document.querySelector('input[type="text"], input[type="search"]');
+        // Search — navigate on Enter, not on focus
+        const searchInput = document.getElementById('home-search');
         if (searchInput && searchInput.dataset.flutterBound !== '1') {
           searchInput.dataset.flutterBound = '1';
-          searchInput.addEventListener('focus', () => {
-            window.StitchBridge.postMessage(JSON.stringify({ action: 'open_filters' }));
+          searchInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+              window.StitchBridge.postMessage(JSON.stringify({ action: 'open_filters' }));
+            }
           });
         }
 
-        // Cart icon
-        const cartIcon = stitchFindByIcon('shopping_cart') || stitchFindByIcon('shopping_bag');
-        stitchBind(cartIcon, 'open_cart');
-
         // Bottom nav
-        stitchBindBottomNav({
-          'home|accueil': 'noop',
-          'smart|ia|commande': 'open_ai_order',
-          'order|commande': 'open_live_tracking',
-          'profile|profil|account|compte': 'open_notifications',
-          'market|march': 'open_filters',
-        });
-
-        // Center FAB
-        const fab = document.querySelector('nav [class*="rounded-full"][class*="bg-primary"]');
-        stitchBind(fab, 'open_ai_voice');
+        stitchBind(document.getElementById('nav-home'), 'noop');
+        stitchBind(document.getElementById('nav-orders'), 'open_live_tracking');
+        stitchBind(document.getElementById('nav-cart'), 'open_cart');
+        stitchBind(document.getElementById('nav-wallet'), 'show_coming_soon');
+        stitchBind(document.getElementById('nav-profile'), 'open_notifications');
       })();
     ''');
   }
@@ -595,35 +579,19 @@ class _StitchViewerState extends ConsumerState<StitchViewer> {
     await _controller.runJavaScript(r'''
       (() => {
         // Back button
-        const backBtn = stitchFindByIcon('arrow_back') || stitchFindByIcon('chevron_left');
-        stitchBind(backBtn, 'go_back');
+        stitchBind(document.getElementById('product-back-btn'), 'go_back');
 
         // Cart icon in header
-        const cartIcon = stitchFindByIcon('shopping_bag') || stitchFindByIcon('shopping_cart');
-        stitchBind(cartIcon, 'open_cart');
+        stitchBind(document.getElementById('product-cart-btn'), 'open_cart');
 
         // Add to Cart button
-        const addToCart = stitchFindByText('button', ['add to cart', 'ajouter', 'add']);
-        stitchBind(addToCart, 'add_to_cart_and_go');
-
-        // Quick-add buttons
-        const quickAdds = Array.from(document.querySelectorAll('button')).filter(el => {
-          const icon = el.querySelector('.material-symbols-outlined, .material-symbols-rounded, .material-icons');
-          return icon && ['add', 'add_circle', 'add_shopping_cart'].includes((icon.textContent || '').trim());
-        });
-        quickAdds.forEach(btn => stitchBind(btn, 'show_added_to_cart'));
-
-        // Zoom button (UI-only)
-        const zoomBtn = stitchFindByIcon('zoom_in');
-        if (zoomBtn) stitchBind(zoomBtn, 'noop');
+        stitchBind(document.getElementById('product-add-to-cart'), 'add_to_cart_and_go');
 
         // Bottom nav
-        stitchBindBottomNav({
-          'home|accueil': 'open_customer_home',
-          'market|march': 'open_filters',
-          'order|commande': 'open_live_tracking',
-          'profile|profil|account|compte': 'open_notifications',
-        });
+        stitchBind(document.getElementById('nav-home'), 'open_customer_home');
+        stitchBind(document.getElementById('nav-search'), 'open_filters');
+        stitchBind(document.getElementById('nav-orders'), 'open_live_tracking');
+        stitchBind(document.getElementById('nav-profile'), 'open_notifications');
       })();
     ''');
   }
@@ -631,18 +599,20 @@ class _StitchViewerState extends ConsumerState<StitchViewer> {
   Future<void> _injectCartBindings() async {
     await _controller.runJavaScript(r'''
       (() => {
-        const confirmBtn = stitchFindByText('button', ['confirm order', 'confirmer', 'checkout', 'passer']);
-        stitchBind(confirmBtn, 'open_checkout_promos');
+        // Back button
+        stitchBind(document.getElementById('cart-back-btn'), 'go_back');
 
-        const addressCard = document.querySelector('[class*="address"], [class*="delivery-address"]');
-        if (addressCard) stitchBind(addressCard, 'show_info', { message: 'Delivery address can be changed at checkout.' });
+        // Confirm order → checkout
+        stitchBind(document.getElementById('cart-confirm-btn'), 'open_checkout_promos');
 
-        stitchBindBottomNav({
-          'home|accueil': 'open_customer_home',
-          'market|march': 'open_filters',
-          'order|commande': 'open_live_tracking',
-          'profile|profil|account|compte': 'open_notifications',
-        });
+        // Edit delivery address
+        stitchBind(document.getElementById('cart-edit-address'), 'show_info', { message: 'Delivery address can be changed at checkout.' });
+
+        // Bottom nav
+        stitchBind(document.getElementById('nav-home'), 'open_customer_home');
+        stitchBind(document.getElementById('nav-cart'), 'noop');
+        stitchBind(document.getElementById('nav-orders'), 'open_live_tracking');
+        stitchBind(document.getElementById('nav-profile'), 'open_notifications');
       })();
     ''');
   }
@@ -650,21 +620,22 @@ class _StitchViewerState extends ConsumerState<StitchViewer> {
   Future<void> _injectCheckoutPromosBindings() async {
     await _controller.runJavaScript(r'''
       (() => {
-        const confirmBtn = stitchFindByText('button', ['confirm order', 'confirmer', 'passer la commande']);
-        stitchBind(confirmBtn, 'open_order_confirm');
+        // Back button
+        stitchBind(document.getElementById('checkout-back-btn'), 'go_back');
 
+        // Confirm order → order confirmation
+        stitchBind(document.getElementById('checkout-confirm-btn'), 'open_order_confirm');
+
+        // Apply promo code (text fallback — no specific ID)
         const applyBtn = stitchFindByText('button', ['apply', 'appliquer']);
         if (applyBtn) stitchBind(applyBtn, 'show_info', { message: 'Promo code applied! 10% discount.' });
 
-        stitchBindBottomNav({
-          'home|accueil': 'open_customer_home',
-          'smart|ia': 'open_ai_order',
-          'order|commande': 'open_live_tracking',
-          'profile|profil|account|compte': 'open_notifications',
-        });
-
-        const fab = document.querySelector('nav [class*="rounded-full"][class*="bg-primary"]');
-        stitchBind(fab, 'open_ai_voice');
+        // Bottom nav
+        stitchBind(document.getElementById('nav-home'), 'open_customer_home');
+        stitchBind(document.getElementById('nav-activity'), 'open_live_tracking');
+        stitchBind(document.getElementById('nav-cart'), 'open_cart');
+        stitchBind(document.getElementById('nav-wallet'), 'show_coming_soon');
+        stitchBind(document.getElementById('nav-profile'), 'open_notifications');
       })();
     ''');
   }
@@ -672,18 +643,20 @@ class _StitchViewerState extends ConsumerState<StitchViewer> {
   Future<void> _injectOrderConfirmationBindings() async {
     await _controller.runJavaScript(r'''
       (() => {
-        const cancelBtn = stitchFindByText('button', ['cancel order', 'annuler']);
-        stitchBind(cancelBtn, 'open_customer_home');
+        // Back to home
+        stitchBind(document.getElementById('confirm-back-btn'), 'open_customer_home');
 
-        const trackBtn = stitchFindByText('button,a', ['track', 'suivre', 'tracking']);
-        stitchBind(trackBtn, 'open_live_tracking');
+        // Track order → live tracking
+        stitchBind(document.getElementById('confirm-track-btn'), 'open_live_tracking');
 
-        stitchBindBottomNav({
-          'home|accueil': 'open_customer_home',
-          'market|march': 'open_filters',
-          'order|commande': 'open_live_tracking',
-          'profile|profil|account|compte': 'open_notifications',
-        });
+        // Cancel order → back to home
+        stitchBind(document.getElementById('confirm-cancel-btn'), 'open_customer_home');
+
+        // Bottom nav
+        stitchBind(document.getElementById('nav-home'), 'open_customer_home');
+        stitchBind(document.getElementById('nav-activity'), 'open_live_tracking');
+        stitchBind(document.getElementById('nav-wallet'), 'show_coming_soon');
+        stitchBind(document.getElementById('nav-profile'), 'open_notifications');
       })();
     ''');
   }
@@ -691,38 +664,23 @@ class _StitchViewerState extends ConsumerState<StitchViewer> {
   Future<void> _injectLiveTrackingBindings() async {
     await _controller.runJavaScript(r'''
       (() => {
-        const helpBtn = stitchFindByIcon('help') || stitchFindByIcon('help_outline') ||
-          stitchFindByText('button', ['help']);
-        stitchBind(helpBtn, 'show_help');
+        // Back button
+        stitchBind(document.getElementById('tracking-back-btn'), 'go_back');
 
-        // Map controls — UI-only
-        const zoomIn = stitchFindByIcon('add') || stitchFindByIcon('zoom_in');
-        const zoomOut = stitchFindByIcon('remove') || stitchFindByIcon('zoom_out');
-        const center = stitchFindByIcon('my_location') || stitchFindByIcon('gps_fixed') || stitchFindByIcon('near_me');
-        if (zoomIn) stitchBind(zoomIn, 'noop');
-        if (zoomOut) stitchBind(zoomOut, 'noop');
-        if (center) stitchBind(center, 'noop');
+        // Help button
+        stitchBind(document.getElementById('tracking-help-btn'), 'show_help');
 
-        // Chat / call driver
-        const chatBtn = stitchFindByIcon('chat') || stitchFindByIcon('message') || stitchFindByIcon('chat_bubble');
-        stitchBind(chatBtn, 'show_coming_soon');
+        // Chat driver
+        stitchBind(document.getElementById('tracking-chat-btn'), 'show_coming_soon');
 
-        const callBtn = stitchFindByIcon('call') || stitchFindByIcon('phone');
-        stitchBind(callBtn, 'show_coming_soon');
+        // Call driver
+        stitchBind(document.getElementById('tracking-call-btn'), 'show_coming_soon');
 
-        // Smart suggestion "Add" button
-        const addSuggestion = stitchFindByText('button,a', ['add', 'ajouter']);
-        stitchBind(addSuggestion, 'open_ai_order');
-
-        stitchBindBottomNav({
-          'home|accueil': 'open_customer_home',
-          'smart|ia': 'open_ai_order',
-          'order|commande': 'noop',
-          'profile|profil|account|compte': 'open_notifications',
-        });
-
-        const fab = document.querySelector('nav [class*="rounded-full"][class*="bg-primary"]');
-        stitchBind(fab, 'open_ai_voice');
+        // Bottom nav
+        stitchBind(document.getElementById('nav-home'), 'open_customer_home');
+        stitchBind(document.getElementById('nav-activity'), 'noop');
+        stitchBind(document.getElementById('nav-wallet'), 'show_coming_soon');
+        stitchBind(document.getElementById('nav-profile'), 'open_notifications');
       })();
     ''');
   }
@@ -730,41 +688,31 @@ class _StitchViewerState extends ConsumerState<StitchViewer> {
   Future<void> _injectFiltersBindings() async {
     await _controller.runJavaScript(r'''
       (() => {
-        const backBtn = stitchFindByIcon('arrow_back') || stitchFindByIcon('chevron_left');
-        stitchBind(backBtn, 'go_back');
+        // Back button
+        stitchBind(document.getElementById('filters-back-btn'), 'go_back');
 
-        const cartIcon = stitchFindByIcon('shopping_bag') || stitchFindByIcon('shopping_cart');
-        stitchBind(cartIcon, 'open_cart');
+        // Cart icon
+        stitchBind(document.getElementById('filters-cart-btn'), 'open_cart');
 
-        // Favorite buttons
+        // Favorite buttons (icon fallback — multiple dynamic items)
         const favBtns = Array.from(document.querySelectorAll('button')).filter(el => {
           const icon = el.querySelector('.material-symbols-outlined, .material-symbols-rounded');
           return icon && (icon.textContent || '').trim() === 'favorite_border';
         });
         favBtns.forEach(btn => stitchBind(btn, 'show_info', { message: 'Added to favorites!' }));
 
-        // Add to cart buttons
+        // Add to cart buttons (icon fallback — multiple dynamic items)
         const addBtns = Array.from(document.querySelectorAll('button')).filter(el => {
           const icon = el.querySelector('.material-symbols-outlined, .material-symbols-rounded');
           return icon && ['add', 'add_circle', 'add_shopping_cart'].includes((icon.textContent || '').trim());
         });
         addBtns.forEach(btn => stitchBind(btn, 'show_added_to_cart'));
 
-        const viewAll = stitchFindByText('button,a', ['view all', 'voir tout']);
-        stitchBind(viewAll, 'show_info', { message: 'Showing all search results.' });
-
-        const clearAll = stitchFindByText('button,a', ['clear all', 'effacer']);
-        if (clearAll) stitchBind(clearAll, 'noop');
-
-        stitchBindBottomNav({
-          'home|accueil': 'open_customer_home',
-          'market|march': 'noop',
-          'order|commande': 'open_live_tracking',
-          'profile|profil|account|compte': 'open_notifications',
-        });
-
-        const fab = document.querySelector('nav [class*="rounded-full"][class*="bg-primary"]');
-        stitchBind(fab, 'open_ai_voice');
+        // Bottom nav
+        stitchBind(document.getElementById('nav-home'), 'open_customer_home');
+        stitchBind(document.getElementById('nav-market'), 'noop');
+        stitchBind(document.getElementById('nav-orders'), 'open_live_tracking');
+        stitchBind(document.getElementById('nav-profile'), 'open_notifications');
       })();
     ''');
   }
@@ -772,28 +720,17 @@ class _StitchViewerState extends ConsumerState<StitchViewer> {
   Future<void> _injectAiOrderBindings() async {
     await _controller.runJavaScript(r'''
       (() => {
-        const backBtn = stitchFindByIcon('arrow_back') || stitchFindByIcon('chevron_left');
-        stitchBind(backBtn, 'go_back');
+        // Back button
+        stitchBind(document.getElementById('ai-order-back-btn'), 'go_back');
 
-        const moreBtn = stitchFindByIcon('more_vert');
-        stitchBind(moreBtn, 'show_info', { message: 'Order settings: Clear chat, Change language, Help.' });
+        // Add to Cart button
+        stitchBind(document.getElementById('ai-order-add-cart'), 'open_cart');
 
-        const addToCartBtn = stitchFindByText('button', ['add to cart', 'ajouter au panier']);
-        stitchBind(addToCartBtn, 'open_cart');
+        // Mic button
+        stitchBind(document.getElementById('ai-order-mic-btn'), 'show_info', { message: 'Listening... Speak your order in Derja or French.' });
 
-        const editBtn = stitchFindByText('button', ['edit order', 'modifier']);
-        if (editBtn) stitchBind(editBtn, 'noop');
-
-        const attachBtn = stitchFindByIcon('add_circle');
-        stitchBind(attachBtn, 'show_coming_soon');
-
-        const emojiBtn = stitchFindByIcon('sentiment_satisfied');
-        if (emojiBtn) stitchBind(emojiBtn, 'noop');
-
-        const micBtn = stitchFindByIcon('mic');
-        stitchBind(micBtn, 'show_info', { message: 'Listening... Speak your order in Derja or French.' });
-
-        const textInput = document.querySelector('input[type="text"]');
+        // Text input — Enter to send
+        const textInput = document.getElementById('ai-order-input');
         if (textInput && textInput.dataset.flutterBound !== '1') {
           textInput.dataset.flutterBound = '1';
           textInput.addEventListener('keydown', (e) => {
@@ -806,15 +743,11 @@ class _StitchViewerState extends ConsumerState<StitchViewer> {
           });
         }
 
-        stitchBindBottomNav({
-          'home|accueil': 'open_customer_home',
-          'smart|ia': 'noop',
-          'activity|activit': 'open_live_tracking',
-          'profile|profil|account|compte': 'open_notifications',
-        });
-
-        const fab = document.querySelector('nav [class*="rounded-full"][class*="bg-primary"]');
-        stitchBind(fab, 'open_ai_voice');
+        // Bottom nav
+        stitchBind(document.getElementById('nav-home'), 'open_customer_home');
+        stitchBind(document.getElementById('nav-smart-order'), 'noop');
+        stitchBind(document.getElementById('nav-activity'), 'open_live_tracking');
+        stitchBind(document.getElementById('nav-profile'), 'open_notifications');
       })();
     ''');
   }
@@ -822,19 +755,13 @@ class _StitchViewerState extends ConsumerState<StitchViewer> {
   Future<void> _injectAiVoiceBindings() async {
     await _controller.runJavaScript(r'''
       (() => {
-        const backBtn = stitchFindByIcon('arrow_back') || stitchFindByIcon('chevron_left');
-        stitchBind(backBtn, 'go_back');
-
-        const moreBtn = stitchFindByIcon('more_vert');
-        stitchBind(moreBtn, 'show_info', { message: 'Voice settings: Language, Sensitivity, History.' });
+        // Back button
+        stitchBind(document.getElementById('voice-back-btn'), 'go_back');
 
         // Main mic button
-        const allBtns = Array.from(document.querySelectorAll('button'));
-        const bigMicBtn = allBtns.find(el => el.classList.contains('h-20') || el.classList.contains('w-20'));
-        const micBtn = bigMicBtn || stitchFindByIcon('mic');
-        stitchBind(micBtn, 'show_info', { message: 'Listening... Say your order in Derja, Arabic, or French.' });
+        stitchBind(document.getElementById('voice-mic-btn'), 'show_info', { message: 'Listening... Say your order in Derja, Arabic, or French.' });
 
-        // Suggestion chips
+        // Suggestion chips (text matching — dynamic content)
         const chips = Array.from(document.querySelectorAll('button[class*="rounded-full"]')).filter(el => !el.closest('nav'));
         chips.forEach(chip => {
           const text = (chip.textContent || '').toLowerCase();
@@ -847,12 +774,12 @@ class _StitchViewerState extends ConsumerState<StitchViewer> {
           }
         });
 
-        stitchBindBottomNav({
-          'home|accueil': 'open_customer_home',
-          'order|commande': 'open_live_tracking',
-          'wallet|portefeuille': 'show_coming_soon',
-          'account|compte': 'open_notifications',
-        });
+        // Bottom nav
+        stitchBind(document.getElementById('nav-home'), 'open_customer_home');
+        stitchBind(document.getElementById('nav-orders'), 'open_live_tracking');
+        stitchBind(document.getElementById('nav-voice'), 'noop');
+        stitchBind(document.getElementById('nav-wallet'), 'show_coming_soon');
+        stitchBind(document.getElementById('nav-profile'), 'open_notifications');
       })();
     ''');
   }
@@ -860,28 +787,21 @@ class _StitchViewerState extends ConsumerState<StitchViewer> {
   Future<void> _injectNotificationsBindings() async {
     await _controller.runJavaScript(r'''
       (() => {
-        const backBtn = stitchFindByIcon('arrow_back') || stitchFindByIcon('chevron_left');
-        stitchBind(backBtn, 'go_back');
+        // Back button
+        stitchBind(document.getElementById('notif-back-btn'), 'go_back');
 
-        // Reorder + buttons
+        // Reorder + buttons (icon fallback — multiple dynamic items)
         const addBtns = Array.from(document.querySelectorAll('button')).filter(el => {
           const icon = el.querySelector('.material-symbols-outlined, .material-symbols-rounded');
           return icon && (icon.textContent || '').trim() === 'add';
         });
         addBtns.forEach(btn => stitchBind(btn, 'open_cart'));
 
-        const viewAll = stitchFindByText('a,button', ['view all', 'voir tout']);
-        stitchBind(viewAll, 'show_info', { message: 'Full reorder history.' });
-
-        stitchBindBottomNav({
-          'home|accueil': 'open_customer_home',
-          'activity|activit': 'open_live_tracking',
-          'wallet|portefeuille': 'show_coming_soon',
-          'account|compte': 'noop',
-        });
-
-        const fab = document.querySelector('nav [class*="rounded-full"][class*="bg-primary"]');
-        stitchBind(fab, 'open_ai_voice');
+        // Bottom nav
+        stitchBind(document.getElementById('nav-home'), 'open_customer_home');
+        stitchBind(document.getElementById('nav-activity'), 'open_live_tracking');
+        stitchBind(document.getElementById('nav-wallet'), 'show_coming_soon');
+        stitchBind(document.getElementById('nav-profile'), 'noop');
       })();
     ''');
   }
