@@ -35,14 +35,14 @@ void main() async {
         supportedLocales: const [Locale('en', 'US'), Locale('ar', 'SA')],
         path: 'assets/translations',
         fallbackLocale: const Locale('en', 'US'),
-        child: const UberMotoApp(),
+        child: const NassibApp(),
       ),
     ),
   );
 }
 
-class UberMotoApp extends StatelessWidget {
-  const UberMotoApp({super.key});
+class NassibApp extends StatelessWidget {
+  const NassibApp({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -51,7 +51,7 @@ class UberMotoApp extends StatelessWidget {
     const stitchScreens = <String, Map<String, dynamic>>{
       '/splash1': {
         'asset': 'stitch/ubermoto_splash_and_language_select_1/code.html',
-        'title': 'UberMoto',
+        'title': 'Nassib',
         'next': '/login1',
       },
       '/splash2': {
@@ -180,7 +180,7 @@ class UberMotoApp extends StatelessWidget {
     };
 
     return MaterialApp(
-      title: 'UberMoto',
+      title: 'Nassib',
       debugShowCheckedModeBanner: false,
       localizationsDelegates: context.localizationDelegates,
       supportedLocales: context.supportedLocales,
@@ -212,7 +212,7 @@ class _AuthGate extends ConsumerWidget {
     if (!authState.isInitialized) {
       return const StitchViewer(
         assetPath: 'stitch/ubermoto_splash_and_language_select_1/code.html',
-        title: 'UberMoto',
+        title: 'Nassib',
         routeName: '/splash1',
       );
     }
@@ -246,7 +246,7 @@ class _AuthGate extends ConsumerWidget {
 
     return const StitchViewer(
       assetPath: 'stitch/ubermoto_splash_and_language_select_1/code.html',
-      title: 'UberMoto',
+      title: 'Nassib',
       nextRoute: '/login1',
       routeName: '/splash1',
     );

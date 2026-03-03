@@ -2,11 +2,13 @@ import 'dart:convert';
 
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart' show rootBundle;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 
 import '../features/auth/providers/auth_provider.dart';
 import '../features/driver/providers/driver_provider.dart';
+import '../features/products/providers/product_provider.dart';
 import '../features/settings/providers/language_provider.dart';
 import '../services/delivery_service.dart';
 
@@ -32,6 +34,7 @@ class _StitchViewerState extends ConsumerState<StitchViewer> {
   late final WebViewController _controller;
   bool _loading = true;
   bool _isActionLoading = false;
+  static String? _logoBase64Cache;
 
   @override
   void initState() {
@@ -304,10 +307,349 @@ class _StitchViewerState extends ConsumerState<StitchViewer> {
   }
 
   // ═══════════════════════════════════════════════════════════════════
+  // LOGO INJECTION HELPER
+  // ═══════════════════════════════════════════════════════════════════
+
+  /// Injects the Nassib logo into elements with the given [imgId] and hides
+  /// the fallback element with [fallbackId].
+  Future<void> _injectLogo({
+    String imgId = 'nassib-logo',
+    String fallbackId = 'nassib-logo-fallback',
+  }) async {
+    try {
+      _logoBase64Cache ??= base64Encode(
+        (await rootBundle.load('assets/nassib-logo.png')).buffer.asUint8List(),
+      );
+      await _controller.runJavaScript('''
+        (() => {
+          const logo = document.getElementById('$imgId');
+          const fallback = document.getElementById('$fallbackId');
+          if (logo) {
+            logo.src = 'data:image/png;base64,$_logoBase64Cache';
+            logo.classList.remove('hidden');
+            if (fallback) fallback.classList.add('hidden');
+          }
+        })();
+      ''');
+    } catch (e) {
+      debugPrint('Logo injection failed: \$e');
+    }
+  }
+
+  // ═══════════════════════════════════════════════════════════════════
+  // DYNAMIC CONTENT INJECTION (Products, Cart, Checkout)
+  // ═══════════════════════════════════════════════════════════════════
+
+  /// Injects product cards into the `#products-grid` container on the
+  /// customer home screen, replacing loading skeletons with real data.
+  Future<void> _injectProductsGrid() async {
+    final catalog = ref.read(productCatalogProvider);
+    final products = catalog.popularProducts.isNotEmpty
+        ? catalog.popularProducts
+        : catalog.products;
+
+    if (products.isEmpty) return;
+
+    final cardsHtml = StringBuffer();
+    for (final p in products) {
+      final priceStr = p.price.toStringAsFixed(3);
+      final escapedName = p.name.replaceAll("'", "\\'");
+      final discount = p.originalPrice != null
+          ? '<span class="absolute top-2 left-2 bg-red-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full">-${((1 - p.price / p.originalPrice!) * 100).round()}%</span>'
+          : '';
+      final favIcon = p.isFavorite ? 'favorite' : 'favorite_border';
+      final favFill = p.isFavorite ? "font-variation-settings: 'FILL' 1;" : '';
+      cardsHtml.write('''
+<div data-product-id="${p.id}" class="product-card flex flex-col gap-2 cursor-pointer group">
+  <div class="relative aspect-square w-full overflow-hidden rounded-2xl bg-stone-100 dark:bg-stone-800">
+    <img src="${p.imageUrl}" alt="$escapedName" class="h-full w-full object-cover transition-transform duration-300 group-hover:scale-110" />
+    $discount
+    <button data-fav-id="${p.id}" class="fav-btn absolute top-2 right-2 h-8 w-8 rounded-full bg-white/80 dark:bg-black/50 flex items-center justify-center text-red-500 shadow-sm backdrop-blur-sm">
+      <span class="material-symbols-outlined text-[18px]" style="$favFill">$favIcon</span>
+    </button>
+  </div>
+  <div class="px-1">
+    <h4 class="text-sm font-bold text-slate-900 dark:text-white truncate">$escapedName</h4>
+    <div class="flex items-center justify-between mt-1">
+      <span class="text-primary font-bold text-sm">$priceStr DT</span>
+      <span class="text-[10px] text-stone-400 dark:text-stone-500">${p.unit}</span>
+    </div>
+    <div class="flex items-center gap-1 mt-1">
+      <span class="material-symbols-outlined text-yellow-500 text-[14px]" style="font-variation-settings: 'FILL' 1;">star</span>
+      <span class="text-[11px] font-medium text-stone-500">${p.rating} (${p.reviewCount})</span>
+    </div>
+  </div>
+</div>
+''');
+    }
+
+    final escapedHtml =
+        cardsHtml.toString().replaceAll('\\', '\\\\').replaceAll('`', '\\`');
+
+    await _controller.runJavaScript('''
+      (() => {
+        const grid = document.getElementById('products-grid');
+        if (!grid) return;
+        grid.innerHTML = `$escapedHtml`;
+
+        // Bind product card clicks → open_product with product ID
+        grid.querySelectorAll('.product-card').forEach(card => {
+          const pid = card.dataset.productId;
+          card.addEventListener('click', (e) => {
+            // Ignore if clicking favorite button
+            if (e.target.closest('.fav-btn')) return;
+            window.StitchBridge.postMessage(JSON.stringify({
+              action: 'select_and_open_product',
+              payload: { productId: pid }
+            }));
+          });
+        });
+
+        // Bind favorite buttons
+        grid.querySelectorAll('.fav-btn').forEach(btn => {
+          btn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            window.StitchBridge.postMessage(JSON.stringify({
+              action: 'toggle_favorite',
+              payload: { productId: btn.dataset.favId }
+            }));
+          });
+        });
+      })();
+    ''');
+  }
+
+  /// Injects the selected product's details into the product detail screen.
+  Future<void> _injectProductDetails() async {
+    final catalog = ref.read(productCatalogProvider);
+    final product = catalog.selectedProduct;
+    final cartCount = catalog.cartItemCount;
+
+    if (product == null) return;
+
+    final escapedName = product.name.replaceAll("'", "\\'");
+    final escapedDesc = product.description.replaceAll("'", "\\'");
+    final escapedDescAr = product.descriptionAr.replaceAll("'", "\\'");
+    final priceStr = product.price.toStringAsFixed(3);
+
+    // Build tags HTML
+    final tagsHtml = StringBuffer();
+    for (final tag in product.tags) {
+      final escapedTag = tag.replaceAll("'", "\\'");
+      String bgClass = 'bg-stone-100 dark:bg-stone-800';
+      String textClass = 'text-stone-600 dark:text-stone-300';
+      String icon = '';
+      if (tag.toLowerCase().contains('spicy')) {
+        bgClass = 'bg-orange-100 dark:bg-orange-900/30';
+        textClass = 'text-orange-800 dark:text-orange-200';
+        icon =
+            '<span class="material-symbols-outlined mr-1 text-[14px]">local_fire_department</span>';
+      } else if (tag.toLowerCase().contains('bio')) {
+        bgClass = 'bg-green-100 dark:bg-green-900/30';
+        textClass = 'text-green-800 dark:text-green-200';
+        icon =
+            '<span class="material-symbols-outlined mr-1 text-[14px]">eco</span>';
+      }
+      tagsHtml.write(
+          '<span class="inline-flex items-center rounded-full $bgClass px-2.5 py-0.5 text-xs font-medium $textClass">$icon$escapedTag</span>');
+    }
+
+    // Build related products HTML
+    final relatedProducts =
+        catalog.products.where((p) => p.id != product.id).take(3);
+    final relatedHtml = StringBuffer();
+    for (final rp in relatedProducts) {
+      final rpName = rp.name.replaceAll("'", "\\'");
+      relatedHtml.write('''
+<div data-product-id="${rp.id}" class="related-card snap-start shrink-0 w-36 flex flex-col gap-2 group cursor-pointer">
+  <div class="relative aspect-square w-full overflow-hidden rounded-xl bg-stone-100 dark:bg-stone-800">
+    <img src="${rp.imageUrl}" alt="$rpName" class="h-full w-full object-cover transition-transform duration-300 group-hover:scale-110" />
+    <button data-add-id="${rp.id}" class="quick-add-btn absolute bottom-2 right-2 h-8 w-8 rounded-full bg-white dark:bg-stone-700 shadow-sm flex items-center justify-center text-primary hover:bg-primary hover:text-white transition-colors">
+      <span class="material-symbols-outlined text-[18px]">add</span>
+    </button>
+  </div>
+  <div>
+    <h4 class="text-sm font-semibold text-slate-900 dark:text-white truncate">$rpName</h4>
+    <p class="text-xs font-medium text-stone-500 dark:text-stone-400">${rp.unit} • ${rp.price.toStringAsFixed(3)} DT</p>
+  </div>
+</div>
+''');
+    }
+
+    final escapedTags =
+        tagsHtml.toString().replaceAll('\\', '\\\\').replaceAll('`', '\\`');
+    final escapedRelated =
+        relatedHtml.toString().replaceAll('\\', '\\\\').replaceAll('`', '\\`');
+
+    await _controller.runJavaScript('''
+      (() => {
+        const set = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val; };
+        const setHtml = (id, val) => { const el = document.getElementById(id); if (el) el.innerHTML = val; };
+        const setSrc = (id, val) => { const el = document.getElementById(id); if (el) el.src = val; };
+
+        set('product-header-title', '$escapedName');
+        set('product-name', '$escapedName');
+        set('product-unit', '${product.unit}');
+        set('product-price', '$priceStr DT');
+        set('product-cart-count', '$cartCount');
+        set('product-description', '$escapedDesc');
+        set('product-description-ar', '$escapedDescAr');
+        setSrc('product-image', '${product.imageUrl}');
+        setHtml('product-tags', `$escapedTags`);
+
+        // Related products
+        const relatedEl = document.getElementById('product-related');
+        if (relatedEl) {
+          relatedEl.innerHTML = `$escapedRelated`;
+          relatedEl.querySelectorAll('.related-card').forEach(card => {
+            card.addEventListener('click', (e) => {
+              if (e.target.closest('.quick-add-btn')) return;
+              window.StitchBridge.postMessage(JSON.stringify({
+                action: 'select_and_open_product',
+                payload: { productId: card.dataset.productId }
+              }));
+            });
+          });
+          relatedEl.querySelectorAll('.quick-add-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+              e.stopPropagation();
+              window.StitchBridge.postMessage(JSON.stringify({
+                action: 'quick_add_to_cart',
+                payload: { productId: btn.dataset.addId }
+              }));
+            });
+          });
+        }
+      })();
+    ''');
+  }
+
+  /// Injects cart items and totals into the cart/checkout screen.
+  Future<void> _injectCartData() async {
+    final catalog = ref.read(productCatalogProvider);
+    final cart = catalog.cart;
+
+    if (cart.isEmpty) {
+      // Show empty cart message
+      await _controller.runJavaScript('''
+        (() => {
+          const container = document.getElementById('cart-items-container');
+          if (container) {
+            container.innerHTML = '<div class="flex flex-col items-center justify-center py-12 text-center">'
+              + '<span class="material-symbols-outlined text-stone-300 dark:text-stone-600 text-[64px] mb-4">shopping_cart</span>'
+              + '<p class="text-lg font-bold text-stone-400 dark:text-stone-500">Your cart is empty</p>'
+              + '<p class="text-sm text-stone-400 dark:text-stone-600 mt-1">Add some products to get started!</p>'
+              + '</div>';
+          }
+          const set = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val; };
+          set('cart-subtotal', '0.000 DT');
+          set('cart-delivery-fee', '0.000 DT');
+          set('cart-total', '0.000 DT');
+        })();
+      ''');
+      return;
+    }
+
+    final itemsHtml = StringBuffer();
+    for (final ci in cart) {
+      final p = ci.product;
+      final escapedName = p.name.replaceAll("'", "\\'");
+      final subtotalStr = ci.subtotal.toStringAsFixed(3);
+      itemsHtml.write('''
+<div class="cart-item flex items-center gap-4 rounded-xl bg-white dark:bg-stone-800 p-3 shadow-sm border border-stone-100 dark:border-stone-700" data-product-id="${p.id}">
+  <img src="${p.imageUrl}" alt="$escapedName" class="rounded-lg size-16 shrink-0 object-cover" />
+  <div class="flex flex-col justify-center flex-1 min-w-0">
+    <p class="text-sm font-bold text-slate-900 dark:text-slate-100 truncate">$escapedName</p>
+    <p class="text-xs text-stone-400 dark:text-stone-500">${p.unit}</p>
+    <p class="text-sm font-bold text-primary mt-1">$subtotalStr DT</p>
+  </div>
+  <div class="flex items-center gap-1">
+    <button data-qty-action="minus" data-pid="${p.id}" class="cart-qty-btn h-8 w-8 rounded-full bg-stone-100 dark:bg-stone-700 flex items-center justify-center text-stone-600 dark:text-stone-300 hover:bg-primary hover:text-white transition-colors">
+      <span class="material-symbols-outlined text-[16px]">${ci.quantity > 1 ? 'remove' : 'delete'}</span>
+    </button>
+    <span class="w-6 text-center text-sm font-bold">${ci.quantity}</span>
+    <button data-qty-action="plus" data-pid="${p.id}" class="cart-qty-btn h-8 w-8 rounded-full bg-stone-100 dark:bg-stone-700 flex items-center justify-center text-stone-600 dark:text-stone-300 hover:bg-primary hover:text-white transition-colors">
+      <span class="material-symbols-outlined text-[16px]">add</span>
+    </button>
+  </div>
+</div>
+''');
+    }
+
+    final escapedItems =
+        itemsHtml.toString().replaceAll('\\', '\\\\').replaceAll('`', '\\`');
+    final subtotal = catalog.cartSubtotal.toStringAsFixed(3);
+    final fee = catalog.deliveryFee.toStringAsFixed(3);
+    final total = catalog.cartTotal.toStringAsFixed(3);
+
+    await _controller.runJavaScript('''
+      (() => {
+        const container = document.getElementById('cart-items-container');
+        if (container) {
+          container.innerHTML = `$escapedItems`;
+
+          // Bind quantity buttons
+          container.querySelectorAll('.cart-qty-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+              e.stopPropagation();
+              const action = btn.dataset.qtyAction;
+              const pid = btn.dataset.pid;
+              window.StitchBridge.postMessage(JSON.stringify({
+                action: 'update_cart_qty',
+                payload: { productId: pid, direction: action }
+              }));
+            });
+          });
+        }
+
+        const set = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val; };
+        set('cart-subtotal', '$subtotal DT');
+        set('cart-delivery-fee', '$fee DT');
+        set('cart-total', '$total DT');
+      })();
+    ''');
+  }
+
+  /// Injects dynamic totals into the checkout/promo screen.
+  Future<void> _injectCheckoutTotals() async {
+    final catalog = ref.read(productCatalogProvider);
+    final subtotal = catalog.cartSubtotal.toStringAsFixed(3);
+    final fee = catalog.deliveryFee.toStringAsFixed(3);
+    final total = catalog.cartTotal.toStringAsFixed(3);
+
+    await _controller.runJavaScript('''
+      (() => {
+        const set = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val; };
+        set('checkout-subtotal', '$subtotal DT');
+        set('checkout-delivery-fee', '$fee DT');
+        set('checkout-discount', '-0.000 DT');
+        set('checkout-total', '$total DT');
+      })();
+    ''');
+  }
+
+  /// Injects the order total into the confirmation screen.
+  Future<void> _injectOrderConfirmTotal() async {
+    final catalog = ref.read(productCatalogProvider);
+    final total = catalog.cartTotal.toStringAsFixed(3);
+
+    await _controller.runJavaScript('''
+      (() => {
+        const el = document.getElementById('confirm-total');
+        if (el) {
+          el.innerHTML = '$total <span class="text-sm font-medium text-slate-500 dark:text-slate-400">DT</span>';
+        }
+      })();
+    ''');
+  }
+
+  // ═══════════════════════════════════════════════════════════════════
   // SPLASH SCREENS
   // ═══════════════════════════════════════════════════════════════════
 
   Future<void> _injectSplash1Bindings() async {
+    await _injectLogo();
+
     await _controller.runJavaScript(r'''
       (() => {
         const getStarted = document.getElementById('splash-get-started');
@@ -360,7 +702,7 @@ class _StitchViewerState extends ConsumerState<StitchViewer> {
           } else if (text.includes('help') || text.includes('aide') || text.includes('support')) {
             stitchBind(row, 'show_help');
           } else if (text.includes('about') || text.includes('propos')) {
-            stitchBind(row, 'show_info', { message: 'UberMoto v1.0.2 — Motorcycle delivery for Tunisia.' });
+            stitchBind(row, 'show_info', { message: 'Nassib v1.0.2 — Motorcycle delivery for Tunisia.' });
           } else if (text.includes('log out') || text.includes('connexion') || text.includes('logout')) {
             stitchBind(row, 'logout');
           } else if (text.includes('home') || text.includes('maison') || text.includes('work') || text.includes('travail')) {
@@ -412,6 +754,9 @@ class _StitchViewerState extends ConsumerState<StitchViewer> {
   // ═══════════════════════════════════════════════════════════════════
 
   Future<void> _injectLoginBindings() async {
+    // Inject mini logo into login header
+    await _injectLogo(imgId: 'login-logo', fallbackId: 'login-logo-fallback');
+
     await _controller.runJavaScript('''
       (() => {
         const phoneTab = document.getElementById('login-tab-phone');
@@ -538,6 +883,9 @@ class _StitchViewerState extends ConsumerState<StitchViewer> {
   // ═══════════════════════════════════════════════════════════════════
 
   Future<void> _injectCustomerHomeBindings() async {
+    // Inject dynamic product cards from provider
+    await _injectProductsGrid();
+
     await _controller.runJavaScript(r'''
       (() => {
         // Profile button
@@ -548,11 +896,6 @@ class _StitchViewerState extends ConsumerState<StitchViewer> {
 
         // Promo banner
         stitchBind(document.getElementById('home-promo-btn'), 'show_info', { message: 'Check back for seasonal promotions and discounts!' });
-
-        // Product cards
-        stitchBind(document.getElementById('product-card-harissa'), 'open_product');
-        stitchBind(document.getElementById('product-card-couscous'), 'open_product');
-        stitchBind(document.getElementById('product-card-indomie'), 'open_product');
 
         // Search — navigate on Enter, not on focus
         const searchInput = document.getElementById('home-search');
@@ -576,6 +919,9 @@ class _StitchViewerState extends ConsumerState<StitchViewer> {
   }
 
   Future<void> _injectProductBindings() async {
+    // Inject dynamic product detail data
+    await _injectProductDetails();
+
     await _controller.runJavaScript(r'''
       (() => {
         // Back button
@@ -587,6 +933,28 @@ class _StitchViewerState extends ConsumerState<StitchViewer> {
         // Add to Cart button
         stitchBind(document.getElementById('product-add-to-cart'), 'add_to_cart_and_go');
 
+        // Quantity controls
+        const qtyEl = document.getElementById('product-qty');
+        const minusBtn = document.getElementById('product-qty-minus');
+        const plusBtn = document.getElementById('product-qty-plus');
+        if (qtyEl && minusBtn && plusBtn) {
+          let qty = parseInt(qtyEl.textContent) || 1;
+          if (minusBtn.dataset.flutterBound !== '1') {
+            minusBtn.dataset.flutterBound = '1';
+            minusBtn.addEventListener('click', (e) => {
+              e.preventDefault();
+              if (qty > 1) { qty--; qtyEl.textContent = qty; }
+            });
+          }
+          if (plusBtn.dataset.flutterBound !== '1') {
+            plusBtn.dataset.flutterBound = '1';
+            plusBtn.addEventListener('click', (e) => {
+              e.preventDefault();
+              if (qty < 20) { qty++; qtyEl.textContent = qty; }
+            });
+          }
+        }
+
         // Bottom nav
         stitchBind(document.getElementById('nav-home'), 'open_customer_home');
         stitchBind(document.getElementById('nav-search'), 'open_filters');
@@ -597,6 +965,9 @@ class _StitchViewerState extends ConsumerState<StitchViewer> {
   }
 
   Future<void> _injectCartBindings() async {
+    // Inject dynamic cart items and totals
+    await _injectCartData();
+
     await _controller.runJavaScript(r'''
       (() => {
         // Back button
@@ -618,6 +989,9 @@ class _StitchViewerState extends ConsumerState<StitchViewer> {
   }
 
   Future<void> _injectCheckoutPromosBindings() async {
+    // Inject dynamic checkout totals
+    await _injectCheckoutTotals();
+
     await _controller.runJavaScript(r'''
       (() => {
         // Back button
@@ -641,6 +1015,9 @@ class _StitchViewerState extends ConsumerState<StitchViewer> {
   }
 
   Future<void> _injectOrderConfirmationBindings() async {
+    // Inject dynamic order total
+    await _injectOrderConfirmTotal();
+
     await _controller.runJavaScript(r'''
       (() => {
         // Back to home
@@ -1100,7 +1477,7 @@ class _StitchViewerState extends ConsumerState<StitchViewer> {
           } else if (text.includes('help') || text.includes('aide') || text.includes('support')) {
             stitchBind(row, 'show_help');
           } else if (text.includes('about') || text.includes('propos')) {
-            stitchBind(row, 'show_info', { message: 'UberMoto v1.0.2 — Motorcycle delivery, Tunisia.' });
+            stitchBind(row, 'show_info', { message: 'Nassib v1.0.2 — Motorcycle delivery, Tunisia.' });
           } else if (text.includes('log out') || text.includes('connexion') || text.includes('logout')) {
             stitchBind(row, 'logout');
           } else if (text.includes('motorcycle') || text.includes('vehicle') || text.includes('moto')) {
@@ -1313,6 +1690,42 @@ class _StitchViewerState extends ConsumerState<StitchViewer> {
       // ── Navigation: Customer ──
       case 'open_product':
         _navigateTo('/customer/product');
+      case 'select_and_open_product':
+        final productId = payload['productId']?.toString();
+        if (productId != null) {
+          ref.read(productCatalogProvider.notifier).selectProduct(productId);
+        }
+        _navigateTo('/customer/product');
+      case 'toggle_favorite':
+        final favId = payload['productId']?.toString();
+        if (favId != null) {
+          ref.read(productCatalogProvider.notifier).toggleFavorite(favId);
+          _showMessage('❤️ Favorite updated!');
+        }
+      case 'quick_add_to_cart':
+        final addId = payload['productId']?.toString();
+        if (addId != null) {
+          ref.read(productCatalogProvider.notifier).addToCart(addId);
+          _showMessage('✅ Added to cart!');
+        }
+      case 'update_cart_qty':
+        final qtyPid = payload['productId']?.toString();
+        final direction = payload['direction']?.toString();
+        if (qtyPid != null && direction != null) {
+          final catalog = ref.read(productCatalogProvider);
+          final currentItem =
+              catalog.cart.where((ci) => ci.product.id == qtyPid).firstOrNull;
+          if (currentItem != null) {
+            final newQty = direction == 'plus'
+                ? currentItem.quantity + 1
+                : currentItem.quantity - 1;
+            ref
+                .read(productCatalogProvider.notifier)
+                .updateCartQuantity(qtyPid, newQty);
+          }
+          // Refresh the cart screen with updated data
+          await _injectCartData();
+        }
       case 'open_filters':
         _navigateTo('/customer/filters');
       case 'open_cart':
@@ -1409,6 +1822,20 @@ class _StitchViewerState extends ConsumerState<StitchViewer> {
 
       // ── Cart Actions ──
       case 'add_to_cart_and_go':
+        // Read quantity from the product detail page and add to cart
+        final selectedProd = ref.read(productCatalogProvider).selectedProduct;
+        if (selectedProd != null) {
+          int qty = 1;
+          try {
+            final qtyResult = await _controller.runJavaScriptReturningResult(
+              "document.getElementById('product-qty')?.textContent || '1'",
+            );
+            qty = int.tryParse(qtyResult.toString().replaceAll('"', '')) ?? 1;
+          } catch (_) {}
+          ref
+              .read(productCatalogProvider.notifier)
+              .addToCart(selectedProd.id, quantity: qty);
+        }
         _showMessage('✅ Added to cart!');
         _navigateTo('/customer/cart');
       case 'show_added_to_cart':
@@ -1428,7 +1855,7 @@ class _StitchViewerState extends ConsumerState<StitchViewer> {
         _showMessage(payload['message']?.toString() ?? 'Information');
       case 'show_help':
         _showMessage(
-            '📞 Help & Support: Call +216 70 000 000 or email support@ubermoto.tn');
+            '📞 Help & Support: Call +216 70 000 000 or email support@nassib.tn');
       case 'show_coming_soon':
         _showMessage('🚀 This feature is coming soon!');
 
