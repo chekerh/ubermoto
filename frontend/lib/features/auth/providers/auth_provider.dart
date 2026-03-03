@@ -1,188 +1,182 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../../core/errors/app_exception.dart';
-import '../../../core/utils/storage_service.dart';
-import '../../../models/auth_response_model.dart';
 import '../../../models/user_model.dart';
 import '../../../services/auth_service.dart';
 import '../../../services/user_service.dart';
-
-final authServiceProvider = Provider<AuthService>((ref) {
-  return AuthService();
-});
-
-final authStateProvider = StateNotifierProvider<AuthNotifier, AuthState>(
-  (ref) {
-    return AuthNotifier(ref.read(authServiceProvider));
-  },
-);
+import '../../../core/utils/storage_service.dart';
 
 class AuthState {
   final bool isLoading;
+  final bool isInitialized;
   final bool isAuthenticated;
-  final String? error;
-  final AuthResponseModel? authResponse;
   final UserModel? user;
+  final String? error;
 
   const AuthState({
     this.isLoading = false,
+    this.isInitialized = false,
     this.isAuthenticated = false,
-    this.error,
-    this.authResponse,
     this.user,
+    this.error,
   });
 
   AuthState copyWith({
     bool? isLoading,
+    bool? isInitialized,
     bool? isAuthenticated,
-    String? error,
-    AuthResponseModel? authResponse,
     UserModel? user,
+    String? error,
   }) {
     return AuthState(
       isLoading: isLoading ?? this.isLoading,
+      isInitialized: isInitialized ?? this.isInitialized,
       isAuthenticated: isAuthenticated ?? this.isAuthenticated,
-      error: error,
-      authResponse: authResponse ?? this.authResponse,
       user: user ?? this.user,
+      error: error,
     );
   }
 }
 
+final authServiceProvider = Provider<AuthService>((ref) => AuthService());
+final userServiceProvider = Provider<UserService>((ref) => UserService());
+
+final authStateProvider = StateNotifierProvider<AuthNotifier, AuthState>((ref) {
+  return AuthNotifier(
+    authService: ref.read(authServiceProvider),
+    userService: ref.read(userServiceProvider),
+  )..init();
+});
+
 class AuthNotifier extends StateNotifier<AuthState> {
-  final AuthService _authService;
-  final UserService _userService = UserService();
+  final AuthService authService;
+  final UserService userService;
 
-  AuthNotifier(this._authService) : super(const AuthState()) {
-    _checkAuthStatus();
-  }
+  AuthNotifier({
+    required this.authService,
+    required this.userService,
+  }) : super(const AuthState());
 
-  Future<void> _checkAuthStatus() async {
-    final isAuth = await _authService.isAuthenticated();
-    if (isAuth) {
-      await _loadUser();
+  Future<void> init() async {
+    final token = await StorageService.getToken();
+    if (token != null && token.isNotEmpty) {
+      state = state.copyWith(isLoading: true, error: null);
+      await refreshUser();
+      return;
     }
-    state = state.copyWith(isAuthenticated: isAuth);
-  }
-
-  Future<void> _loadUser() async {
-    try {
-      final user = await _userService.getProfile();
-      state = state.copyWith(user: user);
-    } catch (e) {
-      print('User profile loading failed: $e');
-      // Don't clear auth state immediately - just leave user as null
-      // The user can still navigate and the data will be retried later
-      state = state.copyWith(user: null);
-    }
-  }
-
-  Future<void> refreshUser() async {
-    await _loadUser();
+    state = state.copyWith(isInitialized: true);
   }
 
   Future<void> login(String email, String password) async {
     state = state.copyWith(isLoading: true, error: null);
-
     try {
-      final response = await _authService.login(email, password);
-      await _loadUser();
-      state = state.copyWith(
-        isLoading: false,
-        isAuthenticated: true,
-        authResponse: response,
-      );
-    } on AppException catch (e) {
-      state = state.copyWith(
-        isLoading: false,
-        error: e.message,
-      );
+      await authService.login(email, password);
+      await refreshUser();
     } catch (e) {
       state = state.copyWith(
         isLoading: false,
-        error: 'An unexpected error occurred',
+        isInitialized: true,
+        isAuthenticated: false,
+        error: e.toString(),
       );
     }
   }
 
-  Future<void> registerCustomer(String email, String password, String name) async {
+  Future<void> registerCustomer({
+    required String email,
+    required String password,
+    required String name,
+  }) async {
     state = state.copyWith(isLoading: true, error: null);
-
     try {
-      final response = await _authService.registerCustomer(email, password, name);
-      await _loadUser();
-      state = state.copyWith(
-        isLoading: false,
-        isAuthenticated: true,
-        authResponse: response,
-      );
-    } on AppException catch (e) {
-      state = state.copyWith(
-        isLoading: false,
-        error: e.message,
-      );
+      await authService.registerCustomer(email, password, name);
+      await refreshUser();
     } catch (e) {
       state = state.copyWith(
         isLoading: false,
-        error: 'An unexpected error occurred',
+        isInitialized: true,
+        isAuthenticated: false,
+        error: e.toString(),
       );
     }
   }
 
-  Future<void> registerDriver(
-    String email,
-    String password,
-    String name,
-    String phoneNumber,
-    String licenseNumber,
-  ) async {
+  Future<void> registerDriver({
+    required String email,
+    required String password,
+    required String name,
+    required String phoneNumber,
+    required String licenseNumber,
+  }) async {
     state = state.copyWith(isLoading: true, error: null);
-
     try {
-      final response = await _authService.registerDriver(email, password, name, phoneNumber, licenseNumber);
-      await _loadUser();
-      state = state.copyWith(
-        isLoading: false,
-        isAuthenticated: true,
-        authResponse: response,
+      await authService.registerDriver(
+        email,
+        password,
+        name,
+        phoneNumber,
+        licenseNumber,
       );
-    } on AppException catch (e) {
-      state = state.copyWith(
-        isLoading: false,
-        error: e.message,
-      );
+      await refreshUser();
     } catch (e) {
       state = state.copyWith(
         isLoading: false,
-        error: 'An unexpected error occurred',
+        isInitialized: true,
+        isAuthenticated: false,
+        error: e.toString(),
       );
     }
   }
 
-  // Keep backward compatibility (deprecated)
-  Future<void> register(String email, String password, String name) async {
-    await registerCustomer(email, password, name);
+  Future<void> refreshUser() async {
+    try {
+      final user = await userService.getProfile();
+      state = state.copyWith(
+        isLoading: false,
+        isInitialized: true,
+        isAuthenticated: true,
+        user: user,
+        error: null,
+      );
+    } catch (e) {
+      state = state.copyWith(
+        isLoading: false,
+        isInitialized: true,
+        isAuthenticated: false,
+        user: null,
+        error: e.toString(),
+      );
+    }
   }
 
   Future<void> logout() async {
-    await _authService.logout();
-    state = const AuthState();
-  }
-
-  Future<void> clearInvalidAuth() async {
-    await _authService.logout();
-    state = const AuthState();
+    await StorageService.clearAll();
+    state = const AuthState(
+      isAuthenticated: false,
+      user: null,
+      isLoading: false,
+      isInitialized: true,
+    );
   }
 
   Future<Map<String, String?>> debugAuthState() async {
     final token = await StorageService.getToken();
     final email = await StorageService.getUserEmail();
     return {
-      'hasToken': (token != null && token.isNotEmpty).toString(),
-      'tokenLength': token?.length.toString() ?? '0',
-      'email': email,
       'isAuthenticated': state.isAuthenticated.toString(),
-      'hasUser': (state.user != null).toString(),
+      'userId': state.user?.id,
       'userRole': state.user?.role,
+      'hasToken': (token != null && token.isNotEmpty).toString(),
+      'storedEmail': email,
+      'error': state.error,
     };
+  }
+
+  Future<void> clearInvalidAuth() async {
+    await StorageService.clearAll();
+    state = const AuthState(
+      isAuthenticated: false,
+      user: null,
+      isLoading: false,
+      isInitialized: true,
+    );
   }
 }
