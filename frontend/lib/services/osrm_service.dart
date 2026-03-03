@@ -3,24 +3,24 @@ import 'dart:math' as math;
 import 'package:http/http.dart' as http;
 import '../core/map/types.dart';
 
+/// Route result containing geometry and metadata
+class RouteResult {
+  final List<MapPoint> geometry;
+  final double distance; // in meters
+  final double duration; // in seconds
+  final bool isFallback; // true if using straight-line fallback
+
+  RouteResult({
+    required this.geometry,
+    required this.distance,
+    required this.duration,
+    this.isFallback = false,
+  });
+}
+
 /// OSRM routing service for calculating routes
 class OSRMService {
   static const String _baseUrl = 'https://router.project-osrm.org';
-  
-  /// Route result containing geometry and metadata
-  class RouteResult {
-    final List<MapPoint> geometry;
-    final double distance; // in meters
-    final double duration; // in seconds
-    final bool isFallback; // true if using straight-line fallback
-
-    RouteResult({
-      required this.geometry,
-      required this.distance,
-      required this.duration,
-      this.isFallback = false,
-    });
-  }
 
   /// Get route between two points
   static Future<RouteResult> getRoute(

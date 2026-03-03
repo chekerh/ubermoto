@@ -21,10 +21,8 @@ class AuthService {
       final authResponse = AuthResponseModel.fromJson(json);
 
       // Save token securely
-      print('Auth Service - Saving token: ${authResponse.accessToken.substring(0, 20)}...');
       await StorageService.saveToken(authResponse.accessToken);
       await StorageService.saveUserEmail(email);
-      print('Auth Service - Token saved successfully');
 
       return authResponse;
     } on AppException {
@@ -53,10 +51,8 @@ class AuthService {
       final authResponse = AuthResponseModel.fromJson(json);
 
       // Save token securely
-      print('Auth Service - Saving token: ${authResponse.accessToken.substring(0, 20)}...');
       await StorageService.saveToken(authResponse.accessToken);
       await StorageService.saveUserEmail(email);
-      print('Auth Service - Token saved successfully');
 
       return authResponse;
     } on AppException {
@@ -89,10 +85,8 @@ class AuthService {
       final authResponse = AuthResponseModel.fromJson(json);
 
       // Save token securely
-      print('Auth Service - Saving token: ${authResponse.accessToken.substring(0, 20)}...');
       await StorageService.saveToken(authResponse.accessToken);
       await StorageService.saveUserEmail(email);
-      print('Auth Service - Token saved successfully');
 
       return authResponse;
     } on AppException {

@@ -16,7 +16,6 @@ class ApiService {
 
     if (requiresAuth) {
       final token = await StorageService.getToken();
-      print('API Service - Token for auth: ${token != null ? 'present (${token.length} chars)' : 'null'}');
       if (token != null && token.isNotEmpty) {
         headers['Authorization'] = 'Bearer $token';
       }

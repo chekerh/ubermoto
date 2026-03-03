@@ -69,19 +69,19 @@ class WebSocketService {
 
   static void subscribeToDelivery(String deliveryId) {
     if (_socket?.connected ?? false) {
-      _socket!.emit('subscribe_to_delivery', {'deliveryId': deliveryId});
+      _socket!.emit('subscribeToDelivery', {'deliveryId': deliveryId});
     }
   }
 
   static void unsubscribeFromDelivery(String deliveryId) {
     if (_socket?.connected ?? false) {
-      _socket!.emit('unsubscribe_from_delivery', {'deliveryId': deliveryId});
+      _socket!.emit('unsubscribeFromDelivery', {'deliveryId': deliveryId});
     }
   }
 
   static void updateLocation(String deliveryId, double latitude, double longitude) {
     if (_socket?.connected ?? false) {
-      _socket!.emit('update_location', {
+      _socket!.emit('updateLocation', {
         'deliveryId': deliveryId,
         'latitude': latitude,
         'longitude': longitude,
