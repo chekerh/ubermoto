@@ -11,6 +11,7 @@ import {
 } from '../documents/schemas/document.schema';
 import { UsersService } from '../users/users.service';
 import { DocumentsService } from '../documents/documents.service';
+import { AdminAuditLogService, AdminAuditAction } from './admin-audit-log.service';
 
 @Injectable()
 export class AdminService {
@@ -21,6 +22,7 @@ export class AdminService {
     @InjectModel(DocumentEntity.name) private documentModel: Model<DocumentDocument>,
     private readonly usersService: UsersService,
     private readonly documentsService: DocumentsService,
+    private readonly adminAuditLogService: AdminAuditLogService,
   ) {}
 
   async getDashboardStats() {
@@ -64,13 +66,26 @@ export class AdminService {
   }
 
   async getPendingDrivers() {
-    return this.userModel
+    // Find unverified driver users
+    const pendingUsers = await this.userModel
       .find({ role: UserRole.DRIVER, isVerified: false })
-      .populate({
-        path: 'driverProfile',
-        model: 'Driver',
-      })
+      .select('-password')
       .exec();
+
+    // Attach driver profile data for each user
+    const results = await Promise.all(
+      pendingUsers.map(async (user) => {
+        const driverProfile = await this.driverModel
+          .findOne({ userId: user._id })
+          .exec();
+        return {
+          ...user.toObject(),
+          driverProfile: driverProfile ? driverProfile.toObject() : null,
+        };
+      }),
+    );
+
+    return results;
   }
 
   async getPendingDocuments() {
@@ -81,22 +96,43 @@ export class AdminService {
       .exec();
   }
 
-  async verifyDriver(driverId: string, _adminId: string) {
-    // Update driver verification status
-    await this.usersService.updateVerificationStatus(driverId, true);
+  async verifyDriver(userId: string, adminId: string) {
+    // Verify the user account
+    await this.usersService.updateVerificationStatus(userId, true);
 
-    // TODO: Send notification to driver
-    // TODO: Log admin action
+    // Also mark the driver profile as verified
+    const driver = await this.driverModel.findOne({ userId }).exec();
+    if (driver) {
+      await this.driverModel.findByIdAndUpdate(driver._id, { isVerified: true }).exec();
+    }
+
+    // Log admin action
+    await this.adminAuditLogService.create({
+      adminId,
+      adminRole: UserRole.ADMIN,
+      action: AdminAuditAction.DRIVER_VERIFY,
+      targetId: userId,
+      targetRole: UserRole.DRIVER,
+      targetUserId: userId,
+    });
 
     return { message: 'Driver verified successfully' };
   }
 
-  async rejectDriver(driverId: string, _reason: string, _adminId: string) {
+  async rejectDriver(userId: string, reason: string, adminId: string) {
     // Update driver verification status to false
-    await this.usersService.updateVerificationStatus(driverId, false);
+    await this.usersService.updateVerificationStatus(userId, false);
 
-    // TODO: Send rejection notification to driver with reason
-    // TODO: Log admin action
+    // Log admin action
+    await this.adminAuditLogService.create({
+      adminId,
+      adminRole: UserRole.ADMIN,
+      action: AdminAuditAction.DRIVER_REJECT,
+      targetId: userId,
+      targetRole: UserRole.DRIVER,
+      targetUserId: userId,
+      reason,
+    });
 
     return { message: 'Driver rejected successfully' };
   }
@@ -107,7 +143,26 @@ export class AdminService {
     adminId: string,
     rejectionReason?: string,
   ) {
-    return this.documentsService.updateStatus(documentId, status, adminId, rejectionReason);
+    const document = await this.documentsService.updateStatus(
+      documentId,
+      status,
+      adminId,
+      rejectionReason,
+    );
+
+    // Log admin action
+    await this.adminAuditLogService.create({
+      adminId,
+      adminRole: UserRole.ADMIN,
+      action:
+        status === DocumentStatus.APPROVED
+          ? AdminAuditAction.DOCUMENT_APPROVE
+          : AdminAuditAction.DOCUMENT_REJECT,
+      targetId: documentId,
+      reason: rejectionReason,
+    });
+
+    return document;
   }
 
   async getDeliveryStats() {

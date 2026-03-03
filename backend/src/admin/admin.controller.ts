@@ -28,7 +28,7 @@ interface AuthenticatedRequest extends Request {
 
 @ApiTags('admin')
 @Controller('admin')
-@UseGuards(RolesGuard)
+@UseGuards(JwtAuthGuard, RolesGuard)
 @Roles(UserRole.ADMIN)
 export class AdminController {
   constructor(private readonly adminService: AdminService) {}
