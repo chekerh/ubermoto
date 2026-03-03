@@ -25,7 +25,7 @@ class ErrorDisplay extends StatelessWidget {
       padding: const EdgeInsets.all(16),
       margin: const EdgeInsets.symmetric(vertical: 8),
       decoration: BoxDecoration(
-        color: _getErrorColor(error!).withOpacity(0.1),
+        color: _getErrorColor(error!).withValues(alpha:0.1),
         border: Border.all(color: _getErrorColor(error!)),
         borderRadius: BorderRadius.circular(8),
       ),

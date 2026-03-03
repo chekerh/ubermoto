@@ -104,7 +104,7 @@ class _ServiceCard extends StatelessWidget {
         padding: const EdgeInsets.all(20),
         decoration: BoxDecoration(
           color: isSelected
-              ? theme.colorScheme.primary.withOpacity(0.1)
+              ? theme.colorScheme.primary.withValues(alpha:0.1)
               : theme.cardColor,
           borderRadius: BorderRadius.circular(16),
           border: Border.all(
