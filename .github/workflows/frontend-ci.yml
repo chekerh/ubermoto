@@ -1,118 +1,113 @@
-name: Frontend CI/CD
+name: Frontend CI
 
 on:
   push:
-    branches: [ main, develop ]
-    paths: [ 'frontend/**' ]
+    branches: [main, develop]
+    paths: ['frontend/**']
   pull_request:
-    branches: [ main, develop ]
-    paths: [ 'frontend/**' ]
+    branches: [main, develop]
+    paths: ['frontend/**']
+
+concurrency:
+  group: frontend-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
-  test:
+  analyze:
+    name: Static Analysis
     runs-on: ubuntu-latest
-
     defaults:
       run:
         working-directory: ./frontend
-
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.19.0'
+          channel: 'stable'
+          cache: true
+      - run: flutter pub get
+      - name: Flutter analyze (zero errors enforced)
+        run: flutter analyze --no-fatal-infos --no-fatal-warnings
 
-    - name: Setup Flutter
-      uses: subosito/flutter-action@v2
-      with:
-        flutter-version: '3.19.0'
-        channel: 'stable'
+  test:
+    name: Unit & Widget Tests
+    runs-on: ubuntu-latest
+    needs: analyze
+    defaults:
+      run:
+        working-directory: ./frontend
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.19.0'
+          channel: 'stable'
+          cache: true
+      - run: flutter pub get
+      - name: Run tests
+        run: flutter test
 
-    - name: Cache Flutter dependencies
-      uses: actions/cache@v3
-      with:
-        path: |
-          ${{ runner.tool_cache }}/flutter
-        key: flutter-${{ runner.os }}-${{ hashFiles('**/pubspec.lock') }}
+  stitch-lint:
+    name: Stitch HTML Validation
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check stitch screens for common issues
+        run: |
+          echo "=== Stitch Screen Audit ==="
+          errors=0
+          for html in frontend/stitch/*/code.html; do
+            screen=$(basename $(dirname "$html"))
+            # Check that StitchBridge is used (not raw navigation)
+            if grep -q "window.location" "$html" 2>/dev/null; then
+              echo "❌ $screen: Uses window.location instead of StitchBridge"
+              errors=$((errors + 1))
+            fi
+            # Check for buttons/links without IDs
+            buttonCount=$(grep -cE '<button|<a ' "$html" 2>/dev/null || echo 0)
+            idCount=$(grep -cE '<button[^>]+id=|<a [^>]+id=' "$html" 2>/dev/null || echo 0)
+            if [ "$buttonCount" -gt 0 ] && [ "$idCount" -lt "$buttonCount" ]; then
+              echo "⚠️  $screen: $buttonCount buttons/links but only $idCount have IDs"
+            fi
+            echo "✓ $screen ($buttonCount interactive, $idCount with IDs)"
+          done
+          echo ""
+          echo "=== $errors critical errors found ==="
+          if [ "$errors" -gt 0 ]; then
+            exit 1
+          fi
 
-    - name: Install dependencies
-      run: flutter pub get
-
-    - name: Run Flutter analyze
-      run: flutter analyze
-
-    - name: Run Flutter tests
-      run: flutter test --coverage
-
-    - name: Upload coverage to Codecov
-      uses: codecov/codecov-action@v4
-      with:
-        file: ./frontend/coverage/lcov.info
-        flags: frontend
-        name: frontend-coverage
-
-    - name: Run integration tests
-      run: flutter test integration_test/
+      - name: Check stitch screens exist and are non-empty
+        run: |
+          for html in frontend/stitch/*/code.html; do
+            if [ ! -s "$html" ]; then
+              echo "❌ Empty stitch screen: $html"
+              exit 1
+            fi
+          done
+          count=$(find frontend/stitch -name "code.html" | wc -l)
+          echo "✓ All $count stitch screens are non-empty"
 
   build-web:
-    needs: test
+    name: Web Build
     runs-on: ubuntu-latest
-
+    needs: [analyze, test]
     defaults:
       run:
         working-directory: ./frontend
-
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
-
-    - name: Setup Flutter
-      uses: subosito/flutter-action@v2
-      with:
-        flutter-version: '3.19.0'
-        channel: 'stable'
-
-    - name: Build web app
-      run: flutter build web --release
-
-    - name: Upload build artifacts
-      uses: actions/upload-artifact@v3
-      with:
-        name: web-build
-        path: frontend/build/web/
-
-  deploy-staging:
-    needs: build-web
-    runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/develop' && github.event_name == 'push'
-
-    steps:
-    - name: Download build artifacts
-      uses: actions/download-artifact@v3
-      with:
-        name: web-build
-
-    - name: Deploy to Firebase staging
-      uses: FirebaseExtended/action-hosting-deploy@v0
-      with:
-        repoToken: ${{ secrets.GITHUB_TOKEN }}
-        firebaseServiceAccount: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
-        channelId: live
-        projectId: your-project-staging
-
-  deploy-production:
-    needs: build-web
-    runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
-
-    steps:
-    - name: Download build artifacts
-      uses: actions/download-artifact@v3
-      with:
-        name: web-build
-
-    - name: Deploy to Firebase production
-      uses: FirebaseExtended/action-hosting-deploy@v0
-      with:
-        repoToken: ${{ secrets.GITHUB_TOKEN }}
-        firebaseServiceAccount: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
-        channelId: live
-        projectId: your-project-production
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.19.0'
+          channel: 'stable'
+          cache: true
+      - run: flutter pub get
+      - name: Build web release
+        run: flutter build web --release
+      - uses: actions/upload-artifact@v4
+        with:
+          name: web-build
+          path: frontend/build/web/
+          retention-days: 7

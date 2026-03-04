@@ -22,7 +22,7 @@ export class AdminAuditLog {
   @Prop({ required: true, ref: 'User' })
   adminId!: Types.ObjectId;
 
-  @Prop({ required: true, enum: UserRole })
+  @Prop({ required: true, type: String, enum: UserRole })
   adminRole!: UserRole;
 
   @Prop({ required: true, enum: AdminAuditAction })
@@ -31,7 +31,7 @@ export class AdminAuditLog {
   @Prop({ required: true })
   targetId!: string; // e.g., driverId or documentId
 
-  @Prop()
+  @Prop({ type: String, enum: UserRole })
   targetRole?: UserRole; // optional: role of the target user
 
   @Prop()
