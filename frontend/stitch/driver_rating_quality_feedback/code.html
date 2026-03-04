@@ -92,13 +92,13 @@
 <div class="h-20 w-20 rounded-full border-4 border-background-light bg-cover bg-center shadow-md" data-alt="Portrait of a smiling Tunisian man" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuDReEpdEb1XDBF2Hh0fmGzEr0lSjzpzhaUrFAE9WesWkIzL9xIeBcRmF5XID6K1VcUaxuBdzIMiqxZn1zA48azqnrThh3qVwu3ctsGNMl-sTyNlFJLy1LpufISu8Lh0WqhghFTERguAKkUXvQmkp-FfrHGhimjZXbGdaz-ECEPdrTq2fyOfolE0SwABuwqil7M27VMm5PdASRKMzYM073SOeXGv98JRiPZv6AtCwzFwzf200ccjfN3iTEGhmnlxrmx-QRhwNauuEP0');"></div>
 <div class="absolute bottom-0 right-0 bg-green-500 border-2 border-white w-5 h-5 rounded-full"></div>
 </div>
-<h2 class="text-xl font-bold text-text-dark mt-2">Ahmed Ben Ali</h2>
+<h2 id="rating-driver-name" class="text-xl font-bold text-text-dark mt-2">Ahmed Ben Ali</h2>
 <p class="text-sm text-text-muted">Honda PCX 125 • <span class="text-primary font-medium">4.9 ★</span></p>
 </div>
 <!-- Star Rating -->
 <div class="text-center mb-6">
 <h3 class="text-lg font-bold text-text-dark mb-3">Comment s'est passée votre course ?</h3>
-<div class="flex justify-center gap-2">
+<div id="rating-stars" class="flex justify-center gap-2">
 <button class="text-primary hover:scale-110 transition-transform focus:outline-none">
 <span class="material-symbols-outlined text-[40px] fill-current" style="font-variation-settings: 'FILL' 1;">star</span>
 </button>
@@ -115,12 +115,12 @@
 <span class="material-symbols-outlined text-[40px]" style="font-variation-settings: 'FILL' 1;">star</span>
 </button>
 </div>
-<p class="text-sm text-text-muted mt-2 font-medium">Bien</p>
+<p id="rating-label" class="text-sm text-text-muted mt-2 font-medium">Bien</p>
 </div>
 <!-- Feedback Tags -->
 <div class="mb-6">
 <p class="text-xs font-bold text-text-muted uppercase tracking-wider mb-3 text-center">Qu'avez-vous apprécié ?</p>
-<div class="flex flex-wrap justify-center gap-2">
+<div id="rating-tags" class="flex flex-wrap justify-center gap-2">
 <button class="px-4 py-2 rounded-full bg-primary-light border border-primary text-primary text-sm font-semibold transition-colors flex items-center gap-1.5">
 <span class="material-symbols-outlined text-lg">schedule</span>
                             Ponctuel
@@ -142,15 +142,15 @@
 <!-- Comment Box -->
 <div class="mb-6">
 <div class="relative">
-<textarea class="w-full bg-white border border-gray-200 rounded-xl p-4 text-sm text-text-dark placeholder:text-gray-400 focus:ring-2 focus:ring-primary focus:border-transparent outline-none resize-none min-h-[80px]" placeholder="Dites-nous en plus (optionnel)..."></textarea>
+<textarea id="rating-comment" class="w-full bg-white border border-gray-200 rounded-xl p-4 text-sm text-text-dark placeholder:text-gray-400 focus:ring-2 focus:ring-primary focus:border-transparent outline-none resize-none min-h-[80px]" placeholder="Dites-nous en plus (optionnel)..."></textarea>
 </div>
 </div>
 <!-- Actions -->
 <div class="flex flex-col gap-3">
-<button class="w-full bg-primary hover:bg-orange-600 text-white font-bold py-3.5 rounded-xl shadow-lg shadow-orange-200 transition-all active:scale-[0.98]">
+<button id="rating-submit-btn" class="w-full bg-primary hover:bg-orange-600 text-white font-bold py-3.5 rounded-xl shadow-lg shadow-orange-200 transition-all active:scale-[0.98]">
                         Envoyer l'avis
                     </button>
-<button class="w-full bg-transparent text-text-muted font-medium text-sm py-2 hover:text-text-dark transition-colors">
+<button id="rating-skip-btn" class="w-full bg-transparent text-text-muted font-medium text-sm py-2 hover:text-text-dark transition-colors">
                         Passer
                     </button>
 </div>
@@ -159,19 +159,19 @@
 <!-- Bottom Navigation Bar (Partially obscured but visible) -->
 <div class="absolute bottom-0 w-full z-30 bg-[#fcfaf8] border-t border-[#f4ece7]">
 <div class="flex justify-around items-center px-4 pb-5 pt-3">
-<a class="flex flex-1 flex-col items-center justify-end gap-1 text-[#9c6c49] opacity-50" href="#">
+<a id="rating-nav-home" class="flex flex-1 flex-col items-center justify-end gap-1 text-[#9c6c49] opacity-50" href="#">
 <span class="material-symbols-outlined text-2xl">home</span>
 <p class="text-[10px] font-medium leading-normal">Accueil</p>
 </a>
-<a class="flex flex-1 flex-col items-center justify-end gap-1 text-[#1c130d] opacity-50" href="#">
+<a id="rating-nav-activity" class="flex flex-1 flex-col items-center justify-end gap-1 text-[#1c130d] opacity-50" href="#">
 <span class="material-symbols-outlined text-2xl font-bold">history</span>
 <p class="text-[10px] font-medium leading-normal">Activité</p>
 </a>
-<a class="flex flex-1 flex-col items-center justify-end gap-1 text-[#9c6c49] opacity-50" href="#">
+<a id="rating-nav-payment" class="flex flex-1 flex-col items-center justify-end gap-1 text-[#9c6c49] opacity-50" href="#">
 <span class="material-symbols-outlined text-2xl">credit_card</span>
 <p class="text-[10px] font-medium leading-normal">Paiement</p>
 </a>
-<a class="flex flex-1 flex-col items-center justify-end gap-1 text-[#9c6c49] opacity-50" href="#">
+<a id="rating-nav-account" class="flex flex-1 flex-col items-center justify-end gap-1 text-[#9c6c49] opacity-50" href="#">
 <span class="material-symbols-outlined text-2xl">person</span>
 <p class="text-[10px] font-medium leading-normal">Compte</p>
 </a>

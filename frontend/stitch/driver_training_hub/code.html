@@ -45,11 +45,11 @@
 <div class="relative flex h-full min-h-screen w-full flex-col overflow-hidden max-w-md mx-auto shadow-2xl bg-white dark:bg-slate-900">
 <!-- Header -->
 <div class="flex items-center p-4 pb-2 justify-between sticky top-0 z-10 bg-white/90 dark:bg-slate-900/90 backdrop-blur-sm border-b border-slate-100 dark:border-slate-800">
-<button class="text-slate-900 dark:text-white flex size-12 shrink-0 items-center justify-center rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">
+<button id="training-back-btn" class="text-slate-900 dark:text-white flex size-12 shrink-0 items-center justify-center rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">
 <span class="material-symbols-outlined text-2xl">arrow_back</span>
 </button>
 <h2 class="text-slate-900 dark:text-white text-lg font-bold leading-tight tracking-[-0.015em] flex-1 text-center">Centre d'apprentissage</h2>
-<button class="flex size-12 items-center justify-center rounded-full text-slate-900 dark:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">
+<button id="training-info-btn" class="flex size-12 items-center justify-center rounded-full text-slate-900 dark:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">
 <span class="material-symbols-outlined text-2xl">info</span>
 </button>
 </div>
@@ -61,7 +61,7 @@
 <span class="material-symbols-outlined text-[180px]">two_wheeler</span>
 </div>
 <div class="relative z-10">
-<h1 class="text-2xl font-bold mb-1">Ahlan, Mohamed !</h1>
+<h1 id="training-driver-name" class="text-2xl font-bold mb-1">Ahlan, Mohamed !</h1>
 <p class="text-blue-50 text-sm font-medium opacity-90">Devenez un pro de Nassib.</p>
 </div>
 </div>
@@ -73,11 +73,11 @@
 </div>
 <div class="bg-white dark:bg-slate-800 p-5 rounded-xl border border-slate-100 dark:border-slate-700 shadow-sm">
 <div class="flex gap-6 justify-between mb-3">
-<p class="text-slate-700 dark:text-slate-300 text-sm font-medium">3 modules sur 8 terminés</p>
-<span class="text-slate-500 dark:text-slate-400 text-sm font-bold">37%</span>
+<p id="training-progress-text" class="text-slate-700 dark:text-slate-300 text-sm font-medium">3 modules sur 8 terminés</p>
+<span id="training-progress-pct" class="text-slate-500 dark:text-slate-400 text-sm font-bold">37%</span>
 </div>
 <div class="h-3 w-full rounded-full bg-slate-100 dark:bg-slate-700 overflow-hidden">
-<div class="h-full rounded-full bg-primary transition-all duration-500" style="width: 37%;"></div>
+<div id="training-progress-bar" class="h-full rounded-full bg-primary transition-all duration-500" style="width: 37%;"></div>
 </div>
 <p class="text-slate-500 dark:text-slate-400 text-xs mt-3 flex items-center gap-2">
 <span class="material-symbols-outlined text-base text-yellow-500">emoji_events</span>
@@ -89,7 +89,7 @@
 <div class="px-4 mb-8">
 <div class="flex items-center justify-between mb-4">
 <h3 class="text-slate-900 dark:text-white text-xl font-bold">Modules vidéo</h3>
-<a class="text-primary text-sm font-medium hover:underline" href="#">Voir tout</a>
+<a id="training-view-all" class="text-primary text-sm font-medium hover:underline" href="#">Voir tout</a>
 </div>
 <div class="flex flex-col gap-4">
 <!-- Module 1 -->
@@ -162,7 +162,7 @@
 <div class="flex-1">
 <h4 class="font-bold text-lg mb-1">Testez vos acquis</h4>
 <p class="text-slate-300 text-xs mb-3">Répondez à 5 questions pour valider votre badge de sécurité.</p>
-<button class="bg-primary hover:bg-primary/90 text-white text-xs font-bold py-2 px-4 rounded-lg transition-colors w-full sm:w-auto">
+<button id="training-quiz-btn" class="bg-primary hover:bg-primary/90 text-white text-xs font-bold py-2 px-4 rounded-lg transition-colors w-full sm:w-auto">
                                 Commencer le Quiz
                             </button>
 </div>
@@ -173,11 +173,11 @@
 <div class="px-4 pb-8">
 <h3 class="text-slate-900 dark:text-white text-xl font-bold mb-4">Ressources utiles</h3>
 <div class="grid grid-cols-2 gap-3">
-<a class="flex flex-col items-center justify-center gap-2 p-4 rounded-xl bg-primary/5 hover:bg-primary/10 transition-colors border border-primary/10" href="#">
+<a id="training-guide-btn" class="flex flex-col items-center justify-center gap-2 p-4 rounded-xl bg-primary/5 hover:bg-primary/10 transition-colors border border-primary/10" href="#">
 <span class="material-symbols-outlined text-primary text-3xl">menu_book</span>
 <span class="text-slate-900 dark:text-white text-xs font-semibold">Guide PDF</span>
 </a>
-<a class="flex flex-col items-center justify-center gap-2 p-4 rounded-xl bg-primary/5 hover:bg-primary/10 transition-colors border border-primary/10" href="#">
+<a id="training-support-btn" class="flex flex-col items-center justify-center gap-2 p-4 rounded-xl bg-primary/5 hover:bg-primary/10 transition-colors border border-primary/10" href="#">
 <span class="material-symbols-outlined text-primary text-3xl">support_agent</span>
 <span class="text-slate-900 dark:text-white text-xs font-semibold">Support Chauffeur</span>
 </a>
@@ -186,21 +186,21 @@
 </div>
 <!-- Bottom Navigation -->
 <div class="flex gap-2 border-t border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 px-4 pb-6 pt-3 sticky bottom-0 z-20">
-<a class="flex flex-1 flex-col items-center justify-end gap-1 text-slate-400 dark:text-slate-500 hover:text-primary transition-colors" href="#">
+<a id="training-nav-home" class="flex flex-1 flex-col items-center justify-end gap-1 text-slate-400 dark:text-slate-500 hover:text-primary transition-colors" href="#">
 <span class="material-symbols-outlined text-[24px]">home</span>
 <p class="text-xs font-medium leading-normal tracking-[0.015em]">Accueil</p>
 </a>
-<a class="flex flex-1 flex-col items-center justify-end gap-1 text-slate-400 dark:text-slate-500 hover:text-primary transition-colors" href="#">
+<a id="training-nav-earnings" class="flex flex-1 flex-col items-center justify-end gap-1 text-slate-400 dark:text-slate-500 hover:text-primary transition-colors" href="#">
 <span class="material-symbols-outlined text-[24px]">payments</span>
 <p class="text-xs font-medium leading-normal tracking-[0.015em]">Revenus</p>
 </a>
-<a class="flex flex-1 flex-col items-center justify-end gap-1 text-primary" href="#">
+<a id="training-nav-training" class="flex flex-1 flex-col items-center justify-end gap-1 text-primary" href="#">
 <div class="bg-primary/10 px-5 py-1 rounded-full flex flex-col items-center">
 <span class="material-symbols-outlined text-[24px] font-variation-settings-fill">school</span>
 </div>
 <p class="text-xs font-medium leading-normal tracking-[0.015em]">Formation</p>
 </a>
-<a class="flex flex-1 flex-col items-center justify-end gap-1 text-slate-400 dark:text-slate-500 hover:text-primary transition-colors" href="#">
+<a id="training-nav-profile" class="flex flex-1 flex-col items-center justify-end gap-1 text-slate-400 dark:text-slate-500 hover:text-primary transition-colors" href="#">
 <span class="material-symbols-outlined text-[24px]">person</span>
 <p class="text-xs font-medium leading-normal tracking-[0.015em]">Profil</p>
 </a>

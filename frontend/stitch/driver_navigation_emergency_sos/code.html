@@ -67,12 +67,12 @@
 <body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 overflow-hidden h-screen flex flex-col">
 <!-- Top Bar -->
 <header class="flex items-center bg-surface-dark p-4 pb-3 justify-between border-b border-[#233648] z-20 shadow-md">
-<button class="text-white flex size-10 shrink-0 items-center justify-center rounded-full hover:bg-white/10 transition-colors">
+<button id="sos-back-btn" class="text-white flex size-10 shrink-0 items-center justify-center rounded-full hover:bg-white/10 transition-colors">
 <span class="material-symbols-outlined text-2xl">arrow_back</span>
 </button>
 <h2 class="text-white text-lg font-bold leading-tight tracking-[-0.015em] flex-1 text-center font-display">Nassib Ride</h2>
 <div class="flex items-center justify-end">
-<button class="bg-danger hover:bg-red-600 text-white px-3 py-1.5 rounded-full text-sm font-bold shadow-lg shadow-red-500/20 flex items-center gap-1 transition-colors">
+<button id="sos-trigger-btn" class="bg-danger hover:bg-red-600 text-white px-3 py-1.5 rounded-full text-sm font-bold shadow-lg shadow-red-500/20 flex items-center gap-1 transition-colors">
 <span class="material-symbols-outlined text-lg">sos</span>
 <span>SOS</span>
 </button>
@@ -113,8 +113,8 @@
 <span class="material-symbols-outlined text-3xl">turn_right</span>
 </div>
 <div class="flex-1 min-w-0">
-<p class="text-text-secondary text-xs uppercase font-bold tracking-wider mb-0.5">200m</p>
-<h3 class="text-white text-lg font-bold truncate leading-tight">Avenue Habib Bourguiba</h3>
+<p id="sos-turn-distance" class="text-text-secondary text-xs uppercase font-bold tracking-wider mb-0.5">200m</p>
+<h3 id="sos-turn-street" class="text-white text-lg font-bold truncate leading-tight">Avenue Habib Bourguiba</h3>
 </div>
 </div>
 </div>
@@ -122,11 +122,11 @@
 <div class="mt-auto z-10 p-4 pb-6 bg-gradient-to-t from-background-dark via-background-dark/90 to-transparent">
 <!-- Quick Actions Grid -->
 <div class="grid grid-cols-2 gap-3 mb-4">
-<button class="flex items-center justify-center gap-2 h-12 bg-surface-dark hover:bg-[#233648] text-white rounded-xl font-medium border border-[#233648] transition-all shadow-lg active:scale-95">
+<button id="sos-call-admin-btn" class="flex items-center justify-center gap-2 h-12 bg-surface-dark hover:bg-[#233648] text-white rounded-xl font-medium border border-[#233648] transition-all shadow-lg active:scale-95">
 <span class="material-symbols-outlined text-primary">call</span>
 <span>Call Admin</span>
 </button>
-<button class="flex items-center justify-center gap-2 h-12 bg-surface-dark hover:bg-[#233648] text-white rounded-xl font-medium border border-[#233648] transition-all shadow-lg active:scale-95">
+<button id="sos-report-btn" class="flex items-center justify-center gap-2 h-12 bg-surface-dark hover:bg-[#233648] text-white rounded-xl font-medium border border-[#233648] transition-all shadow-lg active:scale-95">
 <span class="material-symbols-outlined text-orange-400">report_problem</span>
 <span>Report Issue</span>
 </button>
@@ -140,7 +140,7 @@
 <div class="absolute -bottom-1 -right-1 bg-green-500 size-3 rounded-full border-2 border-surface-dark"></div>
 </div>
 <div>
-<h4 class="text-white font-bold text-sm">Ahmed Ben Ali</h4>
+<h4 id="sos-customer-name" class="text-white font-bold text-sm">Ahmed Ben Ali</h4>
 <div class="flex items-center gap-1 text-xs text-text-secondary">
 <span class="material-symbols-outlined text-[14px] text-yellow-400 fill-current">star</span>
 <span>4.8</span>
@@ -150,11 +150,11 @@
 </div>
 </div>
 <div class="text-right">
-<p class="text-primary font-bold text-lg">8.5 TND</p>
+<p id="sos-trip-amount" class="text-primary font-bold text-lg">8.5 TND</p>
 <p class="text-xs text-text-secondary">12 min</p>
 </div>
 </div>
-<button class="w-full h-12 bg-primary hover:bg-blue-600 text-white font-bold rounded-lg shadow-lg shadow-blue-500/20 transition-all flex items-center justify-center gap-2">
+<button id="sos-complete-btn" class="w-full h-12 bg-primary hover:bg-blue-600 text-white font-bold rounded-lg shadow-lg shadow-blue-500/20 transition-all flex items-center justify-center gap-2">
 <span class="material-symbols-outlined">check_circle</span>
                     Complete Ride
                 </button>
@@ -163,25 +163,25 @@
 </main>
 <!-- Bottom Navigation -->
 <nav class="flex gap-2 border-t border-[#233648] bg-surface-dark px-4 pb-6 pt-3 z-20 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.1)]">
-<a class="flex flex-1 flex-col items-center justify-end gap-1 rounded-full text-white group" href="#">
+<a id="sos-nav-home" class="flex flex-1 flex-col items-center justify-end gap-1 rounded-full text-white group" href="#">
 <div class="text-white group-hover:bg-white/5 rounded-full w-12 h-8 flex items-center justify-center transition-colors">
 <span class="material-symbols-outlined">home</span>
 </div>
 <p class="text-white text-[10px] font-medium leading-normal tracking-[0.015em]">Home</p>
 </a>
-<a class="flex flex-1 flex-col items-center justify-end gap-1 text-text-secondary group" href="#">
+<a id="sos-nav-earnings" class="flex flex-1 flex-col items-center justify-end gap-1 text-text-secondary group" href="#">
 <div class="text-text-secondary group-hover:text-white group-hover:bg-white/5 rounded-full w-12 h-8 flex items-center justify-center transition-colors">
 <span class="material-symbols-outlined">attach_money</span>
 </div>
 <p class="text-text-secondary group-hover:text-white text-[10px] font-medium leading-normal tracking-[0.015em]">Earnings</p>
 </a>
-<a class="flex flex-1 flex-col items-center justify-end gap-1 text-text-secondary group" href="#">
+<a id="sos-nav-ratings" class="flex flex-1 flex-col items-center justify-end gap-1 text-text-secondary group" href="#">
 <div class="text-text-secondary group-hover:text-white group-hover:bg-white/5 rounded-full w-12 h-8 flex items-center justify-center transition-colors">
 <span class="material-symbols-outlined">star</span>
 </div>
 <p class="text-text-secondary group-hover:text-white text-[10px] font-medium leading-normal tracking-[0.015em]">Ratings</p>
 </a>
-<a class="flex flex-1 flex-col items-center justify-end gap-1 text-text-secondary group" href="#">
+<a id="sos-nav-profile" class="flex flex-1 flex-col items-center justify-end gap-1 text-text-secondary group" href="#">
 <div class="text-text-secondary group-hover:text-white group-hover:bg-white/5 rounded-full w-12 h-8 flex items-center justify-center transition-colors">
 <span class="material-symbols-outlined">person</span>
 </div>

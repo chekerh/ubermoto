@@ -50,7 +50,7 @@
 <div class="relative flex h-full min-h-screen w-full flex-col bg-background-light dark:bg-background-dark group/design-root">
 <!-- Header -->
 <div class="sticky top-0 z-10 flex items-center bg-background-light dark:bg-background-dark p-4 pb-2 justify-between border-b border-primary/10 dark:border-primary/5">
-<div class="text-text-primary-light dark:text-text-primary-dark flex size-12 shrink-0 items-center cursor-pointer hover:bg-primary/10 rounded-full justify-center transition-colors">
+<div id="docs-back-btn" class="text-text-primary-light dark:text-text-primary-dark flex size-12 shrink-0 items-center cursor-pointer hover:bg-primary/10 rounded-full justify-center transition-colors">
 <span class="material-symbols-outlined">arrow_back</span>
 </div>
 <h2 class="text-text-primary-light dark:text-text-primary-dark text-lg font-bold leading-tight tracking-[-0.015em] flex-1 text-center pr-12">
@@ -63,12 +63,12 @@
 <p class="text-text-primary-light dark:text-text-primary-dark text-base font-bold leading-normal">
                     Let's get you on the road
                 </p>
-<p class="text-primary text-sm font-bold leading-normal">33%</p>
+<p id="docs-progress-pct" class="text-primary text-sm font-bold leading-normal">33%</p>
 </div>
 <div class="rounded-full bg-primary/20 dark:bg-primary/10 h-2 w-full overflow-hidden">
-<div class="h-full rounded-full bg-primary transition-all duration-500 ease-out" style="width: 33%;"></div>
+<div id="docs-progress-bar" class="h-full rounded-full bg-primary transition-all duration-500 ease-out" style="width: 33%;"></div>
 </div>
-<p class="text-text-secondary-light dark:text-text-secondary-dark text-sm font-normal leading-normal">
+<p id="docs-progress-text" class="text-text-secondary-light dark:text-text-secondary-dark text-sm font-normal leading-normal">
                 1 of 3 documents uploaded. We need these to verify your identity and vehicle.
             </p>
 </div>
@@ -83,7 +83,7 @@
 </div>
 </div>
 <!-- Documents List -->
-<div class="flex flex-col flex-1 pb-24">
+<div id="docs-list" class="flex flex-col flex-1 pb-24">
 <!-- Item 1: National ID (CIN) - Verified -->
 <div class="flex items-center gap-4 bg-background-light dark:bg-background-dark px-4 py-3 justify-between border-b border-primary/5 dark:border-primary/5 hover:bg-surface-light dark:hover:bg-surface-dark transition-colors group">
 <div class="flex items-center gap-4 flex-1">
@@ -101,7 +101,7 @@
 </div>
 </div>
 <div class="shrink-0">
-<button class="flex items-center justify-center rounded-lg h-9 px-3 text-text-secondary-light dark:text-text-secondary-dark text-sm font-medium leading-normal w-fit hover:bg-black/5 dark:hover:bg-white/5 transition-colors">
+<button id="docs-cin-edit" class="flex items-center justify-center rounded-lg h-9 px-3 text-text-secondary-light dark:text-text-secondary-dark text-sm font-medium leading-normal w-fit hover:bg-black/5 dark:hover:bg-white/5 transition-colors">
 <span class="truncate">Edit</span>
 </button>
 </div>
@@ -123,7 +123,7 @@
 </div>
 </div>
 <div class="shrink-0">
-<button class="flex items-center justify-center rounded-lg h-9 px-3 text-text-secondary-light dark:text-text-secondary-dark text-sm font-medium leading-normal w-fit hover:bg-black/5 dark:hover:bg-white/5 transition-colors">
+<button id="docs-license-view" class="flex items-center justify-center rounded-lg h-9 px-3 text-text-secondary-light dark:text-text-secondary-dark text-sm font-medium leading-normal w-fit hover:bg-black/5 dark:hover:bg-white/5 transition-colors">
 <span class="truncate">View</span>
 </button>
 </div>
@@ -143,7 +143,7 @@
 </div>
 </div>
 <div class="shrink-0">
-<button class="flex min-w-[84px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-9 px-4 bg-primary text-white text-sm font-bold leading-normal w-fit shadow-sm shadow-primary/20 hover:bg-primary-dark transition-colors">
+<button id="docs-moto-upload" class="flex min-w-[84px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-9 px-4 bg-primary text-white text-sm font-bold leading-normal w-fit shadow-sm shadow-primary/20 hover:bg-primary-dark transition-colors">
 <span class="truncate">Upload</span>
 </button>
 </div>
@@ -162,7 +162,7 @@
 </div>
 </div>
 <div class="shrink-0">
-<button class="flex min-w-[84px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-9 px-4 bg-primary text-white text-sm font-bold leading-normal w-fit shadow-sm shadow-primary/20 hover:bg-primary-dark transition-colors">
+<button id="docs-insurance-upload" class="flex min-w-[84px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-9 px-4 bg-primary text-white text-sm font-bold leading-normal w-fit shadow-sm shadow-primary/20 hover:bg-primary-dark transition-colors">
 <span class="truncate">Upload</span>
 </button>
 </div>
@@ -170,7 +170,7 @@
 </div>
 <!-- Sticky Bottom Action -->
 <div class="fixed bottom-0 left-0 right-0 p-4 bg-background-light/90 dark:bg-background-dark/90 backdrop-blur-md border-t border-primary/10 dark:border-primary/5">
-<button class="w-full h-12 rounded-xl bg-gray-200 dark:bg-gray-700 text-gray-400 dark:text-gray-500 font-bold text-base flex items-center justify-center cursor-not-allowed" disabled="">
+<button id="docs-submit-btn" class="w-full h-12 rounded-xl bg-gray-200 dark:bg-gray-700 text-gray-400 dark:text-gray-500 font-bold text-base flex items-center justify-center cursor-not-allowed" disabled="">
                 Submit Documents
             </button>
 <p class="text-center text-xs text-text-secondary-light dark:text-text-secondary-dark mt-2">

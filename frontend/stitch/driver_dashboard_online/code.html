@@ -65,7 +65,7 @@
 <p class="text-xs text-text-secondary-light dark:text-text-secondary-dark font-medium mt-0.5">Driver Partner</p>
 </div>
 </div>
-<button class="relative w-10 h-10 flex items-center justify-center rounded-full hover:bg-black/5 dark:hover:bg-white/10 transition-colors">
+<button id="driver-notif-btn" class="relative w-10 h-10 flex items-center justify-center rounded-full hover:bg-black/5 dark:hover:bg-white/10 transition-colors">
 <span class="material-symbols-outlined text-2xl">notifications</span>
 <span class="absolute top-2 right-2.5 w-2 h-2 rounded-full bg-red-500 ring-2 ring-background-light dark:ring-background-dark"></span>
 </button>
@@ -81,7 +81,7 @@
 <p class="text-sm text-text-secondary-light dark:text-text-secondary-dark mt-1">Receiving requests nearby...</p>
 </div>
 <label class="relative inline-flex items-center cursor-pointer">
-<input checked="" class="sr-only peer" type="checkbox" value=""/>
+<input id="driver-online-toggle" checked="" class="sr-only peer" type="checkbox" value=""/>
 <div class="w-14 h-8 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary/20 dark:peer-focus:ring-primary/30 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-7 after:w-7 after:transition-all dark:border-gray-600 peer-checked:bg-primary"></div>
 </label>
 </div>
@@ -95,7 +95,7 @@
 <span class="material-symbols-outlined text-lg">attach_money</span>
 </div>
 <p class="text-xs font-medium text-text-secondary-light dark:text-text-secondary-dark uppercase tracking-wide">Today's Earnings</p>
-<p class="text-2xl font-bold mt-1">45 <span class="text-sm font-semibold text-text-secondary-light dark:text-text-secondary-dark">TND</span></p>
+<p id="driver-today-earnings" class="text-2xl font-bold mt-1">45 <span class="text-sm font-semibold text-text-secondary-light dark:text-text-secondary-dark">TND</span></p>
 </div>
 </div>
 <div class="bg-surface-light dark:bg-surface-dark rounded-2xl p-5 shadow-sm border border-primary/10 flex flex-col justify-between h-32 relative overflow-hidden group">
@@ -105,12 +105,12 @@
 <span class="material-symbols-outlined text-lg">check_circle</span>
 </div>
 <p class="text-xs font-medium text-text-secondary-light dark:text-text-secondary-dark uppercase tracking-wide">Jobs Completed</p>
-<p class="text-2xl font-bold mt-1">6</p>
+<p id="driver-jobs-count" class="text-2xl font-bold mt-1">6</p>
 </div>
 </div>
 </div>
 <!-- Incoming Job Request -->
-<div class="px-4 mt-8 mb-4">
+<div id="driver-incoming-section" class="px-4 mt-8 mb-4">
 <h2 class="text-lg font-bold mb-4 flex items-center gap-2">
                 Incoming Request
                 <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-primary text-white uppercase tracking-wider">New</span>
@@ -132,10 +132,10 @@
 <div class="flex justify-between items-start mb-4">
 <div>
 <h3 class="font-bold text-lg">Delivery • Electronics</h3>
-<p class="text-sm text-text-secondary-light dark:text-text-secondary-dark">Order #8832</p>
+<p id="driver-request-order" class="text-sm text-text-secondary-light dark:text-text-secondary-dark">Order #8832</p>
 </div>
 <div class="text-right">
-<p class="text-xl font-bold text-primary">12.50 TND</p>
+<p id="driver-request-amount" class="text-xl font-bold text-primary">12.50 TND</p>
 <p class="text-xs text-text-secondary-light dark:text-text-secondary-dark">COD Amount</p>
 </div>
 </div>
@@ -151,7 +151,7 @@
 </div>
 <div class="flex-1">
 <p class="text-xs font-semibold text-text-secondary-light dark:text-text-secondary-dark uppercase mb-0.5">Pick Up</p>
-<p class="font-medium text-sm">Technopark El Ghazala</p>
+<p id="driver-request-pickup" class="font-medium text-sm">Technopark El Ghazala</p>
 <p class="text-xs text-text-secondary-light dark:text-text-secondary-dark truncate">Ariana, Tunis</p>
 </div>
 </div>
@@ -164,18 +164,18 @@
 </div>
 <div class="flex-1">
 <p class="text-xs font-semibold text-text-secondary-light dark:text-text-secondary-dark uppercase mb-0.5">Drop Off</p>
-<p class="font-medium text-sm">Rue de Marseille</p>
+<p id="driver-request-dropoff" class="font-medium text-sm">Rue de Marseille</p>
 <p class="text-xs text-text-secondary-light dark:text-text-secondary-dark truncate">Tunis Centre Ville</p>
 </div>
 </div>
 </div>
 <!-- Actions -->
 <div class="grid grid-cols-2 gap-3 mt-6">
-<button class="flex items-center justify-center gap-2 py-3 rounded-xl border border-gray-200 dark:border-gray-700 font-bold text-text-secondary-light dark:text-text-secondary-dark hover:bg-gray-50 dark:hover:bg-white/5 transition-colors">
+<button id="driver-decline-btn" class="flex items-center justify-center gap-2 py-3 rounded-xl border border-gray-200 dark:border-gray-700 font-bold text-text-secondary-light dark:text-text-secondary-dark hover:bg-gray-50 dark:hover:bg-white/5 transition-colors">
 <span class="material-symbols-outlined text-xl">close</span>
                             Decline
                         </button>
-<button class="flex items-center justify-center gap-2 py-3 rounded-xl bg-primary text-white font-bold shadow-lg shadow-primary/30 hover:bg-primary/90 transition-colors">
+<button id="driver-accept-btn" class="flex items-center justify-center gap-2 py-3 rounded-xl bg-primary text-white font-bold shadow-lg shadow-primary/30 hover:bg-primary/90 transition-colors">
 <span class="material-symbols-outlined text-xl">check</span>
                             Accept
                         </button>
@@ -187,25 +187,25 @@
 <!-- Bottom Navigation -->
 <nav class="fixed bottom-0 w-full bg-surface-light dark:bg-surface-dark border-t border-primary/10 pb-safe pt-2 px-6 z-20">
 <div class="flex justify-between items-center pb-5">
-<a class="flex flex-col items-center gap-1 group" href="#">
+<a id="driver-nav-dashboard" class="flex flex-col items-center gap-1 group" href="#">
 <div class="p-1.5 rounded-xl bg-primary/10 text-primary transition-colors">
 <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">dashboard</span>
 </div>
 <span class="text-[10px] font-bold text-primary">Dashboard</span>
 </a>
-<a class="flex flex-col items-center gap-1 group" href="#">
+<a id="driver-nav-wallet" class="flex flex-col items-center gap-1 group" href="#">
 <div class="p-1.5 rounded-xl text-text-secondary-light dark:text-text-secondary-dark group-hover:bg-primary/5 group-hover:text-primary transition-colors">
 <span class="material-symbols-outlined">account_balance_wallet</span>
 </div>
 <span class="text-[10px] font-medium text-text-secondary-light dark:text-text-secondary-dark group-hover:text-primary transition-colors">Wallet</span>
 </a>
-<a class="flex flex-col items-center gap-1 group" href="#">
+<a id="driver-nav-docs" class="flex flex-col items-center gap-1 group" href="#">
 <div class="p-1.5 rounded-xl text-text-secondary-light dark:text-text-secondary-dark group-hover:bg-primary/5 group-hover:text-primary transition-colors">
 <span class="material-symbols-outlined">description</span>
 </div>
 <span class="text-[10px] font-medium text-text-secondary-light dark:text-text-secondary-dark group-hover:text-primary transition-colors">Docs</span>
 </a>
-<a class="flex flex-col items-center gap-1 group" href="#">
+<a id="driver-nav-profile" class="flex flex-col items-center gap-1 group" href="#">
 <div class="p-1.5 rounded-xl text-text-secondary-light dark:text-text-secondary-dark group-hover:bg-primary/5 group-hover:text-primary transition-colors">
 <span class="material-symbols-outlined">person</span>
 </div>
