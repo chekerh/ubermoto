@@ -3,12 +3,10 @@ import { AuthService } from './auth.service';
 import { UsersService } from '../users/users.service';
 import { DriversService } from '../drivers/drivers.service';
 import { JwtService } from '@nestjs/jwt';
-import { UnauthorizedException } from '@nestjs/common';
 
 describe('AuthService', () => {
   let service: AuthService;
   let usersService: UsersService;
-  let driversService: DriversService;
   let jwtService: JwtService;
 
   const mockUser = {
@@ -50,7 +48,6 @@ describe('AuthService', () => {
 
     service = module.get<AuthService>(AuthService);
     usersService = module.get<UsersService>(UsersService);
-    driversService = module.get<DriversService>(DriversService);
     jwtService = module.get<JwtService>(JwtService);
   });
 
