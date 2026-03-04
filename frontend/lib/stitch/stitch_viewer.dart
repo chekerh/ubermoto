@@ -6,6 +6,7 @@ import 'package:flutter/services.dart' show rootBundle;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 
+import '../features/admin/providers/admin_provider.dart';
 import '../features/auth/providers/auth_provider.dart';
 import '../features/driver/providers/driver_provider.dart';
 import '../features/products/providers/product_provider.dart';
@@ -1196,14 +1197,16 @@ class _StitchViewerState extends ConsumerState<StitchViewer> {
           .loadDriverProfile(authState.user!.id);
     }
 
+    // Inject dynamic driver dashboard data
+    await _injectDriverDashboardData();
+
     await _controller.runJavaScript(r'''
       (() => {
         // Notifications bell
-        const bellBtn = stitchFindByIcon('notifications') || stitchFindByIcon('notifications_none');
-        stitchBind(bellBtn, 'show_info', { message: 'No new notifications.' });
+        stitchBind(document.getElementById('driver-notif-btn'), 'show_info', { message: 'No new notifications.' });
 
-        // Online/Offline toggle (checkbox-based)
-        const toggle = document.querySelector('input[type="checkbox"]');
+        // Online/Offline toggle
+        const toggle = document.getElementById('driver-online-toggle');
         if (toggle && toggle.dataset.flutterBound !== '1') {
           toggle.dataset.flutterBound = '1';
           toggle.addEventListener('change', () => {
@@ -1211,80 +1214,45 @@ class _StitchViewerState extends ConsumerState<StitchViewer> {
           });
         }
 
-        // Accept delivery
-        const acceptBtn = stitchFindByText('button', ['accept', 'accepter']);
-        stitchBind(acceptBtn, 'driver_accept_delivery');
+        // Accept / Decline delivery
+        stitchBind(document.getElementById('driver-accept-btn'), 'driver_accept_delivery');
+        stitchBind(document.getElementById('driver-decline-btn'), 'driver_decline_delivery');
 
-        // Decline delivery
-        const declineBtn = stitchFindByText('button', ['decline', 'refuser']);
-        stitchBind(declineBtn, 'driver_decline_delivery');
-
-        // Wire up any links that match driver sub-screens
-        const allLinks = document.querySelectorAll('a, button, [class*="cursor-pointer"]');
-        allLinks.forEach(el => {
-          if (el.closest('nav')) return;
-          const text = (el.textContent || '').toLowerCase();
-          if (text.includes('motorcycle') || text.includes('vehicle') || text.includes('moto')) {
-            stitchBind(el, 'open_motorcycle_select');
-          } else if (text.includes('training') || text.includes('formation') || text.includes('learn')) {
-            stitchBind(el, 'open_driver_training');
-          } else if (text.includes('sos') || text.includes('emergency') || text.includes('urgence')) {
-            stitchBind(el, 'open_driver_sos');
-          } else if (text.includes('rating') || text.includes('feedback') || text.includes('valuation')) {
-            stitchBind(el, 'open_driver_rating');
-          }
-        });
-
-        // Bottom nav: Dashboard, Wallet, Docs, Profile
-        stitchBindBottomNav({
-          'dashboard|tableau': 'noop',
-          'wallet|portefeuille|earning|revenu': 'open_driver_earnings',
-          'doc|document': 'open_driver_docs',
-          'profile|profil|compte': 'open_driver_profile',
-        });
+        // Bottom nav
+        stitchBind(document.getElementById('driver-nav-dashboard'), 'noop');
+        stitchBind(document.getElementById('driver-nav-wallet'), 'open_driver_earnings');
+        stitchBind(document.getElementById('driver-nav-docs'), 'open_driver_docs');
+        stitchBind(document.getElementById('driver-nav-profile'), 'open_driver_profile');
       })();
     ''');
   }
 
   Future<void> _injectActiveJobBindings() async {
+    // Inject dynamic active job data
+    await _injectActiveJobData();
+
     await _controller.runJavaScript(r'''
       (() => {
-        const backBtn = stitchFindByIcon('arrow_back') || stitchFindByIcon('chevron_left');
-        stitchBind(backBtn, 'open_driver_dashboard');
+        // Back
+        stitchBind(document.getElementById('job-back-btn'), 'open_driver_dashboard');
 
-        const helpBtn = stitchFindByIcon('help') || stitchFindByIcon('help_outline');
-        stitchBind(helpBtn, 'show_help');
+        // Header actions
+        stitchBind(document.getElementById('job-help-btn'), 'show_help');
+        stitchBind(document.getElementById('job-location-btn'), 'noop');
+        stitchBind(document.getElementById('job-nav-btn'), 'show_info', { message: 'Opening navigation to destination...' });
 
-        // Recenter map — UI-only
-        const recenterBtn = stitchFindByIcon('my_location') || stitchFindByIcon('gps_fixed');
-        if (recenterBtn) stitchBind(recenterBtn, 'noop');
+        // Customer contact
+        stitchBind(document.getElementById('job-chat-btn'), 'show_coming_soon');
+        stitchBind(document.getElementById('job-call-btn'), 'show_coming_soon');
 
-        // Navigate
-        const navBtn = stitchFindByIcon('navigation') || stitchFindByIcon('near_me');
-        stitchBind(navBtn, 'show_info', { message: 'Opening navigation to destination...' });
+        // Complete delivery
+        stitchBind(document.getElementById('job-complete-btn'), 'driver_complete_delivery');
 
-        // Chat / call customer
-        const chatBtn = stitchFindByIcon('chat') || stitchFindByIcon('message') || stitchFindByIcon('chat_bubble');
-        stitchBind(chatBtn, 'show_coming_soon');
-
-        const callBtn = stitchFindByIcon('call') || stitchFindByIcon('phone');
-        stitchBind(callBtn, 'show_coming_soon');
-
-        // SOS button (if present on active job screen)
-        const sosBtn = stitchFindByText('button', ['sos', 'emergency', 'urgence']);
-        stitchBind(sosBtn, 'open_driver_sos');
-
-        // Slide to Complete
-        const slideBtn = stitchFindByText('button,div', ['slide to complete', 'slide', 'complete', 'terminer', 'glisser']);
-        stitchBind(slideBtn, 'driver_complete_delivery');
-
-        // Bottom nav: Delivery, Earnings, Ratings, Profile
-        stitchBindBottomNav({
-          'delivery|livraison': 'noop',
-          'earning|revenu': 'open_driver_earnings',
-          'rating|valuation|note': 'open_driver_rating',
-          'profile|profil|compte': 'open_driver_profile',
-        });
+        // Bottom nav
+        stitchBind(document.getElementById('job-nav-delivery'), 'noop');
+        stitchBind(document.getElementById('job-nav-earnings'), 'open_driver_earnings');
+        stitchBind(document.getElementById('job-nav-ratings'), 'open_driver_rating');
+        stitchBind(document.getElementById('job-nav-profile'), 'open_driver_profile');
       })();
     ''');
   }
@@ -1292,25 +1260,17 @@ class _StitchViewerState extends ConsumerState<StitchViewer> {
   Future<void> _injectDriverDocsBindings() async {
     await _controller.runJavaScript(r'''
       (() => {
-        const backBtn = stitchFindByIcon('arrow_back') || stitchFindByIcon('chevron_left');
-        stitchBind(backBtn, 'open_driver_dashboard');
+        // Back
+        stitchBind(document.getElementById('docs-back-btn'), 'open_driver_dashboard');
 
-        const allBtns = Array.from(document.querySelectorAll('button'));
-        allBtns.forEach(btn => {
-          if (btn.closest('nav')) return;
-          const text = (btn.textContent || '').toLowerCase().trim();
-          if (text === 'edit') {
-            stitchBind(btn, 'show_info', { message: 'Document editor opening...' });
-          } else if (text === 'view') {
-            stitchBind(btn, 'show_info', { message: 'Viewing document...' });
-          } else if (text === 'upload') {
-            stitchBind(btn, 'show_coming_soon');
-          } else if (text.includes('submit')) {
-            stitchBind(btn, 'driver_submit_docs');
-          } else if (text.includes('continue') || text.includes('next') || text.includes('skip')) {
-            stitchBind(btn, 'open_driver_training');
-          }
-        });
+        // Document action buttons
+        stitchBind(document.getElementById('docs-cin-edit'), 'show_info', { message: 'Document editor opening...' });
+        stitchBind(document.getElementById('docs-license-view'), 'show_info', { message: 'Viewing document...' });
+        stitchBind(document.getElementById('docs-moto-upload'), 'show_coming_soon');
+        stitchBind(document.getElementById('docs-insurance-upload'), 'show_coming_soon');
+
+        // Submit all
+        stitchBind(document.getElementById('docs-submit-btn'), 'driver_submit_docs');
       })();
     ''');
   }
@@ -1318,11 +1278,29 @@ class _StitchViewerState extends ConsumerState<StitchViewer> {
   Future<void> _injectMotorcycleSelectBindings() async {
     await _controller.runJavaScript(r'''
       (() => {
-        const backBtn = stitchFindByIcon('arrow_back') || stitchFindByIcon('chevron_left');
-        stitchBind(backBtn, 'open_driver_dashboard');
+        // Back
+        stitchBind(document.getElementById('moto-back-btn'), 'open_driver_dashboard');
 
-        const confirmBtn = stitchFindByText('button', ['confirm selection', 'confirmer', 'select', 'choisir']);
-        stitchBind(confirmBtn, 'driver_confirm_motorcycle');
+        // Motorcycle cards — tap to select (visual highlight)
+        ['moto-card-1','moto-card-2','moto-card-3','moto-card-4'].forEach(id => {
+          const card = document.getElementById(id);
+          if (card && card.dataset.flutterBound !== '1') {
+            card.dataset.flutterBound = '1';
+            card.addEventListener('click', () => {
+              // Remove selection from all
+              ['moto-card-1','moto-card-2','moto-card-3','moto-card-4'].forEach(cid => {
+                const c = document.getElementById(cid);
+                if (c) { c.style.borderColor = ''; c.style.boxShadow = ''; }
+              });
+              // Highlight selected
+              card.style.borderColor = '#f97316';
+              card.style.boxShadow = '0 0 0 2px #f97316';
+            });
+          }
+        });
+
+        // Confirm selection
+        stitchBind(document.getElementById('moto-confirm-btn'), 'driver_confirm_motorcycle');
       })();
     ''');
   }
@@ -1330,27 +1308,65 @@ class _StitchViewerState extends ConsumerState<StitchViewer> {
   Future<void> _injectDriverRatingBindings() async {
     await _controller.runJavaScript(r'''
       (() => {
-        const menuBtn = stitchFindByIcon('menu');
-        stitchBind(menuBtn, 'show_info', { message: 'Menu: Dashboard, Earnings, Settings.' });
+        // Interactive star rating
+        const starsContainer = document.getElementById('rating-stars');
+        if (starsContainer && starsContainer.dataset.flutterBound !== '1') {
+          starsContainer.dataset.flutterBound = '1';
+          const stars = starsContainer.querySelectorAll('span');
+          let selectedRating = 0;
+          stars.forEach((star, idx) => {
+            star.style.cursor = 'pointer';
+            star.addEventListener('click', () => {
+              selectedRating = idx + 1;
+              stars.forEach((s, i) => {
+                s.style.fontVariationSettings = i < selectedRating ? "'FILL' 1" : "'FILL' 0";
+                s.style.color = i < selectedRating ? '#f59e0b' : '#d1d5db';
+              });
+            });
+          });
+        }
 
-        const bellBtn = stitchFindByIcon('notifications') || stitchFindByIcon('notifications_none');
-        stitchBind(bellBtn, 'show_info', { message: 'No new notifications.' });
+        // Toggleable feedback tags
+        const tagsContainer = document.getElementById('rating-tags');
+        if (tagsContainer && tagsContainer.dataset.flutterBound !== '1') {
+          tagsContainer.dataset.flutterBound = '1';
+          tagsContainer.querySelectorAll('span, button').forEach(tag => {
+            tag.style.cursor = 'pointer';
+            tag.addEventListener('click', () => {
+              const isActive = tag.dataset.active === '1';
+              tag.dataset.active = isActive ? '0' : '1';
+              if (isActive) {
+                tag.style.backgroundColor = '';
+                tag.style.color = '';
+              } else {
+                tag.style.backgroundColor = '#f97316';
+                tag.style.color = '#ffffff';
+              }
+            });
+          });
+        }
 
-        // Submit feedback
-        const submitBtn = stitchFindByText('button', ['envoyer', 'submit', 'send']);
-        stitchBind(submitBtn, 'driver_submit_rating');
+        // Submit rating — reads stars, tags, and comment
+        const submitBtn = document.getElementById('rating-submit-btn');
+        if (submitBtn && submitBtn.dataset.flutterBound !== '1') {
+          submitBtn.dataset.flutterBound = '1';
+          submitBtn.addEventListener('click', () => {
+            const comment = document.getElementById('rating-comment')?.value || '';
+            window.StitchBridge.postMessage(JSON.stringify({
+              action: 'driver_submit_rating',
+              payload: { comment }
+            }));
+          });
+        }
 
         // Skip
-        const skipBtn = stitchFindByText('button', ['passer', 'skip']);
-        stitchBind(skipBtn, 'open_driver_dashboard');
+        stitchBind(document.getElementById('rating-skip-btn'), 'open_driver_dashboard');
 
-        // Bottom nav: Accueil, Activité, Paiement, Compte
-        stitchBindBottomNav({
-          'accueil|home': 'open_driver_dashboard',
-          'activit|activity': 'open_active_job',
-          'paiement|payment|earning': 'open_driver_earnings',
-          'compte|account|profil': 'open_driver_profile',
-        });
+        // Bottom nav
+        stitchBind(document.getElementById('rating-nav-home'), 'open_driver_dashboard');
+        stitchBind(document.getElementById('rating-nav-activity'), 'open_active_job');
+        stitchBind(document.getElementById('rating-nav-payment'), 'open_driver_earnings');
+        stitchBind(document.getElementById('rating-nav-account'), 'open_driver_profile');
       })();
     ''');
   }
@@ -1358,39 +1374,21 @@ class _StitchViewerState extends ConsumerState<StitchViewer> {
   Future<void> _injectDriverTrainingBindings() async {
     await _controller.runJavaScript(r'''
       (() => {
-        const backBtn = stitchFindByIcon('arrow_back') || stitchFindByIcon('chevron_left');
-        stitchBind(backBtn, 'open_driver_dashboard');
+        // Header
+        stitchBind(document.getElementById('training-back-btn'), 'open_driver_dashboard');
+        stitchBind(document.getElementById('training-info-btn'), 'show_info', { message: 'Complete training modules to unlock premium deliveries and earn badges.' });
 
-        const infoBtn = stitchFindByIcon('info') || stitchFindByIcon('info_outline');
-        stitchBind(infoBtn, 'show_info', { message: 'Complete training modules to unlock premium deliveries and earn badges.' });
+        // Training actions
+        stitchBind(document.getElementById('training-view-all'), 'show_info', { message: 'All training modules will be available soon.' });
+        stitchBind(document.getElementById('training-quiz-btn'), 'show_info', { message: 'Safety quiz starting... Answer 10 questions to earn your safety badge!' });
+        stitchBind(document.getElementById('training-guide-btn'), 'show_coming_soon');
+        stitchBind(document.getElementById('training-support-btn'), 'show_coming_soon');
 
-        const quizBtn = stitchFindByText('button', ['quiz', 'commencer', 'start']);
-        stitchBind(quizBtn, 'show_info', { message: 'Safety quiz starting... Answer 10 questions to earn your safety badge!' });
-
-        const viewAll = stitchFindByText('a,button', ['voir tout', 'view all']);
-        stitchBind(viewAll, 'show_info', { message: 'All training modules will be available soon.' });
-
-        const guideLink = stitchFindByText('a,button,div', ['guide pdf', 'guide']);
-        stitchBind(guideLink, 'show_coming_soon');
-
-        const supportLink = stitchFindByText('a,button,div', ['support chauffeur', 'driver support', 'support']);
-        stitchBind(supportLink, 'show_coming_soon');
-
-        // Clickable video cards
-        const videoCards = document.querySelectorAll('[class*="cursor-pointer"]');
-        videoCards.forEach(card => {
-          if (!card.closest('nav')) {
-            stitchBind(card, 'show_info', { message: 'Video lesson loading...' });
-          }
-        });
-
-        // Bottom nav: Accueil, Revenus, Formation, Profil
-        stitchBindBottomNav({
-          'accueil|home': 'open_driver_dashboard',
-          'revenu|earning': 'open_driver_earnings',
-          'formation|training': 'noop',
-          'profil|profile': 'open_driver_profile',
-        });
+        // Bottom nav
+        stitchBind(document.getElementById('training-nav-home'), 'open_driver_dashboard');
+        stitchBind(document.getElementById('training-nav-earnings'), 'open_driver_earnings');
+        stitchBind(document.getElementById('training-nav-training'), 'noop');
+        stitchBind(document.getElementById('training-nav-profile'), 'open_driver_profile');
       })();
     ''');
   }
@@ -1398,36 +1396,22 @@ class _StitchViewerState extends ConsumerState<StitchViewer> {
   Future<void> _injectDriverSosBindings() async {
     await _controller.runJavaScript(r'''
       (() => {
-        const backBtn = stitchFindByIcon('arrow_back') || stitchFindByIcon('chevron_left');
-        stitchBind(backBtn, 'go_back');
+        // Header
+        stitchBind(document.getElementById('sos-back-btn'), 'go_back');
 
-        const sosBtn = stitchFindByText('button', ['sos']);
-        stitchBind(sosBtn, 'driver_sos_activated');
+        // SOS trigger
+        stitchBind(document.getElementById('sos-trigger-btn'), 'driver_sos_activated');
 
-        // Map controls — UI-only
-        const addBtn = stitchFindByIcon('add');
-        const removeBtn = stitchFindByIcon('remove');
-        const centerBtn = stitchFindByIcon('near_me') || stitchFindByIcon('my_location');
-        if (addBtn) stitchBind(addBtn, 'noop');
-        if (removeBtn) stitchBind(removeBtn, 'noop');
-        if (centerBtn) stitchBind(centerBtn, 'noop');
+        // Action buttons
+        stitchBind(document.getElementById('sos-call-admin-btn'), 'show_info', { message: 'Calling admin support...' });
+        stitchBind(document.getElementById('sos-report-btn'), 'show_info', { message: 'Issue report submitted. Admin will review.' });
+        stitchBind(document.getElementById('sos-complete-btn'), 'driver_complete_delivery');
 
-        const callAdminBtn = stitchFindByText('button', ['call admin', 'appeler', 'admin']);
-        stitchBind(callAdminBtn, 'show_info', { message: 'Calling admin support...' });
-
-        const reportBtn = stitchFindByText('button', ['report', 'signaler']);
-        stitchBind(reportBtn, 'show_info', { message: 'Issue report submitted. Admin will review.' });
-
-        const completeBtn = stitchFindByText('button', ['complete ride', 'terminer', 'complete']);
-        stitchBind(completeBtn, 'driver_complete_delivery');
-
-        // Bottom nav: Home, Earnings, Ratings, Profile
-        stitchBindBottomNav({
-          'home|accueil': 'open_driver_dashboard',
-          'earning|revenu': 'open_driver_earnings',
-          'rating|valuation|note': 'open_driver_rating',
-          'profile|profil': 'open_driver_profile',
-        });
+        // Bottom nav
+        stitchBind(document.getElementById('sos-nav-home'), 'open_driver_dashboard');
+        stitchBind(document.getElementById('sos-nav-earnings'), 'open_driver_earnings');
+        stitchBind(document.getElementById('sos-nav-ratings'), 'open_driver_rating');
+        stitchBind(document.getElementById('sos-nav-profile'), 'open_driver_profile');
       })();
     ''');
   }
@@ -1435,69 +1419,73 @@ class _StitchViewerState extends ConsumerState<StitchViewer> {
   Future<void> _injectDriverEarningsBindings() async {
     await _controller.runJavaScript(r'''
       (() => {
-        const backBtn = stitchFindByIcon('arrow_back') || stitchFindByIcon('chevron_left');
-        stitchBind(backBtn, 'open_driver_dashboard');
+        // Header
+        stitchBind(document.getElementById('earnings-back-btn'), 'open_driver_dashboard');
+        stitchBind(document.getElementById('earnings-help-btn'), 'show_help');
 
-        const helpBtn = stitchFindByIcon('help') || stitchFindByIcon('help_outline');
-        stitchBind(helpBtn, 'show_help');
+        // Payout
+        stitchBind(document.getElementById('earnings-payout-btn'), 'show_info', { message: 'Payout request submitted! Processing in 24-48 hours.' });
 
-        const payoutBtn = stitchFindByText('button', ['payout', 'request', 'demander']);
-        stitchBind(payoutBtn, 'show_info', { message: 'Payout request submitted! Processing in 24-48 hours.' });
+        // Period tabs — switch active highlight
+        const tabs = document.getElementById('earnings-period-tabs');
+        if (tabs && tabs.dataset.flutterBound !== '1') {
+          tabs.dataset.flutterBound = '1';
+          ['earnings-tab-today','earnings-tab-week','earnings-tab-month'].forEach(id => {
+            const tab = document.getElementById(id);
+            if (tab) {
+              tab.addEventListener('click', () => {
+                tabs.querySelectorAll('button').forEach(t => {
+                  t.classList.remove('bg-primary', 'text-white');
+                  t.classList.add('text-stone-500');
+                });
+                tab.classList.add('bg-primary', 'text-white');
+                tab.classList.remove('text-stone-500');
+              });
+            }
+          });
+        }
 
-        const viewAll = stitchFindByText('a,button', ['view all', 'voir tout']);
-        stitchBind(viewAll, 'show_info', { message: 'Full transaction history will be available soon.' });
+        // View all transactions
+        stitchBind(document.getElementById('earnings-view-all'), 'show_info', { message: 'Full transaction history will be available soon.' });
 
-        // Bottom nav: Home, Earnings, Scanner, Activity, Profile
-        stitchBindBottomNav({
-          'home|accueil': 'open_driver_dashboard',
-          'earning|revenu': 'noop',
-          'scanner|scan': 'show_coming_soon',
-          'activity|activit': 'open_active_job',
-          'profile|profil': 'open_driver_profile',
-        });
+        // Bottom nav
+        stitchBind(document.getElementById('earnings-nav-home'), 'open_driver_dashboard');
+        stitchBind(document.getElementById('earnings-nav-earnings'), 'noop');
+        stitchBind(document.getElementById('earnings-nav-docs'), 'open_driver_docs');
+        stitchBind(document.getElementById('earnings-nav-profile'), 'open_driver_profile');
       })();
     ''');
   }
 
   Future<void> _injectDriverProfileBindings() async {
+    // Inject dynamic profile data
+    await _injectDriverProfileData();
+
     await _controller.runJavaScript(r'''
       (() => {
-        const editBtn = stitchFindByIcon('edit') || stitchFindByIcon('create');
-        stitchBind(editBtn, 'show_info', { message: 'Profile editing coming soon.' });
+        // Header
+        stitchBind(document.getElementById('profile-back-btn'), 'open_driver_dashboard');
+        stitchBind(document.getElementById('profile-edit-btn'), 'show_info', { message: 'Profile editing coming soon.' });
 
-        const cameraBtn = stitchFindByIcon('camera_alt') || stitchFindByIcon('photo_camera');
-        stitchBind(cameraBtn, 'show_coming_soon');
+        // Camera avatar
+        stitchBind(document.getElementById('profile-camera-btn'), 'show_coming_soon');
 
-        const allClickables = document.querySelectorAll('[class*="cursor-pointer"]');
-        allClickables.forEach(row => {
-          if (row.closest('nav')) return;
-          const text = (row.textContent || '').toLowerCase();
-          if (text.includes('language') || text.includes('langue')) {
-            stitchBind(row, 'show_info', { message: 'Language settings: Change from app settings.' });
-          } else if (text.includes('help') || text.includes('aide') || text.includes('support')) {
-            stitchBind(row, 'show_help');
-          } else if (text.includes('about') || text.includes('propos')) {
-            stitchBind(row, 'show_info', { message: 'Nassib v1.0.2 — Motorcycle delivery, Tunisia.' });
-          } else if (text.includes('log out') || text.includes('connexion') || text.includes('logout')) {
-            stitchBind(row, 'logout');
-          } else if (text.includes('motorcycle') || text.includes('vehicle') || text.includes('moto')) {
-            stitchBind(row, 'open_motorcycle_select');
-          } else if (text.includes('training') || text.includes('formation')) {
-            stitchBind(row, 'open_driver_training');
-          } else if (text.includes('document') || text.includes('verification')) {
-            stitchBind(row, 'open_driver_docs');
-          } else if (text.includes('home') || text.includes('maison') || text.includes('work') || text.includes('travail')) {
-            stitchBind(row, 'show_info', { message: 'Saved places can be updated in delivery settings.' });
-          }
-        });
+        // Quick-access cards
+        stitchBind(document.getElementById('profile-vehicle-btn'), 'open_motorcycle_select');
+        stitchBind(document.getElementById('profile-documents-btn'), 'open_driver_docs');
+        stitchBind(document.getElementById('profile-training-btn'), 'open_driver_training');
 
-        // Bottom nav: Home, Trips, Wallet, Account
-        stitchBindBottomNav({
-          'home|accueil': 'open_driver_dashboard',
-          'trip|trajet': 'open_active_job',
-          'wallet|portefeuille': 'open_driver_earnings',
-          'account|compte': 'noop',
-        });
+        // Settings menu
+        stitchBind(document.getElementById('profile-language-btn'), 'show_info', { message: 'Language settings: Change from app settings.' });
+        stitchBind(document.getElementById('profile-help-btn'), 'show_help');
+        stitchBind(document.getElementById('profile-about-btn'), 'show_info', { message: 'Nassib v1.0.2 — Motorcycle delivery, Tunisia.' });
+        stitchBind(document.getElementById('profile-logout-btn'), 'logout');
+
+        // Bottom nav
+        stitchBind(document.getElementById('profile-nav-home'), 'open_driver_dashboard');
+        stitchBind(document.getElementById('profile-nav-wallet'), 'open_driver_earnings');
+        stitchBind(document.getElementById('profile-nav-docs'), 'open_driver_docs');
+        stitchBind(document.getElementById('profile-nav-profile'), 'noop');
       })();
     ''');
   }
@@ -1507,125 +1495,324 @@ class _StitchViewerState extends ConsumerState<StitchViewer> {
   // ═══════════════════════════════════════════════════════════════════
 
   Future<void> _injectAdminConsoleBindings() async {
+    // Inject dynamic admin dashboard data
+    await _injectAdminDashboardData();
+
     await _controller.runJavaScript(r'''
       (() => {
-        const menuBtn = stitchFindByIcon('menu');
-        stitchBind(menuBtn, 'show_info', { message: 'Admin Menu: Console, Catalog, Analytics, Settings.' });
+        // Header
+        stitchBind(document.getElementById('admin-menu-btn'), 'show_info', { message: 'Admin Menu: Console, Catalog, Analytics, Settings.' });
+        stitchBind(document.getElementById('admin-notif-btn'), 'show_info', { message: '3 pending driver verifications, 1 fraud alert.' });
 
-        const bellBtn = stitchFindByIcon('notifications') || stitchFindByIcon('notifications_none');
-        stitchBind(bellBtn, 'show_info', { message: '3 pending driver verifications, 1 fraud alert.' });
+        // Shortcuts
+        stitchBind(document.getElementById('admin-catalog-shortcut'), 'open_admin_catalog');
+        stitchBind(document.getElementById('admin-view-all-btn'), 'show_info', { message: 'Showing all pending driver verifications.' });
 
-        // Catalog shortcut
-        const chevrons = Array.from(document.querySelectorAll('button')).filter(el => {
-          const icon = el.querySelector('.material-symbols-outlined, .material-symbols-rounded');
-          return icon && (icon.textContent || '').trim() === 'chevron_right';
-        });
-        if (chevrons.length > 0) stitchBind(chevrons[0], 'open_admin_catalog');
-
-        // Analytics — link from stats cards or second chevron
-        const statsCards = document.querySelectorAll('[class*="cursor-pointer"]');
-        statsCards.forEach(card => {
-          if (card.closest('nav')) return;
-          const text = (card.textContent || '').toLowerCase();
-          if (text.includes('revenue') || text.includes('analytics') || text.includes('sales') || text.includes('fraud')) {
-            stitchBind(card, 'open_admin_analytics');
-          }
-        });
-        if (chevrons.length > 1) stitchBind(chevrons[1], 'open_admin_analytics');
-
-        const viewAll = stitchFindByText('button,a', ['view all', 'voir tout']);
-        stitchBind(viewAll, 'show_info', { message: 'Showing all pending driver verifications.' });
-
-        // Details buttons
-        const detailsBtns = Array.from(document.querySelectorAll('button')).filter(
-          el => (el.textContent || '').toLowerCase().trim() === 'details'
-        );
-        detailsBtns.forEach(btn => {
+        // Driver verification — Details and Review buttons (dynamically injected)
+        document.querySelectorAll('[data-driver-action="details"]').forEach(btn => {
           stitchBind(btn, 'show_info', { message: 'Driver details: National ID, License, Insurance, Vehicle — all documents on file.' });
         });
-
-        // Review buttons
-        const reviewBtns = Array.from(document.querySelectorAll('button')).filter(
-          el => (el.textContent || '').toLowerCase().trim() === 'review'
-        );
-        reviewBtns.forEach(btn => {
-          stitchBind(btn, 'admin_verify_driver');
+        document.querySelectorAll('[data-driver-action="review"]').forEach(btn => {
+          if (btn.dataset.flutterBound !== '1') {
+            btn.dataset.flutterBound = '1';
+            btn.addEventListener('click', () => {
+              const driverId = btn.closest('[data-driver-id]')?.dataset.driverId || '';
+              window.StitchBridge.postMessage(JSON.stringify({
+                action: 'admin_verify_driver',
+                payload: { driverId }
+              }));
+            });
+          }
         });
-
-        const continueBtn = stitchFindByText('button', ['continue', 'continuer']);
-        stitchBind(continueBtn, 'show_info', { message: 'Continuing verification review for this driver.' });
       })();
     ''');
   }
 
   Future<void> _injectAdminCatalogBindings() async {
+    // Inject dynamic catalog data
+    await _injectAdminCatalogData();
+
     await _controller.runJavaScript(r'''
       (() => {
-        const backBtn = stitchFindByIcon('arrow_back') || stitchFindByIcon('chevron_left');
-        stitchBind(backBtn, 'open_admin_console');
+        // Header
+        stitchBind(document.getElementById('catalog-back-btn'), 'open_admin_console');
+        stitchBind(document.getElementById('catalog-more-btn'), 'show_info', { message: 'Catalog options: Import CSV, Export, Bulk edit.' });
 
-        const moreBtn = stitchFindByIcon('more_vert');
-        stitchBind(moreBtn, 'show_info', { message: 'Catalog options: Import CSV, Export, Bulk edit.' });
+        // Search input
+        const searchInput = document.getElementById('catalog-search-input');
+        if (searchInput && searchInput.dataset.flutterBound !== '1') {
+          searchInput.dataset.flutterBound = '1';
+          searchInput.addEventListener('input', () => {
+            const query = searchInput.value.toLowerCase();
+            document.querySelectorAll('[data-catalog-product]').forEach(card => {
+              const name = (card.dataset.catalogProduct || '').toLowerCase();
+              card.style.display = name.includes(query) ? '' : 'none';
+            });
+          });
+        }
 
-        // Edit buttons on products
-        const editBtns = Array.from(document.querySelectorAll('button')).filter(el => {
-          const icon = el.querySelector('.material-symbols-outlined, .material-symbols-rounded');
-          return icon && (icon.textContent || '').trim() === 'edit';
-        });
-        editBtns.forEach(btn => {
-          stitchBind(btn, 'show_info', { message: 'Product editor: Update name, price, stock, category, and images.' });
-        });
+        // Filter chips
+        const filtersContainer = document.getElementById('catalog-filters');
+        if (filtersContainer && filtersContainer.dataset.flutterBound !== '1') {
+          filtersContainer.dataset.flutterBound = '1';
+          filtersContainer.querySelectorAll('button, span').forEach(chip => {
+            chip.style.cursor = 'pointer';
+            chip.addEventListener('click', () => {
+              filtersContainer.querySelectorAll('button, span').forEach(c => {
+                c.classList.remove('bg-primary', 'text-white');
+                c.classList.add('bg-stone-100', 'text-stone-600');
+              });
+              chip.classList.add('bg-primary', 'text-white');
+              chip.classList.remove('bg-stone-100', 'text-stone-600');
+            });
+          });
+        }
 
-        // FAB — add new product
-        const allBtns = Array.from(document.querySelectorAll('button'));
-        const fab = allBtns.find(el => {
-          const icon = el.querySelector('.material-symbols-outlined, .material-symbols-rounded');
-          return icon && (icon.textContent || '').trim() === 'add' && !el.closest('nav');
-        });
-        stitchBind(fab, 'show_info', { message: 'New product form: Name, SKU, Price, Category, Image upload.' });
+        // FAB add product
+        stitchBind(document.getElementById('catalog-add-btn'), 'admin_add_product');
 
-        // Bottom nav: Dashboard, Catalog, Orders, Settings
-        stitchBindBottomNav({
-          'dashboard|tableau': 'open_admin_console',
-          'catalog|catalogue': 'noop',
-          'order|commande': 'show_info',
-          'setting|param': 'show_info',
-        });
+        // Bottom nav
+        stitchBind(document.getElementById('catalog-nav-dashboard'), 'open_admin_console');
+        stitchBind(document.getElementById('catalog-nav-catalog'), 'noop');
+        stitchBind(document.getElementById('catalog-nav-orders'), 'show_info', { message: 'Orders management coming soon.' });
+        stitchBind(document.getElementById('catalog-nav-settings'), 'show_info', { message: 'Settings coming soon.' });
       })();
     ''');
   }
 
   Future<void> _injectAdminAnalyticsBindings() async {
+    // Inject dynamic analytics data
+    await _injectAdminAnalyticsData();
+
     await _controller.runJavaScript(r'''
       (() => {
-        const backBtn = stitchFindByIcon('arrow_back') || stitchFindByIcon('chevron_left');
-        stitchBind(backBtn, 'open_admin_console');
+        // Header
+        stitchBind(document.getElementById('analytics-back-btn'), 'open_admin_console');
+        stitchBind(document.getElementById('analytics-notif-btn'), 'show_info', { message: '2 fraud alerts require attention.' });
 
-        const bellBtn = stitchFindByIcon('notifications') || stitchFindByIcon('notifications_none');
-        stitchBind(bellBtn, 'show_info', { message: '2 fraud alerts require attention.' });
+        // Action buttons
+        stitchBind(document.getElementById('analytics-view-report'), 'show_info', { message: 'Sales report: +12% this week. Top sellers: Harissa, Dates, Olive Oil.' });
+        stitchBind(document.getElementById('analytics-view-all-drivers'), 'show_info', { message: 'All active drivers list with real-time locations.' });
 
-        const viewReportBtn = stitchFindByText('button,a', ['view report', 'voir rapport']);
-        stitchBind(viewReportBtn, 'show_info', { message: 'Sales report: +12% this week. Top sellers: Harissa, Dates, Olive Oil.' });
+        // Bottom nav
+        stitchBind(document.getElementById('analytics-nav-dashboard'), 'open_admin_console');
+        stitchBind(document.getElementById('analytics-nav-drivers'), 'show_info', { message: 'Driver management coming soon.' });
+        stitchBind(document.getElementById('analytics-nav-orders'), 'show_info', { message: 'Orders management coming soon.' });
+        stitchBind(document.getElementById('analytics-nav-settings'), 'show_info', { message: 'Settings coming soon.' });
+      })();
+    ''');
+  }
 
-        // Alert chevrons
-        const chevrons = Array.from(document.querySelectorAll('button')).filter(el => {
-          const icon = el.querySelector('.material-symbols-outlined, .material-symbols-rounded');
-          return icon && (icon.textContent || '').trim() === 'chevron_right';
-        });
-        chevrons.forEach(btn => {
-          stitchBind(btn, 'show_info', { message: 'Alert details: Unusual order pattern detected. Review recommended.' });
-        });
+  // ═══════════════════════════════════════════════════════════════════
+  // DRIVER DYNAMIC DATA INJECTION
+  // ═══════════════════════════════════════════════════════════════════
 
-        const viewAll = stitchFindByText('a,button', ['view all', 'voir tout']);
-        stitchBind(viewAll, 'show_info', { message: 'All active drivers list with real-time locations.' });
+  /// Injects real-time stats into the driver dashboard.
+  Future<void> _injectDriverDashboardData() async {
+    final driverState = ref.read(driverAvailabilityProvider);
+    final isOnline = driverState.isAvailable;
 
-        // Bottom nav: Dashboard, Drivers, Orders, Settings
-        stitchBindBottomNav({
-          'dashboard|tableau': 'open_admin_console',
-          'driver|chauffeur': 'show_info',
-          'order|commande': 'show_info',
-          'setting|param': 'show_info',
-        });
+    await _controller.runJavaScript('''
+      (() => {
+        const set = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val; };
+
+        // Toggle state
+        const toggle = document.getElementById('driver-online-toggle');
+        if (toggle) toggle.checked = $isOnline;
+
+        // Stats — will be replaced with real API data when available
+        set('driver-today-earnings', '${isOnline ? '245.50' : '0.00'} TND');
+        set('driver-jobs-count', '${isOnline ? '7' : '0'}');
+
+        // Show/hide incoming delivery section
+        const incoming = document.getElementById('driver-incoming-section');
+        if (incoming) incoming.style.display = $isOnline ? '' : 'none';
+      })();
+    ''');
+  }
+
+  /// Injects active delivery details into the job view.
+  Future<void> _injectActiveJobData() async {
+    try {
+      final service = DeliveryService();
+      final active = await service.getActiveDriverDeliveries();
+      if (active.isEmpty) return;
+      final delivery = active.first;
+
+      final orderId = delivery.id.length > 8
+          ? delivery.id.substring(delivery.id.length - 8).toUpperCase()
+          : delivery.id.toUpperCase();
+      final escapedPickup =
+          delivery.pickupLocation.replaceAll("'", "\\'");
+      final escapedDropoff =
+          delivery.deliveryAddress.replaceAll("'", "\\'");
+      final amount = delivery.estimatedCost?.toStringAsFixed(2) ?? '0.00';
+      final status = delivery.status.name;
+
+      await _controller.runJavaScript('''
+        (() => {
+          const set = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val; };
+          set('job-order-number', '#$orderId');
+          set('job-status', '$status');
+          set('job-amount', '$amount TND');
+          set('job-pickup-address', '$escapedPickup');
+          set('job-dropoff-address', '$escapedDropoff');
+        })();
+      ''');
+    } catch (_) {
+      // Use default placeholder data from HTML
+    }
+  }
+
+  /// Injects driver profile data into the profile screen.
+  Future<void> _injectDriverProfileData() async {
+    final authState = ref.read(authStateProvider);
+    final user = authState.user;
+    if (user == null) return;
+
+    final escapedName = user.name.replaceAll("'", "\\'");
+    final escapedEmail = user.email.replaceAll("'", "\\'");
+
+    await _controller.runJavaScript('''
+      (() => {
+        const set = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val; };
+        set('profile-name', '$escapedName');
+        set('profile-email', '$escapedEmail');
+      })();
+    ''');
+  }
+
+  // ═══════════════════════════════════════════════════════════════════
+  // ADMIN DYNAMIC DATA INJECTION
+  // ═══════════════════════════════════════════════════════════════════
+
+  /// Injects admin dashboard stats and pending driver list.
+  Future<void> _injectAdminDashboardData() async {
+    final adminState = ref.read(adminStateProvider);
+    final stats = adminState.stats;
+    final drivers = adminState.pendingDrivers;
+
+    await _controller.runJavaScript('''
+      (() => {
+        const set = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val; };
+        set('admin-daily-orders', '${stats.dailyOrders}');
+        set('admin-active-drivers', '${stats.activeDrivers}');
+        set('admin-pending-count', '${stats.pendingVerifications}');
+      })();
+    ''');
+
+    // Inject pending driver verification cards if container exists
+    if (drivers.isNotEmpty) {
+      final driversHtml = StringBuffer();
+      for (final d in drivers) {
+        final escapedName = d.name.replaceAll("'", "\\'");
+        driversHtml.write('''
+<div data-driver-id="${d.id}" class="flex items-center gap-3 p-3 rounded-xl bg-stone-50 dark:bg-stone-800 border border-stone-100 dark:border-stone-700">
+  <div class="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold text-sm">${escapedName.isNotEmpty ? escapedName[0] : 'D'}</div>
+  <div class="flex-1 min-w-0">
+    <p class="text-sm font-bold text-slate-900 dark:text-white truncate">$escapedName</p>
+    <p class="text-xs text-stone-400">${d.vehicleModel} • ${d.submittedAgo}</p>
+  </div>
+  <div class="flex gap-2">
+    <button data-driver-action="details" class="text-xs px-3 py-1.5 rounded-lg bg-stone-200 dark:bg-stone-700 text-stone-700 dark:text-stone-300">Details</button>
+    <button data-driver-action="review" class="text-xs px-3 py-1.5 rounded-lg bg-primary text-white">Review</button>
+  </div>
+</div>
+''');
+      }
+
+      final escapedDrivers = driversHtml
+          .toString()
+          .replaceAll('\\', '\\\\')
+          .replaceAll('`', '\\`');
+
+      await _controller.runJavaScript('''
+        (() => {
+          // Find the pending section container — look for the element after admin-pending-count
+          const pendingEl = document.getElementById('admin-pending-count');
+          if (pendingEl) {
+            // Walk up to the section container and find a list-like container
+            const section = pendingEl.closest('section') || pendingEl.closest('[class*="space-y"]')?.parentElement;
+            const listContainer = section?.querySelector('[class*="space-y"]:last-child') || section?.querySelector('[class*="flex-col"]:last-child');
+            if (listContainer && !listContainer.querySelector('[data-driver-id]')) {
+              listContainer.innerHTML = `$escapedDrivers`;
+            }
+          }
+        })();
+      ''');
+    }
+  }
+
+  /// Injects admin catalog product list.
+  Future<void> _injectAdminCatalogData() async {
+    final adminState = ref.read(adminStateProvider);
+    final products = adminState.catalogProducts;
+
+    if (products.isEmpty) return;
+
+    final productsHtml = StringBuffer();
+    for (final p in products) {
+      final escapedName = p.name.replaceAll("'", "\\'");
+      final stockColor = p.stockStatus == 'In Stock'
+          ? 'text-green-600'
+          : p.stockStatus == 'Low Stock'
+              ? 'text-amber-500'
+              : 'text-red-500';
+      productsHtml.write('''
+<div data-catalog-product="$escapedName" class="flex items-center gap-3 p-3 rounded-xl bg-white dark:bg-stone-800 border border-stone-100 dark:border-stone-700">
+  <img src="${p.imageUrl}" alt="$escapedName" class="h-12 w-12 rounded-lg object-cover" />
+  <div class="flex-1 min-w-0">
+    <p class="text-sm font-bold text-slate-900 dark:text-white truncate">$escapedName</p>
+    <p class="text-xs text-stone-400">${p.category} • ${p.unit}</p>
+    <p class="text-xs $stockColor font-medium">${p.stockStatus} (${p.stock})</p>
+  </div>
+  <div class="text-right">
+    <p class="text-sm font-bold text-primary">${p.price.toStringAsFixed(3)} DT</p>
+    <button data-edit-product="${p.id}" class="text-xs text-stone-400 hover:text-primary mt-1">
+      <span class="material-symbols-outlined text-[16px]">edit</span>
+    </button>
+  </div>
+</div>
+''');
+    }
+
+    final escapedProducts = productsHtml
+        .toString()
+        .replaceAll('\\', '\\\\')
+        .replaceAll('`', '\\`');
+
+    await _controller.runJavaScript('''
+      (() => {
+        const container = document.getElementById('catalog-products-list');
+        if (container) {
+          container.innerHTML = `$escapedProducts`;
+
+          // Bind edit buttons
+          container.querySelectorAll('[data-edit-product]').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+              e.stopPropagation();
+              window.StitchBridge.postMessage(JSON.stringify({
+                action: 'admin_edit_product',
+                payload: { productId: btn.dataset.editProduct }
+              }));
+            });
+          });
+        }
+      })();
+    ''');
+  }
+
+  /// Injects admin analytics stats.
+  Future<void> _injectAdminAnalyticsData() async {
+    final adminState = ref.read(adminStateProvider);
+    final stats = adminState.stats;
+
+    await _controller.runJavaScript('''
+      (() => {
+        const set = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val; };
+        set('analytics-revenue', '${stats.totalRevenue.toStringAsFixed(0)} TND');
+        set('analytics-fraud-count', '${stats.fraudAlerts}');
+        set('analytics-efficiency', '${stats.deliveryEfficiency}%');
       })();
     ''');
   }
@@ -1808,8 +1995,31 @@ class _StitchViewerState extends ConsumerState<StitchViewer> {
 
       // ── Admin Actions ──
       case 'admin_verify_driver':
+        final verifyId = payload['driverId']?.toString() ?? '';
+        if (verifyId.isNotEmpty) {
+          ref.read(adminStateProvider.notifier).verifyDriver(verifyId);
+        }
         _showMessage(
             '✅ Driver verified and approved! They can now accept deliveries.');
+      case 'admin_reject_driver':
+        final rejectId = payload['driverId']?.toString() ?? '';
+        if (rejectId.isNotEmpty) {
+          ref.read(adminStateProvider.notifier).rejectDriver(rejectId);
+        }
+        _showMessage('❌ Driver application rejected.');
+      case 'admin_add_product':
+        _showMessage(
+            '📦 New product form: Name, SKU, Price, Category, Image upload.');
+      case 'admin_edit_product':
+        final editProdId = payload['productId']?.toString() ?? '';
+        _showMessage(
+            'Product editor: Update name, price, stock, category, and images. (ID: $editProdId)');
+      case 'admin_delete_product':
+        final deleteProdId = payload['productId']?.toString() ?? '';
+        if (deleteProdId.isNotEmpty) {
+          ref.read(adminStateProvider.notifier).deleteProduct(deleteProdId);
+          _showMessage('🗑️ Product removed from catalog.');
+        }
 
       // ── Biometric/OTP ──
       case 'biometric_verify_otp':
