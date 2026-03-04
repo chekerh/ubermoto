@@ -49,11 +49,11 @@
 <!-- Top Navigation / Header -->
 <header class="sticky top-0 z-20 bg-background-light dark:bg-background-dark/95 backdrop-blur-sm border-b border-slate-200 dark:border-slate-800 pt-10 pb-4 px-4">
 <div class="flex items-center justify-between mb-4">
-<button class="flex items-center justify-center w-10 h-10 rounded-full hover:bg-slate-200 dark:hover:bg-slate-800 text-slate-500 dark:text-slate-400 transition-colors">
+<button id="catalog-back-btn" class="flex items-center justify-center w-10 h-10 rounded-full hover:bg-slate-200 dark:hover:bg-slate-800 text-slate-500 dark:text-slate-400 transition-colors">
 <span class="material-symbols-outlined">arrow_back</span>
 </button>
 <h1 class="text-lg font-bold text-center flex-1">Catalog Management</h1>
-<button class="flex items-center justify-center w-10 h-10 rounded-full hover:bg-slate-200 dark:hover:bg-slate-800 text-slate-500 dark:text-slate-400 transition-colors">
+<button id="catalog-more-btn" class="flex items-center justify-center w-10 h-10 rounded-full hover:bg-slate-200 dark:hover:bg-slate-800 text-slate-500 dark:text-slate-400 transition-colors">
 <span class="material-symbols-outlined">more_vert</span>
 </button>
 </div>
@@ -62,10 +62,10 @@
 <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
 <span class="material-symbols-outlined text-slate-400">search</span>
 </div>
-<input class="block w-full pl-10 pr-3 py-3 border-none rounded-xl bg-surface-light dark:bg-surface-dark text-slate-900 dark:text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-primary shadow-sm" placeholder="Search products, SKUs..." type="text" value=""/>
+<input id="catalog-search-input" class="block w-full pl-10 pr-3 py-3 border-none rounded-xl bg-surface-light dark:bg-surface-dark text-slate-900 dark:text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-primary shadow-sm" placeholder="Search products, SKUs..." type="text" value=""/>
 </div>
 <!-- Filter Chips -->
-<div class="flex gap-3 mt-4 overflow-x-auto hide-scrollbar pb-1">
+<div id="catalog-filters" class="flex gap-3 mt-4 overflow-x-auto hide-scrollbar pb-1">
 <button class="flex-shrink-0 px-4 py-2 rounded-full bg-primary text-white text-sm font-medium shadow-md shadow-primary/20">
                 All
             </button>
@@ -84,7 +84,7 @@
 </div>
 </header>
 <!-- Main Content: Product List -->
-<main class="flex-1 overflow-y-auto px-4 py-2 pb-24 space-y-4">
+<main id="catalog-products-list" class="flex-1 overflow-y-auto px-4 py-2 pb-24 space-y-4">
 <!-- Product Item 1 -->
 <div class="group relative flex items-center gap-4 p-3 rounded-2xl bg-surface-light dark:bg-surface-dark border border-slate-200 dark:border-slate-800 shadow-sm transition-transform active:scale-[0.99]">
 <div class="relative h-20 w-20 shrink-0 overflow-hidden rounded-xl bg-slate-100 dark:bg-slate-800">
@@ -204,27 +204,27 @@
 </main>
 <!-- Floating Action Button -->
 <div class="fixed bottom-24 right-4 z-30">
-<button class="flex items-center justify-center h-14 w-14 rounded-full bg-accent hover:bg-orange-600 text-white shadow-lg shadow-orange-500/30 transition-all active:scale-95">
+<button id="catalog-add-btn" class="flex items-center justify-center h-14 w-14 rounded-full bg-accent hover:bg-orange-600 text-white shadow-lg shadow-orange-500/30 transition-all active:scale-95">
 <span class="material-symbols-outlined text-[28px]">add</span>
 </button>
 </div>
 <!-- Bottom Navigation -->
 <nav class="fixed bottom-0 w-full z-40 border-t border-slate-200 dark:border-slate-800 bg-background-light dark:bg-background-dark pb-6 pt-3 px-6 safe-area-bottom">
 <div class="flex justify-between items-end">
-<a class="flex flex-col items-center gap-1 text-slate-400 dark:text-slate-500 hover:text-primary transition-colors group" href="#">
+<a id="catalog-nav-dashboard" class="flex flex-col items-center gap-1 text-slate-400 dark:text-slate-500 hover:text-primary transition-colors group" href="#">
 <span class="material-symbols-outlined group-hover:scale-110 transition-transform">dashboard</span>
 <span class="text-[10px] font-medium">Dashboard</span>
 </a>
-<a class="flex flex-col items-center gap-1 text-primary hover:text-primary transition-colors group relative" href="#">
+<a id="catalog-nav-catalog" class="flex flex-col items-center gap-1 text-primary hover:text-primary transition-colors group relative" href="#">
 <div class="absolute -top-3 w-8 h-1 bg-primary rounded-full shadow-[0_0_10px_2px_rgba(17,82,212,0.5)]"></div>
 <span class="material-symbols-outlined group-hover:scale-110 transition-transform filled">sell</span>
 <span class="text-[10px] font-medium">Catalog</span>
 </a>
-<a class="flex flex-col items-center gap-1 text-slate-400 dark:text-slate-500 hover:text-primary transition-colors group" href="#">
+<a id="catalog-nav-orders" class="flex flex-col items-center gap-1 text-slate-400 dark:text-slate-500 hover:text-primary transition-colors group" href="#">
 <span class="material-symbols-outlined group-hover:scale-110 transition-transform">package_2</span>
 <span class="text-[10px] font-medium">Orders</span>
 </a>
-<a class="flex flex-col items-center gap-1 text-slate-400 dark:text-slate-500 hover:text-primary transition-colors group" href="#">
+<a id="catalog-nav-settings" class="flex flex-col items-center gap-1 text-slate-400 dark:text-slate-500 hover:text-primary transition-colors group" href="#">
 <span class="material-symbols-outlined group-hover:scale-110 transition-transform">settings</span>
 <span class="text-[10px] font-medium">Settings</span>
 </a>

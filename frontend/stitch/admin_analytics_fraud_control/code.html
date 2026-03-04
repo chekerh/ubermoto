@@ -52,13 +52,13 @@
 <!-- Header -->
 <header class="sticky top-0 z-10 flex items-center justify-between bg-background-dark/95 backdrop-blur-md px-4 py-4 border-b border-border-dark">
 <div class="flex items-center gap-3">
-<button class="text-slate-400 hover:text-white transition-colors">
+<button id="analytics-back-btn" class="text-slate-400 hover:text-white transition-colors">
 <span class="material-symbols-outlined">arrow_back</span>
 </button>
 <h1 class="text-lg font-bold text-white tracking-tight">Analytics &amp; Fraud</h1>
 </div>
 <div class="flex items-center gap-3">
-<button class="relative text-slate-400 hover:text-white transition-colors">
+<button id="analytics-notif-btn" class="relative text-slate-400 hover:text-white transition-colors">
 <span class="material-symbols-outlined">notifications</span>
 <span class="absolute top-0 right-0 h-2 w-2 rounded-full bg-secondary"></span>
 </button>
@@ -84,7 +84,7 @@
 </div>
 <div class="z-10 mt-2">
 <p class="text-slate-400 text-xs font-medium">Total Revenue</p>
-<p class="text-white text-xl font-bold mt-0.5">3,450 <span class="text-sm text-slate-400 font-normal">TND</span></p>
+<p id="analytics-revenue" class="text-white text-xl font-bold mt-0.5">3,450 <span class="text-sm text-slate-400 font-normal">TND</span></p>
 </div>
 </div>
 <!-- Fraud Alert Card (Highlight) -->
@@ -100,7 +100,7 @@
 </div>
 <div class="z-10 mt-2">
 <p class="text-slate-400 text-xs font-medium">Fraud Alerts</p>
-<p class="text-white text-xl font-bold mt-0.5">5 <span class="text-sm text-slate-400 font-normal">Flags</span></p>
+<p id="analytics-fraud-count" class="text-white text-xl font-bold mt-0.5">5 <span class="text-sm text-slate-400 font-normal">Flags</span></p>
 </div>
 </div>
 </section>
@@ -114,7 +114,7 @@
 <span class="text-xs text-slate-400">Last 7 Days</span>
 </div>
 </div>
-<button class="text-primary text-xs font-medium bg-primary/10 px-3 py-1.5 rounded-full hover:bg-primary/20 transition-colors">
+<button id="analytics-view-report" class="text-primary text-xs font-medium bg-primary/10 px-3 py-1.5 rounded-full hover:bg-primary/20 transition-colors">
                     View Report
                 </button>
 </div>
@@ -195,7 +195,7 @@
 <h3 class="text-white text-sm font-semibold">Delivery Efficiency</h3>
 <div class="flex items-center gap-2 mt-1">
 <span class="material-symbols-outlined text-emerald-400 text-[18px]">check_circle</span>
-<span class="text-2xl font-bold text-white tracking-tight">94%</span>
+<span id="analytics-efficiency" class="text-2xl font-bold text-white tracking-tight">94%</span>
 <span class="text-sm text-slate-400">On Time</span>
 </div>
 </div>
@@ -234,7 +234,7 @@
 <section>
 <div class="flex items-center justify-between mb-3 px-1">
 <h3 class="text-white font-semibold text-base">Recent Active Drivers</h3>
-<a class="text-xs text-primary hover:text-blue-400 font-medium" href="#">View All</a>
+<a id="analytics-view-all-drivers" class="text-xs text-primary hover:text-blue-400 font-medium" href="#">View All</a>
 </div>
 <div class="bg-surface-dark border border-border-dark rounded-xl overflow-hidden divide-y divide-border-dark">
 <!-- Driver 1 -->
@@ -275,25 +275,25 @@
 <!-- Bottom Navigation -->
 <nav class="fixed bottom-0 w-full bg-background-dark border-t border-border-dark px-6 pb-6 pt-3 z-50">
 <div class="flex justify-between items-center max-w-md mx-auto">
-<a class="flex flex-col items-center gap-1 text-primary group" href="#">
+<a id="analytics-nav-dashboard" class="flex flex-col items-center gap-1 text-primary group" href="#">
 <div class="p-1 rounded-full group-hover:bg-primary/10 transition-colors">
 <span class="material-symbols-outlined fill text-[24px]">dashboard</span>
 </div>
 <span class="text-[10px] font-medium">Dashboard</span>
 </a>
-<a class="flex flex-col items-center gap-1 text-slate-400 hover:text-white transition-colors group" href="#">
+<a id="analytics-nav-drivers" class="flex flex-col items-center gap-1 text-slate-400 hover:text-white transition-colors group" href="#">
 <div class="p-1 rounded-full group-hover:bg-white/5 transition-colors">
 <span class="material-symbols-outlined text-[24px]">two_wheeler</span>
 </div>
 <span class="text-[10px] font-medium">Drivers</span>
 </a>
-<a class="flex flex-col items-center gap-1 text-slate-400 hover:text-white transition-colors group" href="#">
+<a id="analytics-nav-orders" class="flex flex-col items-center gap-1 text-slate-400 hover:text-white transition-colors group" href="#">
 <div class="p-1 rounded-full group-hover:bg-white/5 transition-colors">
 <span class="material-symbols-outlined text-[24px]">receipt_long</span>
 </div>
 <span class="text-[10px] font-medium">Orders</span>
 </a>
-<a class="flex flex-col items-center gap-1 text-slate-400 hover:text-white transition-colors group" href="#">
+<a id="analytics-nav-settings" class="flex flex-col items-center gap-1 text-slate-400 hover:text-white transition-colors group" href="#">
 <div class="p-1 rounded-full group-hover:bg-white/5 transition-colors">
 <span class="material-symbols-outlined text-[24px]">settings</span>
 </div>
