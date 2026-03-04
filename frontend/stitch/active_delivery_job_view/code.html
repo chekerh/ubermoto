@@ -158,7 +158,13 @@
 </div>
 </div>
 <!-- Slide to Complete Action -->
-<div class="px-6 mt-6">
+<div class="px-6 mt-6 space-y-3">
+<!-- Start Delivery / Picked Up Button (visible before pickup) -->
+<button id="job-start-delivery-btn" class="w-full h-14 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-full flex items-center justify-center gap-2 shadow-lg shadow-blue-500/30 active:scale-[0.98] transition-all">
+<span class="material-symbols-outlined text-xl">inventory_2</span>
+<span data-i18n="Picked Up - Start Delivery">Picked Up - Start Delivery</span>
+</button>
+<!-- Slide to Complete (visible after pickup) -->
 <div id="job-complete-btn" class="relative h-14 bg-gray-100 dark:bg-gray-800 rounded-full overflow-hidden flex items-center p-1 cursor-pointer group">
 <div class="absolute inset-0 flex items-center justify-center pointer-events-none">
 <span class="text-sm font-bold text-gray-400 dark:text-gray-500 tracking-wide uppercase group-hover:opacity-50 transition-opacity">Slide to Complete</span>
@@ -169,6 +175,11 @@
 <span class="material-symbols-outlined">check</span>
 </div>
 </div>
+<!-- Emergency SOS Button -->
+<button id="job-sos-btn" class="w-full h-12 border-2 border-red-500 text-red-600 font-bold rounded-full flex items-center justify-center gap-2 hover:bg-red-50 dark:hover:bg-red-900/20 active:scale-[0.98] transition-all">
+<span class="material-symbols-outlined text-xl">emergency</span>
+<span data-i18n="Emergency SOS">Emergency SOS</span>
+</button>
 </div>
 </div>
 <!-- Bottom Navigation Bar -->

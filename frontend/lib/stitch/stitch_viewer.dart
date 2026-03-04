@@ -708,7 +708,18 @@ class _StitchViewerState extends ConsumerState<StitchViewer> {
     await _controller.runJavaScript(r'''
       (() => {
         const getStarted = document.getElementById('splash-get-started');
-        stitchBind(getStarted, 'open_login');
+        if (getStarted) {
+          getStarted.addEventListener('click', (e) => {
+            e.preventDefault();
+            // Read selected language before navigating
+            const selected = document.querySelector('input[name="language_select"]:checked');
+            const lang = selected ? selected.value : 'en';
+            window.StitchBridge.postMessage(JSON.stringify({
+              action: 'save_language_and_login',
+              payload: { language: lang }
+            }));
+          });
+        }
       })();
     ''');
   }
@@ -1302,6 +1313,12 @@ class _StitchViewerState extends ConsumerState<StitchViewer> {
         // Complete delivery
         stitchBind(document.getElementById('job-complete-btn'), 'driver_complete_delivery');
 
+        // Start delivery / Picked up
+        stitchBind(document.getElementById('job-start-delivery-btn'), 'driver_start_delivery');
+
+        // Emergency SOS
+        stitchBind(document.getElementById('job-sos-btn'), 'open_driver_sos');
+
         // Bottom nav
         stitchBind(document.getElementById('job-nav-delivery'), 'noop');
         stitchBind(document.getElementById('job-nav-earnings'), 'open_driver_earnings');
@@ -1562,22 +1579,38 @@ class _StitchViewerState extends ConsumerState<StitchViewer> {
         stitchBind(document.getElementById('admin-catalog-shortcut'), 'open_admin_catalog');
         stitchBind(document.getElementById('admin-view-all-btn'), 'show_info', { message: 'Showing all pending driver verifications.' });
 
-        // Driver verification — Details and Review buttons (dynamically injected)
-        document.querySelectorAll('[data-driver-action="details"]').forEach(btn => {
-          stitchBind(btn, 'show_info', { message: 'Driver details: National ID, License, Insurance, Vehicle — all documents on file.' });
-        });
-        document.querySelectorAll('[data-driver-action="review"]').forEach(btn => {
-          if (btn.dataset.flutterBound !== '1') {
-            btn.dataset.flutterBound = '1';
-            btn.addEventListener('click', () => {
-              const driverId = btn.closest('[data-driver-id]')?.dataset.driverId || '';
+        // Driver verification — static buttons with IDs
+        ['1','2','3'].forEach(n => {
+          stitchBind(document.getElementById('admin-driver'+n+'-details'), 'show_info', {
+            message: 'Driver details: National ID, License, Insurance, Vehicle — all documents on file.'
+          });
+          const approveBtn = document.getElementById('admin-driver'+n+'-approve');
+          if (approveBtn && approveBtn.dataset.flutterBound !== '1') {
+            approveBtn.dataset.flutterBound = '1';
+            approveBtn.addEventListener('click', () => {
               window.StitchBridge.postMessage(JSON.stringify({
                 action: 'admin_verify_driver',
-                payload: { driverId }
+                payload: { driverId: 'driver-' + n }
+              }));
+            });
+          }
+          const rejectBtn = document.getElementById('admin-driver'+n+'-reject');
+          if (rejectBtn && rejectBtn.dataset.flutterBound !== '1') {
+            rejectBtn.dataset.flutterBound = '1';
+            rejectBtn.addEventListener('click', () => {
+              window.StitchBridge.postMessage(JSON.stringify({
+                action: 'admin_reject_driver',
+                payload: { driverId: 'driver-' + n }
               }));
             });
           }
         });
+
+        // Bottom nav
+        stitchBind(document.getElementById('admin-nav-dashboard'), 'noop');
+        stitchBind(document.getElementById('admin-nav-catalog'), 'open_admin_catalog');
+        stitchBind(document.getElementById('admin-nav-analytics'), 'open_admin_analytics');
+        stitchBind(document.getElementById('admin-nav-logout'), 'logout');
       })();
     ''');
   }
@@ -1807,18 +1840,26 @@ class _StitchViewerState extends ConsumerState<StitchViewer> {
     final productsHtml = StringBuffer();
     for (final p in products) {
       final escapedName = p.name.replaceAll("'", "\\'");
-      final stockColor = p.stockStatus == 'In Stock'
+      final stockColor = p.stockStatus == 'in_stock'
           ? 'text-green-600'
-          : p.stockStatus == 'Low Stock'
+          : p.stockStatus == 'low_stock'
               ? 'text-amber-500'
               : 'text-red-500';
+      final stockLabel = p.stockStatus == 'in_stock'
+          ? 'In Stock'
+          : p.stockStatus == 'low_stock'
+              ? 'Low Stock'
+              : 'Out of Stock';
+      final imgSrc = (p.imageUrl != null && p.imageUrl!.isNotEmpty)
+          ? p.imageUrl!
+          : 'https://placehold.co/48x48/f47b25/white?text=${Uri.encodeComponent(p.name.substring(0, 1))}';
       productsHtml.write('''
 <div data-catalog-product="$escapedName" class="flex items-center gap-3 p-3 rounded-xl bg-white dark:bg-stone-800 border border-stone-100 dark:border-stone-700">
-  <img src="${p.imageUrl}" alt="$escapedName" class="h-12 w-12 rounded-lg object-cover" />
+  <img src="$imgSrc" alt="$escapedName" class="h-12 w-12 rounded-lg object-cover" />
   <div class="flex-1 min-w-0">
     <p class="text-sm font-bold text-slate-900 dark:text-white truncate">$escapedName</p>
     <p class="text-xs text-stone-400">${p.category} • ${p.unit}</p>
-    <p class="text-xs $stockColor font-medium">${p.stockStatus} (${p.stock})</p>
+    <p class="text-xs $stockColor font-medium">$stockLabel (${p.stock})</p>
   </div>
   <div class="text-right">
     <p class="text-sm font-bold text-primary">${p.price.toStringAsFixed(3)} DT</p>
@@ -1918,6 +1959,12 @@ class _StitchViewerState extends ConsumerState<StitchViewer> {
       case 'open_register':
         _navigateTo('/register1');
       case 'open_login':
+        _navigateTo('/login1');
+
+      // ── Language + Login (from splash Get Started) ──
+      case 'save_language_and_login':
+        final lang = payload['language']?.toString() ?? 'en';
+        ref.read(languageProvider.notifier).setFromString(lang);
         _navigateTo('/login1');
 
       // ── Navigation: Splash ──
@@ -2033,6 +2080,13 @@ class _StitchViewerState extends ConsumerState<StitchViewer> {
         await _driverCompleteDelivery();
       case 'driver_decline_delivery':
         _showMessage('Delivery declined. Waiting for next request...');
+        // Hide the incoming request card
+        await _controller.runJavaScript('''
+          (() => {
+            const section = document.getElementById('driver-incoming-section');
+            if (section) section.style.display = 'none';
+          })();
+        ''');
       case 'driver_submit_docs':
         _showMessage(
             '📄 Documents submitted for review. Please wait for admin approval.');
@@ -2302,6 +2356,15 @@ class _StitchViewerState extends ConsumerState<StitchViewer> {
       await service.startDelivery(active.first.id);
       if (!mounted) return;
       _showMessage('🚀 Delivery started! Navigate to drop-off.');
+      // Hide start button, keep complete button visible
+      await _controller.runJavaScript('''
+        (() => {
+          const startBtn = document.getElementById('job-start-delivery-btn');
+          if (startBtn) startBtn.style.display = 'none';
+          const status = document.getElementById('job-status');
+          if (status) status.textContent = 'Dropping off';
+        })();
+      ''');
     } catch (e) {
       _showMessage('Failed to start delivery.');
     } finally {

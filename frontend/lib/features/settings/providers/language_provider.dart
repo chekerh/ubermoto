@@ -229,6 +229,16 @@ const Map<String, Map<String, String>> uiTranslations = {
     'ar': 'إنهاء الرحلة',
     'tn': 'كمّل الرحلة',
   },
+  'Picked Up - Start Delivery': {
+    'fr': 'Récupéré - Démarrer la livraison',
+    'ar': 'تم الاستلام - بدء التوصيل',
+    'tn': 'خذيتها - يلّا نوصّل',
+  },
+  'Emergency SOS': {
+    'fr': 'SOS Urgence',
+    'ar': 'طوارئ SOS',
+    'tn': 'طوارئ SOS',
+  },
   'Request Payout': {
     'fr': 'Demander un paiement',
     'ar': 'طلب دفعة',
@@ -394,18 +404,46 @@ const Map<String, Map<String, String>> uiTranslations = {
     'ar': 'الخريطة المباشرة',
     'tn': 'الخريطة المباشرة',
   },
+  'Analytics': {
+    'fr': 'Analytiques',
+    'ar': 'التحليلات',
+    'tn': 'التحليلات',
+  },
+  'Logout': {
+    'fr': 'Déconnexion',
+    'ar': 'تسجيل الخروج',
+    'tn': 'سكيبي',
+  },
+  'Approve': {
+    'fr': 'Approuver',
+    'ar': 'موافقة',
+    'tn': 'متأكّد',
+  },
+  'Reject': {
+    'fr': 'Rejeter',
+    'ar': 'رفض',
+    'tn': 'ارفض',
+  },
+  'In Stock': {
+    'fr': 'En stock',
+    'ar': 'متوفر',
+    'tn': 'موجود',
+  },
+  'Low Stock': {
+    'fr': 'Stock faible',
+    'ar': 'مخزون منخفض',
+    'tn': 'قليل',
+  },
+  'Out of Stock': {
+    'fr': 'Rupture de stock',
+    'ar': 'نفد المخزون',
+    'tn': 'ما فمّاش',
+  },
   'All': {'fr': 'Tout', 'ar': 'الكل', 'tn': 'الكل'},
   'Fresh Produce': {
     'fr': 'Produits frais',
     'ar': 'منتجات طازجة',
     'tn': 'خضرة فريش',
-  },
-  'In Stock': {'fr': 'En stock', 'ar': 'متوفر', 'tn': 'موجود'},
-  'Low Stock': {'fr': 'Stock faible', 'ar': 'مخزون منخفض', 'tn': 'قليل'},
-  'Out of Stock': {
-    'fr': 'Rupture de stock',
-    'ar': 'نفد المخزون',
-    'tn': 'ما فمّاش',
   },
 
   // ─── Status Messages ────────────────────────────────────────
