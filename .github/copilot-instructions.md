@@ -19,15 +19,18 @@ ubermoto/              # Root — docs, scripts, .gitignore only (NO backend cod
 ## Critical Architecture Patterns
 
 ### The Stitch Architecture (UNIQUE TO THIS PROJECT)
-- **Frontend UI = 30 HTML screens** in `frontend/stitch/**/code.html` loaded into Flutter WebView
+- **Frontend UI = 31 HTML screens** in `frontend/stitch/**/code.html` loaded into Flutter WebView
 - **JavaScript Bridge**: HTML uses `window.StitchBridge.postMessage(JSON.stringify({ action: 'navigate_home', payload: {...} }))` to communicate with Dart
 - **Dart Bridge Handler**: `stitch_viewer.dart` listens via `JavascriptChannel('StitchBridge')` and calls `_handleBridgeMessage()`
+- **Element Binding**: **ALL interactive elements MUST have IDs** — use `document.getElementById()` only (text/icon matching removed Mar 2026)
+- **Dynamic Data**: Injection methods (`_inject*Data()`) populate screens with real-time data from Riverpod providers
 - **Adding a new screen**:
-  1. Create `frontend/stitch/my_new_screen/code.html` with StitchBridge postMessage calls
+  1. Create `frontend/stitch/my_new_screen/code.html` with element IDs and StitchBridge postMessage calls
   2. Add route to `frontend/lib/main.dart` in `stitchScreens` map
-  3. Add injection method in `stitch_viewer.dart`: `_injectMyNewScreenBindings()`
+  3. Add injection method in `stitch_viewer.dart`: `_injectMyNewScreenBindings()` using `getElementById`
   4. Add case in `_installRouteBindings()` switch statement
   5. Add action handlers in `_handleBridgeMessage()` switch
+  6. Add dynamic data injection method if needed: `_injectMyNewScreenData()`
 
 ### Navigation Between Screens
 - **DO**: Use `window.StitchBridge.postMessage(JSON.stringify({ action: 'navigate_to_home' }))`
@@ -95,6 +98,14 @@ cd frontend && flutter test     # Frontend tests
 ./run-tests.sh                  # Both (89% backend, 87% frontend coverage)
 ```
 
+### Lint & Analysis
+```bash
+cd frontend && flutter analyze  # Static analysis (zero errors enforced)
+cd backend && npm run lint      # ESLint + Prettier
+```
+
+**Current Status**: ✅ Zero compilation errors, 15 warnings (unused imports only — safe to ignore)
+
 ## Common Tasks
 
 ### Add a New Stitch Screen
@@ -120,10 +131,16 @@ cd frontend && flutter test     # Frontend tests
 ## Project-Specific Conventions
 
 - **State Management**: Riverpod providers in `frontend/lib/features/{feature}/providers/`
+  - `product_provider.dart` — Customer catalog, cart, favorites
+  - `driver_provider.dart` — Driver profile, availability, deliveries
+  - `admin_provider.dart` — Dashboard stats, driver verification, catalog CRUD
+  - `auth_provider.dart` — JWT auth state, login/register
+  - `language_provider.dart` — 4-language support (EN/FR/AR/Derja)
 - **Error Handling**: Backend uses `AllExceptionsFilter`; frontend shows SnackBar via `_showSnackbar()`
 - **File Naming**: Backend = `kebab-case.ts`, Frontend Dart = `snake_case.dart`, Stitch = `code.html`
 - **API Responses**: Always `{ success: boolean, data?: any, message?: string }`
 - **Driver Actions**: Must check `isAvailable` state before accepting deliveries
+- **Security First**: All user input escaped, DTOs validated, JWT enforced, role-based access control
 
 ## Key Files to Reference
 
@@ -144,11 +161,130 @@ cd frontend && flutter test     # Frontend tests
 - ❌ Don't create backend files (`package.json`, `tsconfig.json`, `src/`, `nest-cli.json`) at the repo root — all backend code belongs in `backend/`
 - ❌ Don't create a duplicate `stitch/` folder at root — stitch HTML lives only in `frontend/stitch/`
 
+## State Management Providers
+
+### Customer State (`product_provider.dart`)
+- **Product** model (id, name, price, imageUrl, rating, tags, description)
+- **CartItem** model (product, quantity, subtotal)
+- **ProductCatalogState** with products, cart, selectedProduct, popularProducts, favorites
+- **ProductCatalogNotifier** methods: addToCart(), updateCartQuantity(), toggleFavorite(), clearCart()
+
+### Driver State (`driver_provider.dart`)
+- **driverProfileProvider** — FutureProvider<UserModel>
+- **driverAvailabilityProvider** — StateNotifier with toggleAvailability(), loadDriverProfile()
+- **availableDeliveriesProvider**, **activeDeliveriesProvider** — FutureProviders
+
+### Admin State (`admin_provider.dart`)
+- **PendingDriver** model (id, name, licenseNumber, vehicleModel, submittedAgo, status)
+- **AdminDashboardStats** model (dailyOrders, activeDrivers, pendingVerifications, totalRevenue, fraudAlerts, deliveryEfficiency)
+- **AdminCatalogProduct** model (id, name, unit, category, stock, stockStatus, price)
+- **AdminStateNotifier** methods: refreshDashboard(), verifyDriver(), rejectDriver(), addProduct(), updateProduct(), deleteProduct()
+
+## Element Binding Pattern (CRITICAL)
+
+**ALL stitch screens now use deterministic getElementById bindings:**
+
+```javascript
+// ✅ CORRECT: Use getElementById
+stitchBind(document.getElementById('login-btn'), 'submit_login');
+
+// ❌ WRONG: Don't use text/icon matching (removed March 2026)
+stitchBind(stitchFindByText('button', ['login']), 'submit_login');
+```
+
+**Every interactive element in HTML must have an ID:**
+- Customer screens: `home-*`, `product-*`, `cart-*`, `nav-*`
+- Driver screens: `driver-*`, `job-*`, `docs-*`, `earnings-*`, `profile-*`, `sos-*`, `training-*`, `rating-*`, `moto-*`
+- Admin screens: `admin-*`, `catalog-*`, `analytics-*`
+
+**Dynamic data injection methods:**
+- Customer: `_injectProductsGrid()`, `_injectProductDetails()`, `_injectCartData()`, `_injectCheckoutTotals()`
+- Driver: `_injectDriverDashboardData()`, `_injectActiveJobData()`, `_injectDriverProfileData()`
+- Admin: `_injectAdminDashboardData()`, `_injectAdminCatalogData()`, `_injectAdminAnalyticsData()`
+
+## Security Best Practices
+
+### Backend Security
+- **JWT Authentication**: All protected routes use `@UseGuards(JwtAuthGuard, RolesGuard)`
+- **Role-based Access Control**: `@Roles(UserRole.CUSTOMER | DRIVER | ADMIN)` enforced via decorators
+- **Input Validation**: DTOs with `class-validator` decorators (`@IsString()`, `@IsEmail()`, `@IsNotEmpty()`)
+- **Password Hashing**: bcrypt with 10 salt rounds in `auth.service.ts`
+- **MongoDB Injection Prevention**: Mongoose schema validation + never trust raw query params
+- **CORS**: Configured in `main.ts` to allow only frontend origin (port 8080/Chrome extension)
+- **Rate Limiting**: Helmet middleware enabled for headers security
+- **Environment Variables**: Sensitive data (`JWT_SECRET`, `MONGO_URI`) in `.env` — **NEVER commit .env**
+
+### Frontend Security
+- **XSS Prevention**: All user input escaped before injection into HTML (`replaceAll("'", "\\'")`)
+- **No eval()**: WebView uses only `runJavaScript()` with sanitized strings, never `eval()`
+- **Secure Storage**: Tokens stored via `flutter_secure_storage` (encrypted keychain/keystore)
+- **HTTPS Only**: Production backend must use HTTPS (enforced in `app_config.dart`)
+- **WebView CSP**: Content Security Policy headers to prevent script injection
+- **Input Sanitization**: All form inputs validated client-side before sending to backend
+
+### API Security Checklist
+- ✅ All endpoints have `@ApiOperation()` Swagger docs
+- ✅ DTOs validate all request bodies
+- ✅ Responses never leak sensitive data (passwords, raw tokens, internal IDs)
+- ✅ Delivery cost calculation server-side only (no client-side price manipulation)
+- ✅ Driver location updates require authenticated WebSocket connection
+- ✅ Admin endpoints check `UserRole.ADMIN` role
+- ✅ File uploads validated (MIME type, size limit) in `documents.service.ts`
+
+## Testing with Mobile MCP
+
+**Tool Integration**: Use `mobile-mcp` for automated UI testing of Flutter app.
+
+### Installation
+```bash
+# Clone mobile-mcp tool
+git clone https://github.com/mobile-next/mobile-mcp.git
+cd mobile-mcp
+npm install
+
+# Link to project
+cd /Users/mac/ubermoto
+```
+
+### Testing Commands
+```bash
+# Run customer flow tests
+mobile-mcp test --flow customer_journey --device chrome
+
+# Run driver flow tests  
+mobile-mcp test --flow driver_journey --device chrome
+
+# Run admin flow tests
+mobile-mcp test --flow admin_journey --device chrome
+
+# Full E2E suite
+mobile-mcp test --suite all --screenshot-on-fail
+```
+
+### Test Coverage Requirements
+- **Customer**: Login → Browse → Add to Cart → Checkout → Track Delivery
+- **Driver**: Login → Go Online → Accept Delivery → Navigate → Complete → Rate
+- **Admin**: Login → View Dashboard → Verify Driver → Manage Catalog → Analytics
+
 ## Recent Major Changes (Context for Debugging)
 
-- ✅ Stitch viewer completely rewritten with 30 screen bindings (Mar 2026)
+**Phase 1-4 (Jan-Feb 2026):**
+- ✅ Stitch viewer completely rewritten with 30 screen bindings
 - ✅ Language provider + translation injection system added
 - ✅ All 7 unreachable routes fixed via text-matching bindings
 - ✅ WebSocket event names standardized (`delivery:assigned`, `delivery:updated`, `location:updated`)
 - ✅ Delivery-driver matching service fixed to use `userId` → `driverId` resolution
 - ✅ Root-level stale backend duplicates removed (src/, dist/, node_modules/, config files, stitch/)
+- ✅ Rebranding: UberMoto → Nassib across all 29 HTML screens, Dart files, backend
+
+**Phase 5 (Mar 4, 2026 — Latest):**
+- ✅ **Driver Side Complete**: 85+ element IDs added to 7 driver screens
+- ✅ **New Screens**: `driver_earnings/code.html`, `driver_profile/code.html` created (~400 lines)
+- ✅ **Admin Side Complete**: 28+ element IDs added to 3 admin screens
+- ✅ **Admin State**: `admin_provider.dart` created (~290 lines) with dashboard stats, driver verification, catalog CRUD
+- ✅ **Binding Migration**: All 11 driver+admin bindings rewritten from `stitchFindByText/Icon` → `getElementById`
+- ✅ **Dynamic Injection**: 6 new methods inject real-time data into driver/admin screens
+- ✅ **Interactive Features**: Star rating system, toggleable feedback tags, live catalog search, motorcycle card selection
+- ✅ **Bridge Actions**: Added `admin_reject_driver`, `admin_add/edit/delete_product`
+- ✅ **Security**: XSS prevention via string escaping in all dynamic injections
+- ✅ **Zero Errors**: Flutter analyze shows 0 errors, 15 warnings (unused imports only)
