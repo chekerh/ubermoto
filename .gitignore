@@ -56,3 +56,4 @@ backend/port-config.json
 backend/uploads/
 frontend/.dart_tool/
 frontend/.flutter-plugins*
+tools/

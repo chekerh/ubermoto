@@ -233,33 +233,37 @@ stitchBind(stitchFindByText('button', ['login']), 'submit_login');
 
 ## Testing with Mobile MCP
 
-**Tool Integration**: Use `mobile-mcp` for automated UI testing of Flutter app.
+**Tool Integration**: MCP server for mobile development and automation across iOS/Android.
 
-### Installation
+### Installation (Global — Already Installed)
 ```bash
-# Clone mobile-mcp tool
-git clone https://github.com/mobile-next/mobile-mcp.git
-cd mobile-mcp
-npm install
+# Installed globally via npm
+npm install -g @mobilenext/mobile-mcp@latest
 
-# Link to project
-cd /Users/mac/ubermoto
+# Verify installation
+which mcp-server-mobile
+# Output: /Users/mac/.nvm/versions/node/v20.20.0/bin/mcp-server-mobile
 ```
 
-### Testing Commands
+### Running the MCP Server
 ```bash
-# Run customer flow tests
-mobile-mcp test --flow customer_journey --device chrome
+# Start in stdio mode (default for Claude Desktop/VS Code)
+mcp-server-mobile --stdio
 
-# Run driver flow tests  
-mobile-mcp test --flow driver_journey --device chrome
-
-# Run admin flow tests
-mobile-mcp test --flow admin_journey --device chrome
-
-# Full E2E suite
-mobile-mcp test --suite all --screenshot-on-fail
+# Start as SSE server on port 3001
+mcp-server-mobile --port 3001
 ```
+
+### VS Code Integration
+The server is MCP-compatible and can be used with:
+- **Claude Desktop**: Add to `~/Library/Application Support/Claude/claude_desktop_config.json`
+- **VS Code**: Install via [VS Code MCP extension](https://insiders.vscode.dev/redirect?url=vscode%3Amcp%2Finstall%3F%7B%22name%22%3A%22mobile-mcp%22%2C%22command%22%3A%22npx%22%2C%22args%22%3A%5B%22-y%22%2C%22%40mobilenext%2Fmobile-mcp%40latest%22%5D%7D)
+
+### Usage with Nassib App
+1. Start backend: `cd backend && npm run start:dev`
+2. Start frontend: `cd frontend && flutter run -d chrome`
+3. Start MCP server: `mcp-server-mobile --stdio`
+4. Use MCP tools to interact with the running app (tap, swipe, accessibility snapshots)
 
 ### Test Coverage Requirements
 - **Customer**: Login → Browse → Add to Cart → Checkout → Track Delivery
