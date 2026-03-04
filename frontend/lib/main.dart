@@ -154,11 +154,11 @@ class NassibApp extends StatelessWidget {
         'title': 'Active Delivery',
       },
       '/driver/earnings': {
-        'asset': 'stitch/ubermoto_splash_and_language_select_2/code.html',
+        'asset': 'stitch/driver_earnings/code.html',
         'title': 'Driver Earnings',
       },
       '/driver/profile': {
-        'asset': 'stitch/ubermoto_splash_and_language_select_3/code.html',
+        'asset': 'stitch/driver_profile/code.html',
         'title': 'Driver Profile',
       },
       '/admin/catalog': {
