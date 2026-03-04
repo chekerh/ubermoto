@@ -52,24 +52,24 @@
 <div class="flex flex-col flex-1 px-4 max-w-md mx-auto w-full pb-8">
 <!-- Welcome Message -->
 <div class="text-center pt-6 pb-6">
-<h1 class="text-slate-900 dark:text-slate-100 text-[32px] font-bold leading-tight mb-2">Merhba bik!</h1>
-<p class="text-slate-500 dark:text-slate-400 text-base font-normal">Log in to start your ride or delivery</p>
+<h1 class="text-slate-900 dark:text-slate-100 text-[32px] font-bold leading-tight mb-2" data-i18n="Welcome">Merhba bik!</h1>
+<p class="text-slate-500 dark:text-slate-400 text-base font-normal" data-i18n="Log in to start your ride or delivery">Log in to start your ride or delivery</p>
 </div>
 <!-- Tabs -->
 <div class="pb-6">
 <div class="flex border-b border-slate-200 dark:border-slate-700">
 <button id="login-tab-phone" class="flex flex-col items-center justify-center border-b-[3px] border-transparent text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 pb-3 pt-2 flex-1 transition-all">
-<p class="text-sm font-bold leading-normal tracking-[0.015em]">Phone Number</p>
+<p class="text-sm font-bold leading-normal tracking-[0.015em]" data-i18n="Phone Number">Phone Number</p>
 </button>
 <button id="login-tab-email" data-active="1" class="flex flex-col items-center justify-center border-b-[3px] border-primary text-slate-900 dark:text-white pb-3 pt-2 flex-1 transition-all">
-<p class="text-sm font-bold leading-normal tracking-[0.015em]">Email</p>
+<p class="text-sm font-bold leading-normal tracking-[0.015em]" data-i18n="Email">Email</p>
 </button>
 </div>
 </div>
 <!-- Input Field -->
 <div class="space-y-4 mb-8">
 <label id="login-phone-field" class="block hidden">
-<span class="text-slate-900 dark:text-slate-100 text-sm font-medium mb-2 block">Phone Number</span>
+<span class="text-slate-900 dark:text-slate-100 text-sm font-medium mb-2 block" data-i18n="Phone Number">Phone Number</span>
 <div class="relative flex items-center">
 <input id="login-phone" class="form-input block w-full rounded-xl border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:border-primary focus:ring-primary h-14 pl-4 pr-12 text-base shadow-sm" placeholder="+216 20 123 456" type="tel"/>
 <div class="absolute right-4 text-slate-400 dark:text-slate-500 pointer-events-none flex items-center">
@@ -78,7 +78,7 @@
 </div>
 </label>
 <label id="login-email-field" class="block">
-<span class="text-slate-900 dark:text-slate-100 text-sm font-medium mb-2 block">Email</span>
+<span class="text-slate-900 dark:text-slate-100 text-sm font-medium mb-2 block" data-i18n="Email">Email</span>
 <div class="relative flex items-center">
 <input id="login-email" class="form-input block w-full rounded-xl border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:border-primary focus:ring-primary h-14 pl-4 pr-12 text-base shadow-sm" placeholder="you@example.com" type="email"/>
 <div class="absolute right-4 text-slate-400 dark:text-slate-500 pointer-events-none flex items-center">
@@ -87,16 +87,16 @@
 </div>
 </label>
 <label class="block">
-<span class="text-slate-900 dark:text-slate-100 text-sm font-medium mb-2 block">Password</span>
+<span class="text-slate-900 dark:text-slate-100 text-sm font-medium mb-2 block" data-i18n="Password">Password</span>
 <div class="relative flex items-center">
-<input id="login-password" class="form-input block w-full rounded-xl border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:border-primary focus:ring-primary h-14 pl-4 pr-12 text-base shadow-sm" placeholder="Minimum 6 characters" type="password"/>
+<input id="login-password" class="form-input block w-full rounded-xl border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:border-primary focus:ring-primary h-14 pl-4 pr-12 text-base shadow-sm" placeholder="Minimum 6 characters" data-i18n-placeholder="Minimum 6 characters" type="password"/>
 <div class="absolute right-4 text-slate-400 dark:text-slate-500 pointer-events-none flex items-center">
 <span class="material-symbols-outlined">lock</span>
 </div>
 </div>
 </label>
 <button id="auth-login-btn" class="w-full bg-primary hover:bg-orange-600 text-white font-bold h-14 rounded-xl shadow-lg shadow-orange-500/20 transition-all active:scale-[0.98] flex items-center justify-center gap-2">
-<span>Continue</span>
+<span data-i18n="Continue">Continue</span>
 <span class="material-symbols-outlined text-[20px]">arrow_forward</span>
 </button>
 <p id="login-mode-hint" class="text-xs text-slate-500 dark:text-slate-400">
@@ -107,7 +107,7 @@
 <div class="mt-8 text-center pb-6">
 <p class="text-slate-500 dark:text-slate-400 text-sm">
                 Don't have an account? 
-                <a id="auth-register-link" class="text-primary font-bold hover:underline" href="#">Register now</a>
+                <a id="auth-register-link" class="text-primary font-bold hover:underline" href="#" data-i18n="Register now">Register now</a>
 </p>
 <p class="text-xs text-slate-400 dark:text-slate-500 mt-2">
                 Choose role during registration.

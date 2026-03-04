@@ -62,7 +62,7 @@
 </div>
 <div>
 <h1 class="text-xl font-bold leading-none">Nassib</h1>
-<p class="text-xs text-text-secondary-light dark:text-text-secondary-dark font-medium mt-0.5">Driver Partner</p>
+<p class="text-xs text-text-secondary-light dark:text-text-secondary-dark font-medium mt-0.5" data-i18n="Driver Partner">Driver Partner</p>
 </div>
 </div>
 <button id="driver-notif-btn" class="relative w-10 h-10 flex items-center justify-center rounded-full hover:bg-black/5 dark:hover:bg-white/10 transition-colors">
@@ -74,11 +74,11 @@
 <div class="px-4 mt-6">
 <div class="bg-surface-light dark:bg-surface-dark rounded-2xl p-5 shadow-sm border border-primary/10 flex items-center justify-between">
 <div>
-<p class="text-lg font-bold text-green-600 dark:text-green-500 flex items-center gap-2">
+<p class="text-lg font-bold text-green-600 dark:text-green-500 flex items-center gap-2" data-i18n="You are Online">
 <span class="w-2.5 h-2.5 rounded-full bg-green-500 animate-pulse"></span>
                         You are Online
                     </p>
-<p class="text-sm text-text-secondary-light dark:text-text-secondary-dark mt-1">Receiving requests nearby...</p>
+<p class="text-sm text-text-secondary-light dark:text-text-secondary-dark mt-1" data-i18n="Receiving requests nearby...">Receiving requests nearby...</p>
 </div>
 <label class="relative inline-flex items-center cursor-pointer">
 <input id="driver-online-toggle" checked="" class="sr-only peer" type="checkbox" value=""/>
@@ -94,7 +94,7 @@
 <div class="w-8 h-8 rounded-full bg-primary/10 text-primary flex items-center justify-center mb-3">
 <span class="material-symbols-outlined text-lg">attach_money</span>
 </div>
-<p class="text-xs font-medium text-text-secondary-light dark:text-text-secondary-dark uppercase tracking-wide">Today's Earnings</p>
+<p class="text-xs font-medium text-text-secondary-light dark:text-text-secondary-dark uppercase tracking-wide" data-i18n="Today's Earnings">Today's Earnings</p>
 <p id="driver-today-earnings" class="text-2xl font-bold mt-1">45 <span class="text-sm font-semibold text-text-secondary-light dark:text-text-secondary-dark">TND</span></p>
 </div>
 </div>
@@ -104,7 +104,7 @@
 <div class="w-8 h-8 rounded-full bg-blue-500/10 text-blue-600 dark:text-blue-400 flex items-center justify-center mb-3">
 <span class="material-symbols-outlined text-lg">check_circle</span>
 </div>
-<p class="text-xs font-medium text-text-secondary-light dark:text-text-secondary-dark uppercase tracking-wide">Jobs Completed</p>
+<p class="text-xs font-medium text-text-secondary-light dark:text-text-secondary-dark uppercase tracking-wide" data-i18n="Jobs Completed">Jobs Completed</p>
 <p id="driver-jobs-count" class="text-2xl font-bold mt-1">6</p>
 </div>
 </div>
@@ -113,7 +113,7 @@
 <div id="driver-incoming-section" class="px-4 mt-8 mb-4">
 <h2 class="text-lg font-bold mb-4 flex items-center gap-2">
                 Incoming Request
-                <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-primary text-white uppercase tracking-wider">New</span>
+                <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-primary text-white uppercase tracking-wider" data-i18n="New">New</span>
 </h2>
 <div class="bg-surface-light dark:bg-surface-dark rounded-2xl overflow-hidden shadow-lg border border-primary/20 ring-1 ring-primary/5">
 <!-- Map Header -->
@@ -150,7 +150,7 @@
 </div>
 </div>
 <div class="flex-1">
-<p class="text-xs font-semibold text-text-secondary-light dark:text-text-secondary-dark uppercase mb-0.5">Pick Up</p>
+<p class="text-xs font-semibold text-text-secondary-light dark:text-text-secondary-dark uppercase mb-0.5" data-i18n="Pick Up">Pick Up</p>
 <p id="driver-request-pickup" class="font-medium text-sm">Technopark El Ghazala</p>
 <p class="text-xs text-text-secondary-light dark:text-text-secondary-dark truncate">Ariana, Tunis</p>
 </div>
@@ -163,7 +163,7 @@
 </div>
 </div>
 <div class="flex-1">
-<p class="text-xs font-semibold text-text-secondary-light dark:text-text-secondary-dark uppercase mb-0.5">Drop Off</p>
+<p class="text-xs font-semibold text-text-secondary-light dark:text-text-secondary-dark uppercase mb-0.5" data-i18n="Drop Off">Drop Off</p>
 <p id="driver-request-dropoff" class="font-medium text-sm">Rue de Marseille</p>
 <p class="text-xs text-text-secondary-light dark:text-text-secondary-dark truncate">Tunis Centre Ville</p>
 </div>
@@ -173,11 +173,11 @@
 <div class="grid grid-cols-2 gap-3 mt-6">
 <button id="driver-decline-btn" class="flex items-center justify-center gap-2 py-3 rounded-xl border border-gray-200 dark:border-gray-700 font-bold text-text-secondary-light dark:text-text-secondary-dark hover:bg-gray-50 dark:hover:bg-white/5 transition-colors">
 <span class="material-symbols-outlined text-xl">close</span>
-                            Decline
+<span data-i18n="Decline">Decline</span>
                         </button>
 <button id="driver-accept-btn" class="flex items-center justify-center gap-2 py-3 rounded-xl bg-primary text-white font-bold shadow-lg shadow-primary/30 hover:bg-primary/90 transition-colors">
 <span class="material-symbols-outlined text-xl">check</span>
-                            Accept
+<span data-i18n="Accept">Accept</span>
                         </button>
 </div>
 </div>
@@ -191,25 +191,25 @@
 <div class="p-1.5 rounded-xl bg-primary/10 text-primary transition-colors">
 <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">dashboard</span>
 </div>
-<span class="text-[10px] font-bold text-primary">Dashboard</span>
+<span class="text-[10px] font-bold text-primary" data-i18n="Dashboard">Dashboard</span>
 </a>
 <a id="driver-nav-wallet" class="flex flex-col items-center gap-1 group" href="#">
 <div class="p-1.5 rounded-xl text-text-secondary-light dark:text-text-secondary-dark group-hover:bg-primary/5 group-hover:text-primary transition-colors">
 <span class="material-symbols-outlined">account_balance_wallet</span>
 </div>
-<span class="text-[10px] font-medium text-text-secondary-light dark:text-text-secondary-dark group-hover:text-primary transition-colors">Wallet</span>
+<span class="text-[10px] font-medium text-text-secondary-light dark:text-text-secondary-dark group-hover:text-primary transition-colors" data-i18n="Wallet">Wallet</span>
 </a>
 <a id="driver-nav-docs" class="flex flex-col items-center gap-1 group" href="#">
 <div class="p-1.5 rounded-xl text-text-secondary-light dark:text-text-secondary-dark group-hover:bg-primary/5 group-hover:text-primary transition-colors">
 <span class="material-symbols-outlined">description</span>
 </div>
-<span class="text-[10px] font-medium text-text-secondary-light dark:text-text-secondary-dark group-hover:text-primary transition-colors">Docs</span>
+<span class="text-[10px] font-medium text-text-secondary-light dark:text-text-secondary-dark group-hover:text-primary transition-colors" data-i18n="Docs">Docs</span>
 </a>
 <a id="driver-nav-profile" class="flex flex-col items-center gap-1 group" href="#">
 <div class="p-1.5 rounded-xl text-text-secondary-light dark:text-text-secondary-dark group-hover:bg-primary/5 group-hover:text-primary transition-colors">
 <span class="material-symbols-outlined">person</span>
 </div>
-<span class="text-[10px] font-medium text-text-secondary-light dark:text-text-secondary-dark group-hover:text-primary transition-colors">Profile</span>
+<span class="text-[10px] font-medium text-text-secondary-light dark:text-text-secondary-dark group-hover:text-primary transition-colors" data-i18n="Profile">Profile</span>
 </a>
 </div>
 </nav>

@@ -51,21 +51,21 @@
 <button id="cart-back-btn" class="flex size-10 items-center justify-center rounded-full bg-white dark:bg-stone-800 shadow-sm text-slate-800 dark:text-slate-200 transition-transform active:scale-95">
 <span class="material-symbols-outlined">arrow_back</span>
 </button>
-<h2 class="text-lg font-bold leading-tight tracking-[-0.015em] flex-1 text-center pr-10">Checkout</h2>
+<h2 class="text-lg font-bold leading-tight tracking-[-0.015em] flex-1 text-center pr-10" data-i18n="Checkout">Checkout</h2>
 </div>
 <!-- Scrollable Content -->
 <div class="flex-1 overflow-y-auto pb-24 hide-scrollbar">
 <!-- Delivery Location -->
 <div class="px-4 py-4">
-<h3 class="text-sm font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-3 ml-1">Delivery Location</h3>
+<h3 class="text-sm font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-3 ml-1" data-i18n="Delivery Location">Delivery Location</h3>
 <div class="flex items-center gap-4 rounded-xl bg-white dark:bg-stone-800 p-4 shadow-sm border border-stone-100 dark:border-stone-700 cursor-pointer active:bg-stone-50 dark:active:bg-stone-700 transition-colors">
 <div class="flex items-center justify-center rounded-full bg-primary/10 text-primary shrink-0 size-12">
 <span class="material-symbols-outlined">location_on</span>
 </div>
 <div class="flex flex-col justify-center flex-1">
 <div class="flex items-center gap-2">
-<p class="text-slate-900 dark:text-slate-100 text-base font-bold leading-normal">Home</p>
-<span class="px-2 py-0.5 bg-primary/20 text-primary text-[10px] font-bold rounded-full uppercase">Default</span>
+<p class="text-slate-900 dark:text-slate-100 text-base font-bold leading-normal" data-i18n="Home">Home</p>
+<span class="px-2 py-0.5 bg-primary/20 text-primary text-[10px] font-bold rounded-full uppercase" data-i18n="Default">Default</span>
 </div>
 <p class="text-slate-500 dark:text-slate-400 text-sm font-medium leading-normal line-clamp-1">15 Avenue Habib Bourguiba, Tunis</p>
 </div>
@@ -76,7 +76,7 @@
 </div>
 <!-- Order Summary -->
 <div class="px-4 pt-2 pb-4">
-<h3 class="text-sm font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-3 ml-1">Order Summary</h3>
+<h3 class="text-sm font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-3 ml-1" data-i18n="Order Summary">Order Summary</h3>
 <div id="cart-items-container" class="flex flex-col gap-3">
 <!-- Dynamic cart items injected by Dart -->
 <div class="flex items-center gap-4 rounded-xl bg-white dark:bg-stone-800 p-3 shadow-sm border border-stone-100 dark:border-stone-700 animate-pulse">
@@ -90,7 +90,7 @@
 </div>
 <!-- Payment Methods -->
 <div class="px-4 py-2">
-<h3 class="text-sm font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-3 ml-1">Payment Method</h3>
+<h3 class="text-sm font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-3 ml-1" data-i18n="Payment Method">Payment Method</h3>
 <div class="flex flex-col gap-3">
 <!-- Cash (Active) -->
 <label class="flex items-center gap-4 rounded-xl bg-primary/5 border-2 border-primary p-4 cursor-pointer relative overflow-hidden transition-all">
@@ -101,21 +101,21 @@
 <span class="material-symbols-outlined">payments</span>
 </div>
 <div class="flex flex-col justify-center flex-1">
-<p class="text-slate-900 dark:text-slate-100 text-base font-bold leading-normal">Cash on Delivery</p>
-<p class="text-slate-500 dark:text-slate-400 text-sm font-medium">Pay when you receive</p>
+<p class="text-slate-900 dark:text-slate-100 text-base font-bold leading-normal" data-i18n="Cash on Delivery">Cash on Delivery</p>
+<p class="text-slate-500 dark:text-slate-400 text-sm font-medium" data-i18n="Pay when you receive">Pay when you receive</p>
 </div>
 <input checked="" class="hidden" name="payment" type="radio"/>
 </label>
 <!-- Stripe (Disabled) -->
 <div class="flex items-center gap-4 rounded-xl bg-stone-50 dark:bg-stone-800/50 p-4 border border-stone-100 dark:border-stone-800 opacity-60 relative grayscale">
 <div class="absolute right-3 top-3 rounded-full bg-stone-200 dark:bg-stone-700 px-2 py-0.5">
-<span class="text-[10px] font-bold text-stone-500 dark:text-stone-400 uppercase">Coming Soon</span>
+<span class="text-[10px] font-bold text-stone-500 dark:text-stone-400 uppercase" data-i18n="Coming Soon">Coming Soon</span>
 </div>
 <div class="flex items-center justify-center rounded-full bg-stone-200 dark:bg-stone-700 text-stone-500 shrink-0 size-10">
 <span class="material-symbols-outlined">credit_card</span>
 </div>
 <div class="flex flex-col justify-center flex-1">
-<p class="text-stone-500 dark:text-stone-400 text-base font-bold leading-normal">Card Payment</p>
+<p class="text-stone-500 dark:text-stone-400 text-base font-bold leading-normal" data-i18n="Card Payment">Card Payment</p>
 <p class="text-stone-400 dark:text-stone-500 text-sm font-medium">Visa, Mastercard</p>
 </div>
 </div>
@@ -137,16 +137,16 @@
 <div class="px-4 py-6">
 <div class="bg-white dark:bg-stone-800 rounded-xl p-5 border border-stone-100 dark:border-stone-700 shadow-sm space-y-3">
 <div class="flex justify-between items-center text-sm">
-<span class="text-slate-500 dark:text-slate-400 font-medium">Subtotal</span>
+<span class="text-slate-500 dark:text-slate-400 font-medium" data-i18n="Subtotal">Subtotal</span>
 <span id="cart-subtotal" class="text-slate-900 dark:text-slate-100 font-bold">0.000 DT</span>
 </div>
 <div class="flex justify-between items-center text-sm">
-<span class="text-slate-500 dark:text-slate-400 font-medium">Delivery Fee</span>
+<span class="text-slate-500 dark:text-slate-400 font-medium" data-i18n="Delivery Fee">Delivery Fee</span>
 <span id="cart-delivery-fee" class="text-slate-900 dark:text-slate-100 font-bold">2.000 DT</span>
 </div>
 <div class="h-px bg-stone-100 dark:bg-stone-700 my-2"></div>
 <div class="flex justify-between items-center text-lg">
-<span class="text-slate-900 dark:text-slate-100 font-bold">Total</span>
+<span class="text-slate-900 dark:text-slate-100 font-bold" data-i18n="Total">Total</span>
 <span id="cart-total" class="text-primary font-bold text-xl">0.000 DT</span>
 </div>
 </div>
@@ -156,7 +156,7 @@
 <!-- Floating Bottom Action -->
 <div class="fixed bottom-[88px] left-0 right-0 p-4 max-w-md mx-auto z-20">
 <button id="cart-confirm-btn" class="w-full bg-primary hover:bg-orange-600 text-white font-bold py-4 px-6 rounded-full shadow-lg shadow-orange-500/30 flex items-center justify-between group active:scale-[0.98] transition-all">
-<span class="text-lg">Confirm Order</span>
+<span class="text-lg" data-i18n="Confirm Order">Confirm Order</span>
 <div class="bg-white/20 rounded-full p-1.5 group-hover:bg-white/30 transition-colors">
 <span class="material-symbols-outlined text-white">arrow_forward</span>
 </div>
@@ -166,19 +166,19 @@
 <div class="flex gap-2 border-t border-stone-200 dark:border-stone-800 bg-background-light dark:bg-background-dark px-4 pb-6 pt-3 z-30 sticky bottom-0">
 <a id="nav-home" class="flex flex-1 flex-col items-center justify-end gap-1 text-slate-400 hover:text-primary transition-colors" href="#">
 <span class="material-symbols-outlined text-[24px]">home</span>
-<p class="text-xs font-medium leading-normal">Home</p>
+<p class="text-xs font-medium leading-normal" data-i18n="Home">Home</p>
 </a>
 <a id="nav-cart" class="flex flex-1 flex-col items-center justify-end gap-1 text-primary" href="#">
 <span class="material-symbols-outlined text-[24px] font-variation-settings-'FILL'1">shopping_bag</span>
-<p class="text-xs font-bold leading-normal">Cart</p>
+<p class="text-xs font-bold leading-normal" data-i18n="Cart">Cart</p>
 </a>
 <a id="nav-orders" class="flex flex-1 flex-col items-center justify-end gap-1 text-slate-400 hover:text-primary transition-colors" href="#">
 <span class="material-symbols-outlined text-[24px]">receipt_long</span>
-<p class="text-xs font-medium leading-normal">Orders</p>
+<p class="text-xs font-medium leading-normal" data-i18n="Orders">Orders</p>
 </a>
 <a id="nav-profile" class="flex flex-1 flex-col items-center justify-end gap-1 text-slate-400 hover:text-primary transition-colors" href="#">
 <span class="material-symbols-outlined text-[24px]">person</span>
-<p class="text-xs font-medium leading-normal">Account</p>
+<p class="text-xs font-medium leading-normal" data-i18n="Account">Account</p>
 </a>
 </div>
 </div>

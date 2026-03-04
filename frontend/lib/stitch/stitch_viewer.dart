@@ -271,40 +271,94 @@ class _StitchViewerState extends ConsumerState<StitchViewer> {
     final isRtl = lang.isRtl;
     final langCode = lang.code;
 
-    // Inject RTL direction if needed
-    if (isRtl) {
-      await _controller.runJavaScript('''
-        document.documentElement.setAttribute('dir', 'rtl');
-        document.body.style.direction = 'rtl';
-      ''');
-    }
+    // Inject RTL/LTR direction
+    await _controller.runJavaScript('''
+      document.documentElement.setAttribute('dir', '${isRtl ? 'rtl' : 'ltr'}');
+      document.body.style.direction = '${isRtl ? 'rtl' : 'ltr'}';
+    ''');
+
+    // Skip injection for English (base language)
+    if (langCode == 'en') return;
 
     // Build JS translation map from Dart
     final translationEntries = <String>[];
     for (final entry in uiTranslations.entries) {
       final translated = entry.value[langCode];
       if (translated != null) {
-        final escapedKey = entry.key.replaceAll("'", "\\'");
-        final escapedVal = translated.replaceAll("'", "\\'");
+        final escapedKey = entry.key.replaceAll("'", "\\'").replaceAll('\n', '\\n');
+        final escapedVal = translated.replaceAll("'", "\\'").replaceAll('\n', '\\n');
         translationEntries.add("'$escapedKey': '$escapedVal'");
       }
     }
 
-    if (translationEntries.isNotEmpty && langCode != 'en') {
-      final mapStr = '{${translationEntries.join(',')}}';
-      await _controller.runJavaScript('''
-        (() => {
-          const translations = $mapStr;
-          const textNodes = document.querySelectorAll('span, button, a');
-          textNodes.forEach(el => {
-            const text = (el.textContent || '').trim();
-            if (translations[text]) {
-              el.textContent = translations[text];
+    if (translationEntries.isEmpty) return;
+
+    final mapStr = '{${translationEntries.join(',')}}';
+    await _controller.runJavaScript('''
+      (() => {
+        const T = $mapStr;
+
+        // --- Phase 1: Translate elements with data-i18n attribute ---
+        document.querySelectorAll('[data-i18n]').forEach(el => {
+          const key = el.getAttribute('data-i18n');
+          if (T[key]) {
+            // For elements with icon children, only replace direct text nodes
+            if (el.children.length > 0) {
+              for (const node of el.childNodes) {
+                if (node.nodeType === 3 && node.textContent.trim()) {
+                  node.textContent = ' ' + T[key] + ' ';
+                  break;
+                }
+              }
+            } else {
+              el.textContent = T[key];
             }
-          });
-        })();
-      ''');
-    }
+          }
+        });
+
+        // --- Phase 2: Translate input placeholders with data-i18n-placeholder ---
+        document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
+          const key = el.getAttribute('data-i18n-placeholder');
+          if (T[key]) el.setAttribute('placeholder', T[key]);
+        });
+
+        // --- Phase 3: Fallback text-node matching for elements WITHOUT data-i18n ---
+        const selector = 'h1,h2,h3,h4,h5,h6,p,span,button,a,label,div,td,th,li';
+        document.querySelectorAll(selector).forEach(el => {
+          // Skip if already handled by data-i18n
+          if (el.hasAttribute('data-i18n')) return;
+
+          // Skip container divs with many children (layout wrappers)
+          if (el.tagName === 'DIV' && el.children.length > 2) return;
+
+          // For elements with child elements (e.g., buttons with icons),
+          // only translate direct text nodes to avoid destroying icons
+          if (el.children.length > 0) {
+            for (const node of el.childNodes) {
+              if (node.nodeType === 3) {
+                const txt = node.textContent.trim();
+                if (txt && T[txt]) {
+                  node.textContent = ' ' + T[txt] + ' ';
+                }
+              }
+            }
+          } else {
+            // Leaf element — safe to use textContent directly
+            const txt = (el.textContent || '').trim();
+            if (txt && T[txt]) {
+              el.textContent = T[txt];
+            }
+          }
+        });
+
+        // --- Phase 4: Translate remaining input placeholders by matching ---
+        document.querySelectorAll('input[placeholder], textarea[placeholder]').forEach(el => {
+          if (el.hasAttribute('data-i18n-placeholder')) return;
+          const ph = (el.getAttribute('placeholder') || '').trim();
+          if (ph && T[ph]) el.setAttribute('placeholder', T[ph]);
+        });
+      })();
+    ''');
   }
 
   // ═══════════════════════════════════════════════════════════════════

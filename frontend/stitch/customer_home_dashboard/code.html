@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 
-<html lang="fr"><head>
+<html lang="en"><head>
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
 <title>Nassib - Customer Home</title>
@@ -72,7 +72,7 @@
 <!-- Header -->
 <header class="flex items-center justify-between p-6 pb-2 sticky top-0 z-20 bg-background-light/95 dark:bg-background-dark/95 backdrop-blur-sm">
 <div>
-<p class="text-text-sub-light dark:text-text-sub-dark text-sm font-medium">Bienvenue,</p>
+<p class="text-text-sub-light dark:text-text-sub-dark text-sm font-medium" data-i18n="Welcome">Welcome,</p>
 <h2 class="text-2xl font-bold tracking-tight text-primary">Asslema, Ahmed!</h2>
 </div>
 <button id="home-profile-btn" class="flex items-center justify-center h-12 w-12 rounded-full bg-surface-light dark:bg-surface-dark shadow-sm border border-slate-100 dark:border-slate-800 relative overflow-hidden group">
@@ -86,7 +86,7 @@
 <div class="absolute inset-y-0 left-0 flex items-center pl-4 pointer-events-none text-text-sub-light dark:text-text-sub-dark">
 <span class="material-symbols-outlined">search</span>
 </div>
-<input id="home-search" class="w-full h-full rounded-xl bg-surface-light dark:bg-surface-dark border-none pl-12 pr-4 text-base placeholder:text-text-sub-light/60 dark:placeholder:text-text-sub-dark/60 focus:ring-2 focus:ring-primary/50 shadow-sm" placeholder="Rechercher couscous, harissa..." type="text"/>
+<input id="home-search" class="w-full h-full rounded-xl bg-surface-light dark:bg-surface-dark border-none pl-12 pr-4 text-base placeholder:text-text-sub-light/60 dark:placeholder:text-text-sub-dark/60 focus:ring-2 focus:ring-primary/50 shadow-sm" placeholder="Search couscous, harissa..." data-i18n-placeholder="Search couscous, harissa..." type="text"/>
 </div>
 <button id="home-filter-btn" class="h-12 w-12 flex items-center justify-center rounded-xl bg-primary text-white shadow-lg shadow-primary/30 active:scale-95 transition-transform">
 <span class="material-symbols-outlined">tune</span>
@@ -96,8 +96,8 @@
 <!-- Categories Parallax-style Carousel -->
 <div class="flex flex-col gap-4 py-2">
 <div class="flex items-center justify-between px-6">
-<h3 class="text-lg font-bold">Catégories</h3>
-<a class="text-primary text-sm font-medium hover:underline" href="#">Voir tout</a>
+<h3 class="text-lg font-bold" data-i18n="Categories">Categories</h3>
+<a class="text-primary text-sm font-medium hover:underline" href="#" data-i18n="View All">View All</a>
 </div>
 <div class="flex gap-4 overflow-x-auto no-scrollbar px-6 pb-4 snap-x">
 <!-- Category 1 -->
@@ -105,35 +105,35 @@
 <div class="h-16 w-16 rounded-2xl bg-orange-100 dark:bg-orange-900/20 flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-white transition-colors duration-300">
 <span class="material-symbols-outlined text-3xl">grocery</span>
 </div>
-<span class="text-xs font-medium text-center truncate w-full group-hover:text-primary transition-colors">Épicerie</span>
+<span class="text-xs font-medium text-center truncate w-full group-hover:text-primary transition-colors" data-i18n="Grocery">Grocery</span>
 </a>
 <!-- Category 2 -->
 <a class="snap-start flex-shrink-0 flex flex-col gap-2 items-center group w-[80px]" href="#">
 <div class="h-16 w-16 rounded-2xl bg-green-100 dark:bg-green-900/20 flex items-center justify-center text-green-600 dark:text-green-400 group-hover:bg-green-600 group-hover:text-white transition-colors duration-300">
 <span class="material-symbols-outlined text-3xl">nutrition</span>
 </div>
-<span class="text-xs font-medium text-center truncate w-full group-hover:text-green-600 transition-colors">Légumes</span>
+<span class="text-xs font-medium text-center truncate w-full group-hover:text-green-600 transition-colors" data-i18n="Vegetables">Vegetables</span>
 </a>
 <!-- Category 3 -->
 <a class="snap-start flex-shrink-0 flex flex-col gap-2 items-center group w-[80px]" href="#">
 <div class="h-16 w-16 rounded-2xl bg-red-100 dark:bg-red-900/20 flex items-center justify-center text-red-600 dark:text-red-400 group-hover:bg-red-600 group-hover:text-white transition-colors duration-300">
 <span class="material-symbols-outlined text-3xl">local_fire_department</span>
 </div>
-<span class="text-xs font-medium text-center truncate w-full group-hover:text-red-600 transition-colors">Épices</span>
+<span class="text-xs font-medium text-center truncate w-full group-hover:text-red-600 transition-colors" data-i18n="Spices">Spices</span>
 </a>
 <!-- Category 4 -->
 <a class="snap-start flex-shrink-0 flex flex-col gap-2 items-center group w-[80px]" href="#">
 <div class="h-16 w-16 rounded-2xl bg-blue-100 dark:bg-blue-900/20 flex items-center justify-center text-blue-600 dark:text-blue-400 group-hover:bg-blue-600 group-hover:text-white transition-colors duration-300">
 <span class="material-symbols-outlined text-3xl">water_drop</span>
 </div>
-<span class="text-xs font-medium text-center truncate w-full group-hover:text-blue-600 transition-colors">Boissons</span>
+<span class="text-xs font-medium text-center truncate w-full group-hover:text-blue-600 transition-colors" data-i18n="Beverages">Beverages</span>
 </a>
 <!-- Category 5 -->
 <a class="snap-start flex-shrink-0 flex flex-col gap-2 items-center group w-[80px]" href="#">
 <div class="h-16 w-16 rounded-2xl bg-yellow-100 dark:bg-yellow-900/20 flex items-center justify-center text-yellow-600 dark:text-yellow-400 group-hover:bg-yellow-600 group-hover:text-white transition-colors duration-300">
 <span class="material-symbols-outlined text-3xl">bakery_dining</span>
 </div>
-<span class="text-xs font-medium text-center truncate w-full group-hover:text-yellow-600 transition-colors">Boulangerie</span>
+<span class="text-xs font-medium text-center truncate w-full group-hover:text-yellow-600 transition-colors" data-i18n="Bakery">Bakery</span>
 </a>
 </div>
 </div>
@@ -143,16 +143,16 @@
 <img alt="Tunisian food delivery background" class="absolute inset-0 w-full h-full object-cover mix-blend-overlay opacity-50" data-alt="Abstract Tunisian pattern background" src="https://lh3.googleusercontent.com/aida-public/AB6AXuC1UyX9OZtZfr_iltulb7RRvG2XLwmVycXBaqBQmITAbHAsl2lD7kVr8RiO-GQWNQ6mqkLqKiysT47Cty2rwHa89VZqWUl8AZBFFJzGjH5AZD5pBP2zeViLk-ww8smC_AL20XZD1NUzkozJnC36ZWU8XUs5WErHV2ej4VOrcZgcR44NzA4qPu7tC2bbL3_Zq63VLr09no1FCjrc0CgRFYLuVY1ZfiSAlFmkLQqIv-NwePtM9oFM_hx6dcZymjJNAvgSKct26l9lcg0"/>
 <div class="absolute inset-0 bg-gradient-to-r from-primary to-transparent opacity-90"></div>
 <div class="relative z-10 flex flex-col justify-center h-full px-6 text-white">
-<span class="text-sm font-semibold mb-1 opacity-90">Offre Spéciale</span>
-<h3 class="text-2xl font-bold mb-2 w-2/3 leading-tight">Livraison Gratuite sur votre 1ère commande!</h3>
-<button id="home-promo-btn" class="bg-white text-primary px-4 py-2 rounded-lg text-sm font-bold self-start shadow-md active:scale-95 transition-transform">Commander</button>
+<span class="text-sm font-semibold mb-1 opacity-90" data-i18n="Special Offer">Special Offer</span>
+<h3 class="text-2xl font-bold mb-2 w-2/3 leading-tight" data-i18n="Free Delivery on your 1st order!">Free Delivery on your 1st order!</h3>
+<button id="home-promo-btn" class="bg-white text-primary px-4 py-2 rounded-lg text-sm font-bold self-start shadow-md active:scale-95 transition-transform" data-i18n="Order Now">Order Now</button>
 </div>
 </div>
 </div>
 <!-- Popular Products Section -->
 <div class="flex-1 bg-surface-light dark:bg-surface-dark rounded-t-[32px] p-6 pb-24 shadow-[0_-4px_20px_rgba(0,0,0,0.05)] dark:shadow-none">
 <div class="flex items-center justify-between mb-6">
-<h2 class="text-xl font-bold">Populaire à Tunis</h2>
+<h2 class="text-xl font-bold" data-i18n="Popular in Tunis">Popular in Tunis</h2>
 <div class="flex gap-1">
 <span class="h-1.5 w-1.5 rounded-full bg-primary"></span>
 <span class="h-1.5 w-1.5 rounded-full bg-slate-300 dark:bg-slate-700"></span>
@@ -181,14 +181,14 @@
 <div class="relative flex items-center justify-center h-10 w-10 bg-primary/10 rounded-full transition-all">
 <span class="material-symbols-outlined text-primary text-[24px]">home</span>
 </div>
-<span class="text-[10px] font-bold text-primary">Accueil</span>
+<span class="text-[10px] font-bold text-primary" data-i18n="Home">Home</span>
 </a>
 <!-- Orders -->
 <a id="nav-orders" class="flex flex-col items-center justify-center gap-1 w-16 group" href="#">
 <div class="relative flex items-center justify-center h-10 w-10 hover:bg-slate-50 dark:hover:bg-white/5 rounded-full transition-all text-text-sub-light dark:text-text-sub-dark group-hover:text-primary">
 <span class="material-symbols-outlined text-[24px]">receipt_long</span>
 </div>
-<span class="text-[10px] font-medium text-text-sub-light dark:text-text-sub-dark group-hover:text-primary">Commandes</span>
+<span class="text-[10px] font-medium text-text-sub-light dark:text-text-sub-dark group-hover:text-primary" data-i18n="Orders">Orders</span>
 </a>
 <!-- Cart (Floating Center) -->
 <a id="nav-cart" class="flex flex-col items-center justify-center gap-1 w-16 -mt-8" href="#">
@@ -202,14 +202,14 @@
 <div class="relative flex items-center justify-center h-10 w-10 hover:bg-slate-50 dark:hover:bg-white/5 rounded-full transition-all text-text-sub-light dark:text-text-sub-dark group-hover:text-primary">
 <span class="material-symbols-outlined text-[24px]">account_balance_wallet</span>
 </div>
-<span class="text-[10px] font-medium text-text-sub-light dark:text-text-sub-dark group-hover:text-primary">Portefeuille</span>
+<span class="text-[10px] font-medium text-text-sub-light dark:text-text-sub-dark group-hover:text-primary" data-i18n="Wallet">Wallet</span>
 </a>
 <!-- Profile -->
 <a id="nav-profile" class="flex flex-col items-center justify-center gap-1 w-16 group" href="#">
 <div class="relative flex items-center justify-center h-10 w-10 hover:bg-slate-50 dark:hover:bg-white/5 rounded-full transition-all text-text-sub-light dark:text-text-sub-dark group-hover:text-primary">
 <span class="material-symbols-outlined text-[24px]">person</span>
 </div>
-<span class="text-[10px] font-medium text-text-sub-light dark:text-text-sub-dark group-hover:text-primary">Profil</span>
+<span class="text-[10px] font-medium text-text-sub-light dark:text-text-sub-dark group-hover:text-primary" data-i18n="Profile">Profile</span>
 </a>
 </div>
 </nav>
