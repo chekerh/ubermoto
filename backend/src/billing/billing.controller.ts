@@ -117,6 +117,17 @@ export class BillingController {
     return this.billingService.getEntitlementsForUser(req.user.sub, req.user.role, merchantId);
   }
 
+  @Get('merchant/me/summary')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRole.MERCHANT, UserRole.ADMIN)
+  @ApiBearerAuth()
+  @ApiOperation({
+    summary: 'Get merchant billing summary for current user (merchant profile, subscription, entitlements)',
+  })
+  getMyMerchantSummary(@Request() req: AuthenticatedRequest) {
+    return this.billingService.getMerchantSummaryForUser(req.user.sub, req.user.role);
+  }
+
   @Post('admin/plans/upsert')
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(UserRole.ADMIN)

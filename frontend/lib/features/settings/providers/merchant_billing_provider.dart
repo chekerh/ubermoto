@@ -7,12 +7,14 @@ class MerchantBillingState {
   final bool isLoading;
   final List<dynamic> plans;
   final Map<String, dynamic>? entitlements;
+  final Map<String, dynamic>? merchantSummary;
   final String? error;
 
   const MerchantBillingState({
     this.isLoading = false,
     this.plans = const [],
     this.entitlements,
+    this.merchantSummary,
     this.error,
   });
 
@@ -20,12 +22,14 @@ class MerchantBillingState {
     bool? isLoading,
     List<dynamic>? plans,
     Map<String, dynamic>? entitlements,
+    Map<String, dynamic>? merchantSummary,
     String? error,
   }) {
     return MerchantBillingState(
       isLoading: isLoading ?? this.isLoading,
       plans: plans ?? this.plans,
       entitlements: entitlements ?? this.entitlements,
+      merchantSummary: merchantSummary ?? this.merchantSummary,
       error: error,
     );
   }
@@ -46,11 +50,13 @@ class MerchantBillingNotifier extends StateNotifier<MerchantBillingState> {
       final results = await Future.wait([
         _billing.listPlans(),
         _entitlements.getMyEntitlements(),
+        _billing.getMerchantSummaryForMe(),
       ]);
       state = state.copyWith(
         isLoading: false,
         plans: results[0] as List<dynamic>,
         entitlements: results[1] as Map<String, dynamic>,
+        merchantSummary: results[2] as Map<String, dynamic>,
       );
     } catch (e) {
       state = state.copyWith(isLoading: false, error: e.toString());

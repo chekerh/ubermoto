@@ -229,6 +229,52 @@ export class BillingService {
     return this.createPortalSession(merchantId, returnUrl, requesterUserId, requesterRole);
   }
 
+  async getMerchantSummaryForUser(requesterUserId: string, requesterRole: string) {
+    const merchantId = await this.resolveMerchantIdForUser(requesterUserId);
+    await this.assertMerchantAccessOrThrow(merchantId, requesterUserId, requesterRole);
+    const merchant = await this.merchantModel.findById(merchantId).lean().exec();
+    const sub = await this.subscriptionModel.findOne({ merchantId }).lean().exec();
+    const ent = await this.entitlementModel.findOne({ merchantId }).lean().exec();
+    const member = await this.merchantMemberModel
+      .findOne({ merchantId, userId: requesterUserId, isActive: true })
+      .lean()
+      .exec();
+
+    return {
+      merchant: merchant
+        ? {
+            id: String((merchant as any)._id),
+            name: merchant.name,
+            region: merchant.region,
+            isActive: merchant.isActive,
+          }
+        : null,
+      membership: member
+        ? {
+            role: member.role,
+            isActive: member.isActive,
+          }
+        : null,
+      subscription: sub
+        ? {
+            status: sub.status,
+            planKey: sub.planKey,
+            currentPeriodStart: sub.currentPeriodStart,
+            currentPeriodEnd: sub.currentPeriodEnd,
+            cancelAtPeriodEnd: sub.cancelAtPeriodEnd,
+          }
+        : null,
+      entitlements: ent
+        ? {
+            planKey: ent.planKey,
+            features: ent.features,
+            limits: ent.limits,
+            computedAt: ent.computedAt,
+          }
+        : null,
+    };
+  }
+
   async upsertSubscriptionFromStripe(
     stripeSubscriptionId: string,
     stripeCustomerId: string,

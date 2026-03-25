@@ -47,9 +47,12 @@ This folder (`/product-workspace`) is the source of truth for building **UberMot
   - `POST /billing/merchant/me/checkout-session`
   - `POST /billing/merchant/me/portal-session`
   (derive merchant context from active membership)
+- Added merchant billing summary endpoint:
+  - `GET /billing/merchant/me/summary` (merchant profile + membership + subscription + entitlements)
 - Added frontend consumption scaffolding:
   - `ContentService` (`/content/:key`)
   - `MerchantBillingProvider` (plans + current entitlements)
+  - `AnnouncementProvider` for admin-managed `home_announcement_banner`
 - Added dynamic content module in backend:
   - `GET /content/:key` (public published content)
   - `GET/PUT /admin/content/:key` (admin view + upsert/publish)

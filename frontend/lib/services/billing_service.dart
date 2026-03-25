@@ -121,5 +121,18 @@ class BillingService {
       throw NetworkException('Failed to create self portal session: ${e.toString()}');
     }
   }
+
+  Future<Map<String, dynamic>> getMerchantSummaryForMe() async {
+    try {
+      final res = await ApiService.get('/billing/merchant/me/summary', requiresAuth: true);
+      final decoded = jsonDecode(res.body);
+      if (decoded is Map<String, dynamic>) return decoded;
+      throw const ServerException('Invalid merchant summary response');
+    } on AppException {
+      rethrow;
+    } catch (e) {
+      throw NetworkException('Failed to load merchant summary: ${e.toString()}');
+    }
+  }
 }
 
