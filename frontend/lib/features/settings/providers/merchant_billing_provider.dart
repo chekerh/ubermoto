@@ -2,6 +2,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../services/billing_service.dart';
 import '../../../services/entitlements_service.dart';
+import '../../auth/providers/entitlements_provider.dart';
 
 class MerchantBillingState {
   final bool isLoading;
@@ -51,10 +52,16 @@ final billingServiceProvider = Provider((ref) => BillingService());
 final entitlementsServiceProvider = Provider((ref) => EntitlementsService());
 
 class MerchantBillingNotifier extends StateNotifier<MerchantBillingState> {
-  MerchantBillingNotifier(this._billing, this._entitlements) : super(const MerchantBillingState());
+  MerchantBillingNotifier(
+    this._billing,
+    this._entitlements, {
+    required Future<void> Function(String? merchantId) syncGlobalEntitlements,
+  })  : _syncGlobalEntitlements = syncGlobalEntitlements,
+        super(const MerchantBillingState());
 
   final BillingService _billing;
   final EntitlementsService _entitlements;
+  final Future<void> Function(String? merchantId) _syncGlobalEntitlements;
 
   Future<void> refresh() async {
     state = state.copyWith(isLoading: true, error: null);
@@ -78,6 +85,7 @@ class MerchantBillingNotifier extends StateNotifier<MerchantBillingState> {
         memberships: memberships,
         selectedMerchantId: selected,
       );
+      await _syncGlobalEntitlements(selected);
     } catch (e) {
       state = state.copyWith(isLoading: false, error: e.toString());
     }
@@ -97,6 +105,7 @@ class MerchantBillingNotifier extends StateNotifier<MerchantBillingState> {
         merchantSummary: results[1],
         merchantUsage: results[2],
       );
+      await _syncGlobalEntitlements(merchantId);
     } catch (e) {
       state = state.copyWith(isLoading: false, error: e.toString());
     }
@@ -108,6 +117,8 @@ final merchantBillingProvider =
   return MerchantBillingNotifier(
     ref.read(billingServiceProvider),
     ref.read(entitlementsServiceProvider),
+    syncGlobalEntitlements: (merchantId) =>
+        ref.read(entitlementsProvider.notifier).refresh(merchantId: merchantId),
   );
 });
 

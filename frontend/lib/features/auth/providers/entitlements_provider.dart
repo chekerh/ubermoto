@@ -22,10 +22,11 @@ class EntitlementsNotifier extends StateNotifier<EntitlementsState> {
 
   final EntitlementsService _service;
 
-  Future<void> refresh() async {
+  /// Loads `/billing/me/entitlements`, optionally scoped to a merchant membership.
+  Future<void> refresh({String? merchantId}) async {
     state = state.copyWith(isLoading: true, error: null);
     try {
-      final payload = await _service.getMyEntitlements();
+      final payload = await _service.getMyEntitlements(merchantId: merchantId);
       state = state.copyWith(payload: payload, isLoading: false, error: null);
     } catch (e) {
       state = state.copyWith(isLoading: false, error: e.toString());

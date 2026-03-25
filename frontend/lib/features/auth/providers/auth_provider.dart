@@ -46,9 +46,11 @@ final authStateProvider = StateNotifierProvider<AuthNotifier, AuthState>((ref) {
     authService: ref.read(authServiceProvider),
     userService: ref.read(userServiceProvider),
     onAuthenticated: (user) async {
-      await ref.read(entitlementsProvider.notifier).refresh();
       if (user.role.toUpperCase() == 'MERCHANT') {
+        // Loads memberships + billing; syncs global [entitlementsProvider] to selected merchant.
         await ref.read(merchantBillingProvider.notifier).refresh();
+      } else {
+        await ref.read(entitlementsProvider.notifier).refresh();
       }
     },
   )..init();

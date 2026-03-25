@@ -121,3 +121,9 @@ This folder (`/product-workspace`) is the source of truth for building **UberMot
 - **Flutter**: after profile load, **`onAuthenticated(UserModel)`** runs entitlements refresh and, for **MERCHANT**, **`merchantBillingProvider.refresh()`** (avoids Riverpod self-read cycle).
 - **Tests**: `CatalogService.listMerchantScopedProducts` coverage (merchant default/explicit id, admin rules).
 
+### 2026-03-25 — Entitlements scoped to selected merchant
+
+- **`EntitlementsNotifier.refresh({merchantId})`** calls `/billing/me/entitlements` with optional query.
+- **`MerchantBillingNotifier`** after successful **refresh** / **selectMerchant**, syncs **`entitlementsProvider`** to the active **`selectedMerchantId`** so app-wide entitlement reads match the store switcher.
+- **Auth**: **MERCHANT** login only runs **`merchantBillingProvider.refresh()`** (which triggers the sync); non-merchants still call **`entitlementsProvider.refresh()`** without `merchantId`.
+
