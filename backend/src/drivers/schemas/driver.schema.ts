@@ -37,6 +37,20 @@ export class Driver {
 
   @Prop({ default: false })
   isVerified!: boolean;
+
+  @Prop({
+    type: Object,
+    default: {
+      monday: { enabled: true, startTime: '08:00', endTime: '20:00' },
+      tuesday: { enabled: true, startTime: '08:00', endTime: '20:00' },
+      wednesday: { enabled: true, startTime: '08:00', endTime: '20:00' },
+      thursday: { enabled: true, startTime: '08:00', endTime: '20:00' },
+      friday: { enabled: true, startTime: '08:00', endTime: '20:00' },
+      saturday: { enabled: true, startTime: '09:00', endTime: '18:00' },
+      sunday: { enabled: false, startTime: null, endTime: null },
+    },
+  })
+  schedule?: Record<string, { enabled: boolean; startTime: string | null; endTime: string | null }>;
 }
 
 export const DriverSchema = SchemaFactory.createForClass(Driver);

@@ -13,15 +13,13 @@ export class RecommendationsService {
 
   async getUserRecommendations(userId: string, limit = 8) {
     // simple heuristic: most frequent products in recent orders
-    const orders = await this.orderModel
-      .find({ userId })
-      .sort({ createdAt: -1 })
-      .limit(20)
-      .exec();
+    const orders = await this.orderModel.find({ userId }).sort({ createdAt: -1 }).limit(20).exec();
 
     const freq = new Map<string, number>();
     orders.forEach((o) =>
-      o.items.forEach((i) => freq.set(i.productId.toString(), (freq.get(i.productId.toString()) || 0) + i.quantity)),
+      o.items.forEach((i) =>
+        freq.set(i.productId.toString(), (freq.get(i.productId.toString()) || 0) + i.quantity),
+      ),
     );
 
     const sorted = Array.from(freq.entries())

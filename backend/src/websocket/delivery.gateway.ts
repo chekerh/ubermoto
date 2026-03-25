@@ -10,7 +10,12 @@ import {
 import { Server, Socket } from 'socket.io';
 import { Injectable, Logger } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
+import { InjectModel } from '@nestjs/mongoose';
+import { Model } from 'mongoose';
 import { UserRole } from '../users/schemas/user.schema';
+import { resolveSocketIoCorsOrigin } from './socket-cors.util';
+import { Delivery, DeliveryDocument } from '../deliveries/schemas/delivery.schema';
+import { Driver, DriverDocument } from '../drivers/schemas/driver.schema';
 
 interface AuthenticatedSocket extends Socket {
   userId?: string;
@@ -34,7 +39,7 @@ interface UpdateLocationData {
 @Injectable()
 @WebSocketGateway({
   cors: {
-    origin: '*', // Configure for production
+    origin: resolveSocketIoCorsOrigin(),
   },
   namespace: '/delivery',
 })
@@ -44,7 +49,38 @@ export class DeliveryGateway implements OnGatewayConnection, OnGatewayDisconnect
 
   private logger: Logger = new Logger('DeliveryGateway');
 
-  constructor(private readonly jwtService: JwtService) {}
+  constructor(
+    private readonly jwtService: JwtService,
+    @InjectModel(Delivery.name) private readonly deliveryModel: Model<DeliveryDocument>,
+    @InjectModel(Driver.name) private readonly driverModel: Model<DriverDocument>,
+  ) {}
+
+  /** Customer (owner), assigned driver, or admin may join `delivery_<id>` room. */
+  private async canSubscribeToDelivery(
+    deliveryId: string,
+    client: AuthenticatedSocket,
+  ): Promise<{ ok: true } | { ok: false; error: string }> {
+    if (!client.userId || !client.userRole) {
+      return { ok: false, error: 'Unauthorized' };
+    }
+    const delivery = await this.deliveryModel.findById(deliveryId).exec();
+    if (!delivery) {
+      return { ok: false, error: 'Delivery not found' };
+    }
+    if (client.userRole === UserRole.ADMIN) {
+      return { ok: true };
+    }
+    if (delivery.userId && delivery.userId.toString() === client.userId) {
+      return { ok: true };
+    }
+    if (client.userRole === UserRole.DRIVER) {
+      const driver = await this.driverModel.findOne({ userId: client.userId }).exec();
+      if (driver && delivery.driverId && delivery.driverId.toString() === driver._id.toString()) {
+        return { ok: true };
+      }
+    }
+    return { ok: false, error: 'Forbidden' };
+  }
 
   async handleConnection(client: AuthenticatedSocket): Promise<void> {
     try {
@@ -82,7 +118,14 @@ export class DeliveryGateway implements OnGatewayConnection, OnGatewayDisconnect
   async handleSubscribeToDelivery(
     @MessageBody() data: SubscribeToDeliveryData,
     @ConnectedSocket() client: AuthenticatedSocket,
-  ): Promise<{ success: boolean }> {
+  ): Promise<{ success: boolean; error?: string }> {
+    const gate = await this.canSubscribeToDelivery(data.deliveryId, client);
+    if (!gate.ok) {
+      this.logger.warn(
+        `subscribeToDelivery denied user=${client.userId} delivery=${data.deliveryId}: ${gate.error}`,
+      );
+      return { success: false, error: gate.error };
+    }
     client.join(`delivery_${data.deliveryId}`);
     this.logger.log(`User ${client.userId} subscribed to delivery ${data.deliveryId}`);
     return { success: true };
@@ -103,8 +146,16 @@ export class DeliveryGateway implements OnGatewayConnection, OnGatewayDisconnect
     @MessageBody() data: UpdateLocationData,
     @ConnectedSocket() client: AuthenticatedSocket,
   ): Promise<{ success: boolean } | { error: string }> {
-    // Only drivers can update location
-    if (client.userRole !== UserRole.DRIVER) {
+    if (client.userRole !== UserRole.DRIVER || !client.userId) {
+      return { error: 'Unauthorized' };
+    }
+
+    const delivery = await this.deliveryModel.findById(data.deliveryId).exec();
+    if (!delivery) {
+      return { error: 'Delivery not found' };
+    }
+    const driver = await this.driverModel.findOne({ userId: client.userId }).exec();
+    if (!driver || !delivery.driverId || delivery.driverId.toString() !== driver._id.toString()) {
       return { error: 'Unauthorized' };
     }
 
@@ -129,9 +180,9 @@ export class DeliveryGateway implements OnGatewayConnection, OnGatewayDisconnect
       updatedAt: delivery.updatedAt,
     });
 
-    // Also notify the customer and driver individually
+    // Also notify the customer and driver individually (rooms = User `sub`, not Driver doc id)
     if (delivery.userId) {
-      this.server.to(`user_${delivery.userId}`).emit('delivery_status_update', {
+      this.server.to(`user_${String(delivery.userId)}`).emit('delivery_status_update', {
         deliveryId,
         status: delivery.status,
         driverId: delivery.driverId,
@@ -140,12 +191,20 @@ export class DeliveryGateway implements OnGatewayConnection, OnGatewayDisconnect
     }
 
     if (delivery.driverId) {
-      this.server.to(`user_${delivery.driverId}`).emit('delivery_status_update', {
-        deliveryId,
-        status: delivery.status,
-        driverId: delivery.driverId,
-        updatedAt: delivery.updatedAt,
-      });
+      const driverDocId = String(delivery.driverId);
+      void this.driverModel
+        .findById(driverDocId)
+        .exec()
+        .then((d) => {
+          if (d?.userId) {
+            this.server.to(`user_${String(d.userId)}`).emit('delivery_status_update', {
+              deliveryId,
+              status: delivery.status,
+              driverId: delivery.driverId,
+              updatedAt: delivery.updatedAt,
+            });
+          }
+        });
     }
   }
 
@@ -162,24 +221,31 @@ export class DeliveryGateway implements OnGatewayConnection, OnGatewayDisconnect
     });
   }
 
-  emitDeliveryAssigned(deliveryId: string, driverId: string, delivery: any) {
-    // Notify the assigned driver
-    this.server.to(`user_${driverId}`).emit('delivery_assigned', {
-      deliveryId,
-      delivery: {
-        pickupLocation: delivery.pickupLocation,
-        deliveryAddress: delivery.deliveryAddress,
-        deliveryType: delivery.deliveryType,
-        estimatedCost: delivery.estimatedCost,
-        distance: delivery.distance,
-      },
-    });
+  emitDeliveryAssigned(deliveryId: string, driverMongoId: string, delivery: any): void {
+    // driverMongoId is Driver collection _id; user rooms are keyed by User _id (JWT `sub`).
+    void (async () => {
+      const driverDoc = await this.driverModel.findById(driverMongoId).exec();
+      const driverUserSub = driverDoc?.userId ? String(driverDoc.userId) : null;
+      if (driverUserSub) {
+        this.server.to(`user_${driverUserSub}`).emit('delivery_assigned', {
+          deliveryId,
+          delivery: {
+            pickupLocation: delivery.pickupLocation,
+            deliveryAddress: delivery.deliveryAddress,
+            deliveryType: delivery.deliveryType,
+            estimatedCost: delivery.estimatedCost,
+            distance: delivery.distance,
+          },
+        });
+      }
 
-    // Notify the customer
-    this.server.to(`user_${delivery.userId}`).emit('driver_assigned', {
-      deliveryId,
-      driverId,
-    });
+      if (delivery.userId) {
+        this.server.to(`user_${String(delivery.userId)}`).emit('driver_assigned', {
+          deliveryId,
+          driverId: driverMongoId,
+        });
+      }
+    })();
   }
 
   emitDriverAvailable(driverId: string) {

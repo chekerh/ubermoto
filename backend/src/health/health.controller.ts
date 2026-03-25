@@ -1,23 +1,48 @@
-import { Controller, Get } from '@nestjs/common';
-import {
-  HealthCheck,
-  HealthCheckService,
-  MongooseHealthIndicator,
-  HealthIndicatorResult,
-} from '@nestjs/terminus';
+import { Controller, Get, ServiceUnavailableException } from '@nestjs/common';
+import { InjectConnection } from '@nestjs/mongoose';
+import { Connection } from 'mongoose';
+import { SkipThrottle } from '@nestjs/throttler';
 
+/**
+ * Uses Mongoose connection state + admin ping so failures return **503** with a JSON body
+ * instead of an unhandled 500 from Terminus when Mongo is down.
+ */
 @Controller('health')
 export class HealthController {
-  constructor(
-    private readonly health: HealthCheckService,
-    private readonly mongoose: MongooseHealthIndicator,
-  ) {}
+  constructor(@InjectConnection() private readonly connection: Connection) {}
 
   @Get()
-  @HealthCheck()
-  check(): Promise<unknown> {
-    return this.health.check([
-      (): Promise<HealthIndicatorResult> => this.mongoose.pingCheck('mongodb'),
-    ]);
+  @SkipThrottle()
+  async check(): Promise<{ status: string; mongodb: string }> {
+    if (this.connection.readyState !== 1) {
+      throw new ServiceUnavailableException({
+        status: 'error',
+        mongodb: 'unavailable',
+        message: 'Database connection is not ready',
+      });
+    }
+
+    try {
+      const db = this.connection.db;
+      if (!db) {
+        throw new ServiceUnavailableException({
+          status: 'error',
+          mongodb: 'unavailable',
+          message: 'Database handle is not available',
+        });
+      }
+      await db.admin().command({ ping: 1 });
+    } catch (e) {
+      if (e instanceof ServiceUnavailableException) {
+        throw e;
+      }
+      throw new ServiceUnavailableException({
+        status: 'error',
+        mongodb: 'unavailable',
+        message: 'Database ping failed',
+      });
+    }
+
+    return { status: 'ok', mongodb: 'up' };
   }
 }

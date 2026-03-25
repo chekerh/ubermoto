@@ -1,19 +1,40 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException, ConflictException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, Types } from 'mongoose';
 import { Product, ProductDocument } from './schemas/product.schema';
 import { Category, CategoryDocument } from './schemas/category.schema';
+import { Merchant, MerchantDocument } from './schemas/merchant.schema';
 import { QueryProductsDto } from './dto/query-products.dto';
+import { CreateProductDto } from './dto/create-product.dto';
+import { UpdateProductDto } from './dto/update-product.dto';
+import { CreateCategoryDto } from './dto/create-category.dto';
+import { UpdateCategoryDto } from './dto/update-category.dto';
 
 @Injectable()
 export class CatalogService {
   constructor(
     @InjectModel(Product.name) private productModel: Model<ProductDocument>,
     @InjectModel(Category.name) private categoryModel: Model<CategoryDocument>,
+    @InjectModel(Merchant.name) private merchantModel: Model<MerchantDocument>,
   ) {}
 
   async listCategories(): Promise<CategoryDocument[]> {
     return this.categoryModel.find({ isActive: true }).sort({ name: 1 }).exec();
+  }
+
+  /** Active merchants for admin catalog (e.g. product create). */
+  async listActiveMerchants(): Promise<Array<{ id: string; name: string; region: string }>> {
+    const docs = await this.merchantModel
+      .find({ isActive: true })
+      .select('_id name region')
+      .sort({ name: 1 })
+      .lean()
+      .exec();
+    return docs.map((m) => ({
+      id: String(m._id),
+      name: m.name as string,
+      region: (m.region as string) ?? 'TND',
+    }));
   }
 
   async listProducts(query: QueryProductsDto): Promise<ProductDocument[]> {
@@ -44,7 +65,10 @@ export class CatalogService {
     const product = await this.productModel.findById(productId).exec();
     if (!product) return [];
     if (product.relatedProductIds?.length) {
-      return this.productModel.find({ _id: { $in: product.relatedProductIds }, isActive: true }).limit(limit).exec();
+      return this.productModel
+        .find({ _id: { $in: product.relatedProductIds }, isActive: true })
+        .limit(limit)
+        .exec();
     }
     // fallback: same category
     return this.productModel
@@ -55,5 +79,102 @@ export class CatalogService {
       })
       .limit(limit)
       .exec();
+  }
+
+  // ── Product CRUD ──────────────────────────────────────────────────────
+
+  async createProduct(dto: CreateProductDto): Promise<ProductDocument> {
+    const productData: any = {
+      ...dto,
+      merchantId: new Types.ObjectId(dto.merchantId),
+    };
+
+    if (dto.categoryIds?.length) {
+      productData.categoryIds = dto.categoryIds.map((id) => new Types.ObjectId(id));
+    }
+
+    if (dto.relatedProductIds?.length) {
+      productData.relatedProductIds = dto.relatedProductIds.map((id) => new Types.ObjectId(id));
+    }
+
+    const product = new this.productModel(productData);
+    return product.save();
+  }
+
+  async updateProduct(id: string, dto: UpdateProductDto): Promise<ProductDocument> {
+    const updateData: any = { ...dto };
+
+    if (dto.merchantId) {
+      updateData.merchantId = new Types.ObjectId(dto.merchantId);
+    }
+
+    if (dto.categoryIds?.length) {
+      updateData.categoryIds = dto.categoryIds.map((cid) => new Types.ObjectId(cid));
+    }
+
+    if (dto.relatedProductIds?.length) {
+      updateData.relatedProductIds = dto.relatedProductIds.map((pid) => new Types.ObjectId(pid));
+    }
+
+    const product = await this.productModel.findByIdAndUpdate(id, updateData, { new: true }).exec();
+    if (!product) {
+      throw new NotFoundException(`Product with ID ${id} not found`);
+    }
+    return product;
+  }
+
+  async deleteProduct(id: string): Promise<void> {
+    const result = await this.productModel.findByIdAndDelete(id).exec();
+    if (!result) {
+      throw new NotFoundException(`Product with ID ${id} not found`);
+    }
+  }
+
+  // ── Category CRUD ─────────────────────────────────────────────────────
+
+  async createCategory(dto: CreateCategoryDto): Promise<CategoryDocument> {
+    const existing = await this.categoryModel.findOne({ slug: dto.slug }).exec();
+    if (existing) {
+      throw new ConflictException(`Category with slug '${dto.slug}' already exists`);
+    }
+
+    const categoryData: any = { ...dto };
+    if (dto.parentId) {
+      categoryData.parentId = new Types.ObjectId(dto.parentId);
+    }
+
+    const category = new this.categoryModel(categoryData);
+    return category.save();
+  }
+
+  async updateCategory(id: string, dto: UpdateCategoryDto): Promise<CategoryDocument> {
+    if (dto.slug) {
+      const existing = await this.categoryModel
+        .findOne({ slug: dto.slug, _id: { $ne: id } })
+        .exec();
+      if (existing) {
+        throw new ConflictException(`Category with slug '${dto.slug}' already exists`);
+      }
+    }
+
+    const updateData: any = { ...dto };
+    if (dto.parentId) {
+      updateData.parentId = new Types.ObjectId(dto.parentId);
+    }
+
+    const category = await this.categoryModel
+      .findByIdAndUpdate(id, updateData, { new: true })
+      .exec();
+    if (!category) {
+      throw new NotFoundException(`Category with ID ${id} not found`);
+    }
+    return category;
+  }
+
+  async deleteCategory(id: string): Promise<void> {
+    const result = await this.categoryModel.findByIdAndDelete(id).exec();
+    if (!result) {
+      throw new NotFoundException(`Category with ID ${id} not found`);
+    }
   }
 }

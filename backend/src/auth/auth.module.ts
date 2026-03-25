@@ -9,6 +9,7 @@ import { DriversModule } from '../drivers/drivers.module';
 import { JwtStrategy } from './strategies/jwt.strategy';
 import { RolesGuard } from './guards/roles.guard';
 import { VerifiedDriverGuard } from './guards/verified-driver.guard';
+import { JwtAuthGuard } from './guards/jwt-auth.guard';
 
 @Module({
   imports: [
@@ -27,7 +28,7 @@ import { VerifiedDriverGuard } from './guards/verified-driver.guard';
     }),
   ],
   controllers: [AuthController],
-  providers: [AuthService, JwtStrategy, RolesGuard, VerifiedDriverGuard],
-  exports: [AuthService, RolesGuard, VerifiedDriverGuard],
+  providers: [AuthService, JwtStrategy, RolesGuard, VerifiedDriverGuard, JwtAuthGuard],
+  exports: [AuthService, RolesGuard, VerifiedDriverGuard, JwtAuthGuard],
 })
 export class AuthModule {}

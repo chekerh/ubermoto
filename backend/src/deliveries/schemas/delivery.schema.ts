@@ -57,6 +57,15 @@ export class Delivery {
   @Prop({ default: 1 })
   surgeMultiplier?: number;
 
+  @Prop({ default: 0 })
+  tipAmount?: number;
+
+  @Prop()
+  customerRating?: number;
+
+  @Prop()
+  customerFeedback?: string;
+
   @Prop({ type: Types.ObjectId, ref: 'Order' })
   orderId?: Types.ObjectId;
 }

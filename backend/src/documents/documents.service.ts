@@ -1,6 +1,14 @@
-import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  BadRequestException,
+  ForbiddenException,
+  Logger,
+} from '@nestjs/common';
+import * as fs from 'fs';
+import * as path from 'path';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
+import { Model, Types } from 'mongoose';
 import {
   DocumentEntity,
   DocumentDocument,
@@ -21,10 +29,34 @@ export interface CreateDocumentDto {
 
 @Injectable()
 export class DocumentsService {
+  private readonly logger = new Logger(DocumentsService.name);
+
   constructor(
     @InjectModel(DocumentEntity.name) private documentModel: Model<DocumentDocument>,
     private readonly usersService: UsersService,
   ) {}
+
+  /** Remove local upload file if path is under `uploads/` (relative to cwd). */
+  private tryRemoveStoredFile(storedPath: string | undefined): void {
+    if (!storedPath || storedPath.includes('..')) {
+      return;
+    }
+    const absolute = path.resolve(process.cwd(), storedPath);
+    const uploadsRoot = path.resolve(process.cwd(), 'uploads');
+    const rel = path.relative(uploadsRoot, absolute);
+    if (rel.startsWith('..') || path.isAbsolute(rel)) {
+      this.logger.warn(`Skipped file delete: path outside uploads (${storedPath})`);
+      return;
+    }
+    if (!fs.existsSync(absolute)) {
+      return;
+    }
+    try {
+      fs.unlinkSync(absolute);
+    } catch (err) {
+      this.logger.error(`Failed to delete file ${absolute}`, err instanceof Error ? err.stack : String(err));
+    }
+  }
 
   async create(createDocumentDto: CreateDocumentDto): Promise<DocumentDocument> {
     // Verify user exists and is a driver
@@ -69,6 +101,32 @@ export class DocumentsService {
       throw new NotFoundException(`Document with ID ${id} not found`);
     }
     return document;
+  }
+
+  private documentOwnerUserId(doc: DocumentDocument): string {
+    const u = doc.userId as unknown as Types.ObjectId | { _id?: Types.ObjectId };
+    if (u instanceof Types.ObjectId) {
+      return u.toString();
+    }
+    if (u && typeof u === 'object' && '_id' in u && u._id) {
+      return u._id.toString();
+    }
+    return String(doc.userId);
+  }
+
+  async findOneForRequester(
+    id: string,
+    requesterSub: string,
+    requesterRole: UserRole,
+  ): Promise<DocumentDocument> {
+    const doc = await this.findOne(id);
+    if (requesterRole === UserRole.ADMIN) {
+      return doc;
+    }
+    if (this.documentOwnerUserId(doc) !== requesterSub) {
+      throw new ForbiddenException('You are not allowed to view this document');
+    }
+    return doc;
   }
 
   async updateStatus(
@@ -145,7 +203,7 @@ export class DocumentsService {
       throw new NotFoundException(`Document with ID ${id} not found`);
     }
 
-    // TODO: Delete file from storage
+    this.tryRemoveStoredFile(document.filePath);
 
     await this.documentModel.findByIdAndDelete(id).exec();
   }

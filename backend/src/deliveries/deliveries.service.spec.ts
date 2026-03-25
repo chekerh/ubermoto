@@ -1,6 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { getModelToken } from '@nestjs/mongoose';
 import { NotFoundException, BadRequestException } from '@nestjs/common';
+import { UserRole } from '../users/schemas/user.schema';
 import { DeliveriesService } from './deliveries.service';
 import { Delivery, DeliveryStatus } from './schemas/delivery.schema';
 import { MotorcyclesService } from '../motorcycles/motorcycles.service';
@@ -28,7 +29,7 @@ describe('DeliveriesService', () => {
     deliveryType: 'Food',
     status: DeliveryStatus.PENDING,
     userId: { toString: () => 'user-id-1' },
-    driverId: null,
+    driverId: 'driver-doc-id',
     distance: 10,
     estimatedCost: 6.25,
     surgeMultiplier: 1,
@@ -83,7 +84,11 @@ describe('DeliveriesService', () => {
     };
     deliveryGateway = { emitDeliveryStatusUpdate: jest.fn() };
     surgeService = { getMultiplierFor: jest.fn() };
-    driversService = { findByUserId: jest.fn() };
+    driversService = {
+      findByUserId: jest.fn().mockResolvedValue({
+        _id: { toString: () => 'driver-doc-id' },
+      }),
+    };
 
     const module: TestingModule = await Test.createTestingModule({
       providers: [
@@ -109,12 +114,11 @@ describe('DeliveriesService', () => {
 
   describe('status transitions (state machine)', () => {
     const validTransitions: [DeliveryStatus, DeliveryStatus][] = [
-      [DeliveryStatus.PENDING, DeliveryStatus.ACCEPTED],
-      [DeliveryStatus.PENDING, DeliveryStatus.CANCELLED],
       [DeliveryStatus.ACCEPTED, DeliveryStatus.PICKED_UP],
       [DeliveryStatus.ACCEPTED, DeliveryStatus.CANCELLED],
       [DeliveryStatus.PICKED_UP, DeliveryStatus.IN_PROGRESS],
       [DeliveryStatus.PICKED_UP, DeliveryStatus.COMPLETED],
+      [DeliveryStatus.PICKED_UP, DeliveryStatus.CANCELLED],
       [DeliveryStatus.IN_PROGRESS, DeliveryStatus.COMPLETED],
       [DeliveryStatus.IN_PROGRESS, DeliveryStatus.CANCELLED],
     ];
@@ -130,44 +134,41 @@ describe('DeliveriesService', () => {
       [DeliveryStatus.CANCELLED, DeliveryStatus.ACCEPTED],
     ];
 
-    it.each(validTransitions)(
-      'should allow %s → %s',
-      async (from, to) => {
-        const existing = mockDelivery({ status: from });
-        deliveryModel.findById.mockReturnValue({
+    it.each(validTransitions)('should allow %s → %s', async (from, to) => {
+      const existing = mockDelivery({ status: from });
+      deliveryModel.findById.mockReturnValue({
+        exec: jest.fn().mockResolvedValue(existing),
+        populate: jest.fn().mockReturnValue({
           exec: jest.fn().mockResolvedValue(existing),
-          populate: jest.fn().mockReturnValue({
-            exec: jest.fn().mockResolvedValue(existing),
-          }),
-        });
-        const updated = mockDelivery({ status: to });
-        deliveryModel.findByIdAndUpdate.mockReturnValue({
-          populate: jest.fn().mockReturnValue({
-            exec: jest.fn().mockResolvedValue(updated),
-          }),
-        });
+        }),
+      });
+      const updated = mockDelivery({ status: to });
+      deliveryModel.findByIdAndUpdate.mockReturnValue({
+        populate: jest.fn().mockReturnValue({
+          exec: jest.fn().mockResolvedValue(updated),
+        }),
+      });
 
-        const result = await service.updateStatus('delivery-id-1', to);
-        expect(result.status).toBe(to);
-      },
-    );
+      const result = await service.updateStatus('delivery-id-1', to, 'driver-user-1');
+      expect(result.status).toBe(to);
+    });
 
-    it.each(invalidTransitions)(
-      'should reject %s → %s',
-      async (from, to) => {
-        const existing = mockDelivery({ status: from });
-        deliveryModel.findById.mockReturnValue({
+    it.each(invalidTransitions)('should reject %s → %s', async (from, to) => {
+      const existing = mockDelivery({
+        status: from,
+        driverId: 'driver-doc-id',
+      });
+      deliveryModel.findById.mockReturnValue({
+        exec: jest.fn().mockResolvedValue(existing),
+        populate: jest.fn().mockReturnValue({
           exec: jest.fn().mockResolvedValue(existing),
-          populate: jest.fn().mockReturnValue({
-            exec: jest.fn().mockResolvedValue(existing),
-          }),
-        });
+        }),
+      });
 
-        await expect(
-          service.updateStatus('delivery-id-1', to),
-        ).rejects.toThrow(BadRequestException);
-      },
-    );
+      await expect(service.updateStatus('delivery-id-1', to, 'driver-user-1')).rejects.toThrow(
+        BadRequestException,
+      );
+    });
   });
 
   // ── updateStatus ─────────────────────────────────────────────────────
@@ -179,13 +180,13 @@ describe('DeliveriesService', () => {
       });
 
       await expect(
-        service.updateStatus('nonexistent', DeliveryStatus.ACCEPTED),
+        service.updateStatus('nonexistent', DeliveryStatus.PICKED_UP, 'driver-user-1'),
       ).rejects.toThrow(NotFoundException);
     });
 
     it('should emit WebSocket update after status change', async () => {
-      const existing = mockDelivery({ status: DeliveryStatus.PENDING });
-      const updated = mockDelivery({ status: DeliveryStatus.ACCEPTED });
+      const existing = mockDelivery({ status: DeliveryStatus.ACCEPTED });
+      const updated = mockDelivery({ status: DeliveryStatus.PICKED_UP });
 
       deliveryModel.findById.mockReturnValue({
         exec: jest.fn().mockResolvedValue(existing),
@@ -196,7 +197,7 @@ describe('DeliveriesService', () => {
         }),
       });
 
-      await service.updateStatus('delivery-id-1', DeliveryStatus.ACCEPTED);
+      await service.updateStatus('delivery-id-1', DeliveryStatus.PICKED_UP, 'driver-user-1');
       expect(deliveryGateway.emitDeliveryStatusUpdate).toHaveBeenCalledWith(
         'delivery-id-1',
         updated,
@@ -226,9 +227,7 @@ describe('DeliveriesService', () => {
         }),
       });
 
-      await expect(service.findOne('nonexistent')).rejects.toThrow(
-        NotFoundException,
-      );
+      await expect(service.findOne('nonexistent')).rejects.toThrow(NotFoundException);
     });
   });
 
@@ -241,7 +240,7 @@ describe('DeliveriesService', () => {
       });
 
       await expect(
-        service.cancelDelivery('nonexistent', 'user-1'),
+        service.cancelDelivery('nonexistent', 'user-1', UserRole.CUSTOMER),
       ).rejects.toThrow(NotFoundException);
     });
 
@@ -256,7 +255,7 @@ describe('DeliveriesService', () => {
       });
 
       await expect(
-        service.cancelDelivery('delivery-id-1', 'random-user'),
+        service.cancelDelivery('delivery-id-1', 'random-user', UserRole.CUSTOMER),
       ).rejects.toThrow(BadRequestException);
     });
 
@@ -270,7 +269,7 @@ describe('DeliveriesService', () => {
       });
 
       await expect(
-        service.cancelDelivery('delivery-id-1', 'user-1'),
+        service.cancelDelivery('delivery-id-1', 'user-1', UserRole.CUSTOMER),
       ).rejects.toThrow(BadRequestException);
     });
   });
@@ -298,9 +297,9 @@ describe('DeliveriesService', () => {
     it('should throw NotFoundException if user has no driver profile', async () => {
       driversService.findByUserId.mockResolvedValue(null);
 
-      await expect(
-        service.acceptDelivery('delivery-id-1', 'non-driver-user'),
-      ).rejects.toThrow(NotFoundException);
+      await expect(service.acceptDelivery('delivery-id-1', 'non-driver-user')).rejects.toThrow(
+        NotFoundException,
+      );
     });
   });
 });

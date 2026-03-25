@@ -17,7 +17,9 @@ import {
 import { FileInterceptor } from '@nestjs/platform-express';
 import { ApiTags, ApiOperation, ApiResponse, ApiConsumes, ApiBody } from '@nestjs/swagger';
 import { DocumentsService, CreateDocumentDto } from './documents.service';
-import { DocumentType, DocumentStatus } from './schemas/document.schema';
+import { DocumentType } from './schemas/document.schema';
+import { UploadDocumentDto } from './dto/upload-document.dto';
+import { UpdateDocumentStatusDto } from './dto/update-document-status.dto';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../auth/guards/roles.guard';
 import { Roles } from '../auth/decorators/roles.decorator';
@@ -110,7 +112,7 @@ export class DocumentsController {
   })
   async uploadDocument(
     @UploadedFile() file: Express.Multer.File,
-    @Body() body: { documentType: DocumentType },
+    @Body() body: UploadDocumentDto,
     @Request() req: AuthenticatedRequest,
   ) {
     // Validate file
@@ -193,8 +195,8 @@ export class DocumentsController {
     description: 'Document details',
   })
   @ApiResponse({ status: 404, description: 'Document not found' })
-  findOne(@Param('id') id: string) {
-    return this.documentsService.findOne(id);
+  findOne(@Param('id') id: string, @Request() req: AuthenticatedRequest) {
+    return this.documentsService.findOneForRequester(id, req.user.sub, req.user.role);
   }
 
   @Patch(':id/status')
@@ -208,7 +210,7 @@ export class DocumentsController {
   @ApiResponse({ status: 404, description: 'Document not found' })
   updateStatus(
     @Param('id') id: string,
-    @Body() body: { status: DocumentStatus; rejectionReason?: string },
+    @Body() body: UpdateDocumentStatusDto,
     @Request() req: AuthenticatedRequest,
   ) {
     return this.documentsService.updateStatus(id, body.status, req.user.sub, body.rejectionReason);
@@ -223,28 +225,7 @@ export class DocumentsController {
   })
   @ApiResponse({ status: 404, description: 'Document not found' })
   async remove(@Param('id') id: string, @Request() req: AuthenticatedRequest) {
-    // Get document before deletion to access file path
-    const document = await this.documentsService.findOne(id);
-
-    // Verify user owns the document or is admin
-    if (document.userId.toString() !== req.user.sub && req.user.role !== UserRole.ADMIN) {
-      throw new BadRequestException('You do not have permission to delete this document');
-    }
-
-    // Delete file from disk if it exists
-    if (document.filePath) {
-      const absolutePath = path.join(process.cwd(), document.filePath);
-      if (fs.existsSync(absolutePath)) {
-        try {
-          fs.unlinkSync(absolutePath);
-        } catch (error) {
-          // Log error but don't fail the request if file deletion fails
-          console.error(`Failed to delete file ${absolutePath}:`, error);
-        }
-      }
-    }
-
-    // Delete document from database
+    await this.documentsService.findOneForRequester(id, req.user.sub, req.user.role);
     await this.documentsService.delete(id);
   }
 }

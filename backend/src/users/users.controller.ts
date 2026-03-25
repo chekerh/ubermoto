@@ -1,9 +1,11 @@
 import {
   Controller,
   Get,
+  Post,
   Patch,
   Delete,
   Body,
+  Param,
   UseGuards,
   Request,
   HttpCode,
@@ -126,6 +128,42 @@ export class UsersController {
         currency: 'TND',
       }
     );
+  }
+
+  @Get('favorites')
+  @ApiOperation({ summary: 'Get user favorite products' })
+  @ApiResponse({
+    status: 200,
+    description: 'Favorite products retrieved successfully',
+  })
+  async getFavorites(@Request() req: AuthenticatedRequest): Promise<unknown[]> {
+    return this.usersService.getFavorites(req.user.sub);
+  }
+
+  @Post('favorites/:productId')
+  @ApiOperation({ summary: 'Add a product to favorites' })
+  @ApiResponse({
+    status: 200,
+    description: 'Product added to favorites',
+  })
+  async addFavorite(
+    @Request() req: AuthenticatedRequest,
+    @Param('productId') productId: string,
+  ): Promise<{ success: boolean; message: string }> {
+    return this.usersService.addFavorite(req.user.sub, productId);
+  }
+
+  @Delete('favorites/:productId')
+  @ApiOperation({ summary: 'Remove a product from favorites' })
+  @ApiResponse({
+    status: 200,
+    description: 'Product removed from favorites',
+  })
+  async removeFavorite(
+    @Request() req: AuthenticatedRequest,
+    @Param('productId') productId: string,
+  ): Promise<{ success: boolean; message: string }> {
+    return this.usersService.removeFavorite(req.user.sub, productId);
   }
 
   @Delete('me')

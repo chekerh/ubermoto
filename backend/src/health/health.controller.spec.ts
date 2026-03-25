@@ -1,38 +1,41 @@
 import { Test, TestingModule } from '@nestjs/testing';
+import { getConnectionToken } from '@nestjs/mongoose';
+import { ServiceUnavailableException } from '@nestjs/common';
 import { HealthController } from './health.controller';
-import { HealthCheckService, HttpHealthIndicator, MongooseHealthIndicator } from '@nestjs/terminus';
 
 describe('HealthController', () => {
   let controller: HealthController;
-  let healthCheckService: HealthCheckService;
+  let mockAdminCommand: jest.Mock;
+
+  const createController = (readyState: number, pingOk: boolean) => {
+    mockAdminCommand = jest.fn().mockImplementation(() =>
+      pingOk ? Promise.resolve({ ok: 1 }) : Promise.reject(new Error('ping failed')),
+    );
+    const mockConnection = {
+      readyState,
+      db: {
+        admin: () => ({
+          command: mockAdminCommand,
+        }),
+      },
+    };
+    return mockConnection;
+  };
 
   beforeEach(async () => {
+    const mockConnection = createController(1, true);
+
     const module: TestingModule = await Test.createTestingModule({
       controllers: [HealthController],
       providers: [
         {
-          provide: HealthCheckService,
-          useValue: {
-            check: jest.fn(),
-          },
-        },
-        {
-          provide: HttpHealthIndicator,
-          useValue: {
-            pingCheck: jest.fn(),
-          },
-        },
-        {
-          provide: MongooseHealthIndicator,
-          useValue: {
-            pingCheck: jest.fn(),
-          },
+          provide: getConnectionToken(),
+          useValue: mockConnection,
         },
       ],
     }).compile();
 
     controller = module.get<HealthController>(HealthController);
-    healthCheckService = module.get<HealthCheckService>(HealthCheckService);
   });
 
   it('should be defined', () => {
@@ -40,24 +43,40 @@ describe('HealthController', () => {
   });
 
   describe('check', () => {
-    it('should return health check result', async () => {
-      const mockResult = {
-        status: 'ok',
-        info: {
-          database: { status: 'up' },
-        },
-        error: {},
-        details: {
-          database: { status: 'up' },
+    it('should return ok when connected and ping succeeds', async () => {
+      const result = await controller.check();
+      expect(result).toEqual({ status: 'ok', mongodb: 'up' });
+      expect(mockAdminCommand).toHaveBeenCalledWith({ ping: 1 });
+    });
+
+    it('should throw ServiceUnavailable when not connected', async () => {
+      const mockConnection = {
+        readyState: 0,
+        db: { admin: () => ({ command: jest.fn() }) },
+      };
+      const module: TestingModule = await Test.createTestingModule({
+        controllers: [HealthController],
+        providers: [{ provide: getConnectionToken(), useValue: mockConnection }],
+      }).compile();
+      const c = module.get<HealthController>(HealthController);
+      await expect(c.check()).rejects.toThrow(ServiceUnavailableException);
+    });
+
+    it('should throw ServiceUnavailable when ping fails', async () => {
+      const mockConnection = {
+        readyState: 1,
+        db: {
+          admin: () => ({
+            command: jest.fn().mockRejectedValue(new Error('down')),
+          }),
         },
       };
-
-      jest.spyOn(healthCheckService, 'check').mockResolvedValue(mockResult as any);
-
-      const result = await controller.check();
-
-      expect(result).toEqual(mockResult);
-      expect(healthCheckService.check).toHaveBeenCalled();
+      const module: TestingModule = await Test.createTestingModule({
+        controllers: [HealthController],
+        providers: [{ provide: getConnectionToken(), useValue: mockConnection }],
+      }).compile();
+      const c = module.get<HealthController>(HealthController);
+      await expect(c.check()).rejects.toThrow(ServiceUnavailableException);
     });
   });
 });

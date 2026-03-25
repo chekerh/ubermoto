@@ -4,15 +4,59 @@ import { ValidationPipe } from '@nestjs/common';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { AppModule } from './app.module';
 import { AllExceptionsFilter } from './common/filters/all-exceptions.filter';
+import { validateProductionEnvironment } from './config/bootstrap-validation';
+import helmet from 'helmet';
+import compression from 'compression';
 
 async function bootstrap(): Promise<void> {
+  validateProductionEnvironment();
+
   // Initialize Sentry
   initializeSentry();
   const app = await NestFactory.create(AppModule);
 
+  app.use(compression());
+
+  app.use(
+    helmet({
+      crossOriginResourcePolicy: false,
+    }),
+  );
+
+  const frontendOriginsFromEnv = (process.env.FRONTEND_ORIGINS ?? '')
+    .split(',')
+    .map((origin) => origin.trim())
+    .filter((origin) => origin.length > 0);
+
+  const devAllowedOrigins = [
+    'http://localhost:8080',
+    'http://127.0.0.1:8080',
+    'http://localhost:3000',
+    'http://127.0.0.1:3000',
+  ];
+
+  const isProduction = process.env.NODE_ENV === 'production';
+  const allowedOrigins = new Set([
+    ...(isProduction ? [] : devAllowedOrigins),
+    ...frontendOriginsFromEnv,
+  ]);
+
   // Enable CORS for Flutter frontend
   app.enableCors({
-    origin: true, // Allow all origins in development
+    origin: (origin, callback) => {
+      // Allow server-to-server and native app requests with no origin header
+      if (!origin) {
+        callback(null, true);
+        return;
+      }
+
+      if (allowedOrigins.has(origin)) {
+        callback(null, true);
+        return;
+      }
+
+      callback(new Error('CORS origin not allowed'));
+    },
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
     credentials: true,
   });

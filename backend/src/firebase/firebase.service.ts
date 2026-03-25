@@ -1,5 +1,7 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
+import * as admin from 'firebase-admin';
+import { readFileSync } from 'fs';
 
 type FirebaseMessage = Record<string, any>;
 
@@ -27,13 +29,14 @@ export class FirebaseService {
 
   constructor(private configService: ConfigService) {
     try {
-      const admin = require('firebase-admin');
-
       // Initialize Firebase Admin SDK if not already initialized.
       if (!admin.apps.length) {
         const serviceAccountPath = this.configService.get<string>('FIREBASE_SERVICE_ACCOUNT_PATH');
         if (serviceAccountPath) {
-          const serviceAccount = JSON.parse(require('fs').readFileSync(serviceAccountPath, 'utf8'));
+          const serviceAccount = JSON.parse(readFileSync(serviceAccountPath, 'utf8')) as Record<
+            string,
+            unknown
+          >;
           admin.initializeApp({
             credential: admin.credential.cert(serviceAccount),
           });
@@ -82,7 +85,10 @@ export class FirebaseService {
   /**
    * Send a multicast notification to multiple device tokens.
    */
-  async sendToMulticast(tokens: string[], payload: FirebaseMessage): Promise<FirebaseBatchResponse> {
+  async sendToMulticast(
+    tokens: string[],
+    payload: FirebaseMessage,
+  ): Promise<FirebaseBatchResponse> {
     try {
       const multicastPayload: FirebaseMulticastMessage = {
         ...payload,

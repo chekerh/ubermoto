@@ -1,4 +1,9 @@
-import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  BadRequestException,
+  ForbiddenException,
+} from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, Types } from 'mongoose';
 import { Delivery, DeliveryDocument, DeliveryStatus } from './schemas/delivery.schema';
@@ -9,6 +14,7 @@ import { DeliveryMatchingService } from './delivery-matching.service';
 import { DeliveryGateway } from '../websocket/delivery.gateway';
 import { SurgeService } from '../surge/surge.service';
 import { DriversService } from '../drivers/drivers.service';
+import { UserRole } from '../users/schemas/user.schema';
 
 @Injectable()
 export class DeliveriesService {
@@ -84,10 +90,42 @@ export class DeliveriesService {
     return delivery;
   }
 
+  /**
+   * Customer (owner), assigned driver, or admin may view a delivery.
+   */
+  async findOneVisibleToRequester(
+    id: string,
+    requesterId: string,
+    role: UserRole,
+  ): Promise<DeliveryDocument> {
+    const delivery = await this.findOne(id);
+    if (role === UserRole.ADMIN) {
+      return delivery;
+    }
+    if (delivery.userId?.toString() === requesterId) {
+      return delivery;
+    }
+    if (role === UserRole.DRIVER) {
+      try {
+        const driverDocId = await this.resolveDriverId(requesterId);
+        if (delivery.driverId?.toString() === driverDocId) {
+          return delivery;
+        }
+      } catch {
+        // not a driver profile
+      }
+    }
+    throw new ForbiddenException('You are not allowed to view this delivery');
+  }
+
   private static readonly VALID_TRANSITIONS: Record<string, DeliveryStatus[]> = {
     [DeliveryStatus.PENDING]: [DeliveryStatus.ACCEPTED, DeliveryStatus.CANCELLED],
     [DeliveryStatus.ACCEPTED]: [DeliveryStatus.PICKED_UP, DeliveryStatus.CANCELLED],
-    [DeliveryStatus.PICKED_UP]: [DeliveryStatus.IN_PROGRESS, DeliveryStatus.COMPLETED, DeliveryStatus.CANCELLED],
+    [DeliveryStatus.PICKED_UP]: [
+      DeliveryStatus.IN_PROGRESS,
+      DeliveryStatus.COMPLETED,
+      DeliveryStatus.CANCELLED,
+    ],
     [DeliveryStatus.IN_PROGRESS]: [DeliveryStatus.COMPLETED, DeliveryStatus.CANCELLED],
     [DeliveryStatus.COMPLETED]: [],
     [DeliveryStatus.CANCELLED]: [],
@@ -102,10 +140,19 @@ export class DeliveriesService {
     }
   }
 
-  async updateStatus(id: string, status: DeliveryStatus): Promise<DeliveryDocument> {
+  async updateStatus(
+    id: string,
+    status: DeliveryStatus,
+    actorUserId: string,
+  ): Promise<DeliveryDocument> {
     const existing = await this.deliveryModel.findById(id).exec();
     if (!existing) {
       throw new NotFoundException(`Delivery with ID ${id} not found`);
+    }
+
+    const driverDocId = await this.resolveDriverId(actorUserId);
+    if (!existing.driverId || String(existing.driverId) !== driverDocId) {
+      throw new ForbiddenException('Only the assigned driver can update delivery status');
     }
 
     this.validateStatusTransition(existing.status, status);
@@ -124,12 +171,40 @@ export class DeliveriesService {
     return delivery;
   }
 
+  private async assertCanMutateDeliveryPricing(
+    delivery: DeliveryDocument,
+    requesterId: string,
+    role: UserRole,
+  ): Promise<void> {
+    if (role === UserRole.ADMIN) {
+      return;
+    }
+    if (delivery.userId?.toString() === requesterId) {
+      return;
+    }
+    if (role === UserRole.DRIVER) {
+      const driver = await this.driversService.findByUserId(requesterId);
+      if (driver && delivery.driverId?.toString() === driver._id.toString()) {
+        return;
+      }
+    }
+    throw new ForbiddenException('You are not allowed to update pricing for this delivery');
+  }
+
   async calculateCost(
     deliveryId: string,
     distance: number,
     motorcycleId: string,
-    region?: string,
+    region: string | undefined,
+    requesterId: string,
+    role: UserRole,
   ): Promise<number> {
+    const delivery = await this.deliveryModel.findById(deliveryId).exec();
+    if (!delivery) {
+      throw new NotFoundException(`Delivery with ID ${deliveryId} not found`);
+    }
+    await this.assertCanMutateDeliveryPricing(delivery, requesterId, role);
+
     const motorcycle = await this.motorcyclesService.findOne(motorcycleId);
     let surgeMultiplier = 1;
     if (region) {
@@ -219,7 +294,9 @@ export class DeliveriesService {
 
     // Make driver available again and increment delivery count (without re-setting status)
     if (delivery.driverId) {
-      await this.deliveryMatchingService.makeDriverAvailableAfterDelivery(delivery.driverId.toString());
+      await this.deliveryMatchingService.makeDriverAvailableAfterDelivery(
+        delivery.driverId.toString(),
+      );
     }
 
     return delivery;
@@ -234,10 +311,33 @@ export class DeliveriesService {
     return this.deliveryMatchingService.getAvailableDeliveries();
   }
 
-  async cancelDelivery(deliveryId: string, userId: string): Promise<DeliveryDocument> {
+  async cancelDelivery(
+    deliveryId: string,
+    userId: string,
+    role: UserRole,
+  ): Promise<DeliveryDocument> {
     const delivery = await this.deliveryModel.findById(deliveryId).exec();
     if (!delivery) {
       throw new NotFoundException('Delivery not found');
+    }
+
+    if (role === UserRole.ADMIN) {
+      this.validateStatusTransition(delivery.status, DeliveryStatus.CANCELLED);
+      const cancelled = await this.deliveryModel
+        .findByIdAndUpdate(deliveryId, { status: DeliveryStatus.CANCELLED }, { new: true })
+        .populate('driverId')
+        .populate('motorcycleId')
+        .exec();
+      if (!cancelled) {
+        throw new NotFoundException('Delivery not found');
+      }
+      if (cancelled.driverId) {
+        await this.deliveryMatchingService.makeDriverAvailableAfterDelivery(
+          cancelled.driverId.toString(),
+        );
+      }
+      this.deliveryGateway.emitDeliveryStatusUpdate(deliveryId, cancelled);
+      return cancelled;
     }
 
     // Only the customer who created the delivery or the assigned driver can cancel
@@ -269,11 +369,86 @@ export class DeliveriesService {
 
     // Free up the driver if one was assigned
     if (cancelled.driverId) {
-      await this.deliveryMatchingService.makeDriverAvailableAfterDelivery(cancelled.driverId.toString());
+      await this.deliveryMatchingService.makeDriverAvailableAfterDelivery(
+        cancelled.driverId.toString(),
+      );
     }
 
     this.deliveryGateway.emitDeliveryStatusUpdate(deliveryId, cancelled);
 
     return cancelled;
+  }
+
+  async addTip(deliveryId: string, userId: string, tipAmount: number): Promise<DeliveryDocument> {
+    if (tipAmount <= 0) {
+      throw new BadRequestException('Tip amount must be greater than 0');
+    }
+
+    const delivery = await this.deliveryModel.findById(deliveryId).exec();
+    if (!delivery) {
+      throw new NotFoundException('Delivery not found');
+    }
+
+    if (delivery.userId?.toString() !== userId) {
+      throw new BadRequestException('You are not authorized to tip this delivery');
+    }
+
+    if (delivery.status !== DeliveryStatus.COMPLETED) {
+      throw new BadRequestException('You can only tip completed deliveries');
+    }
+
+    const updated = await this.deliveryModel
+      .findByIdAndUpdate(deliveryId, { $inc: { tipAmount } }, { new: true })
+      .populate('driverId')
+      .populate('motorcycleId')
+      .exec();
+
+    if (!updated) {
+      throw new NotFoundException('Delivery not found');
+    }
+
+    this.deliveryGateway.emitDeliveryStatusUpdate(deliveryId, updated);
+    return updated;
+  }
+
+  async rateDelivery(
+    deliveryId: string,
+    userId: string,
+    rating: number,
+    feedback?: string,
+  ): Promise<DeliveryDocument> {
+    if (rating < 1 || rating > 5) {
+      throw new BadRequestException('Rating must be between 1 and 5');
+    }
+
+    const delivery = await this.deliveryModel.findById(deliveryId).exec();
+    if (!delivery) {
+      throw new NotFoundException('Delivery not found');
+    }
+
+    if (delivery.userId?.toString() !== userId) {
+      throw new BadRequestException('You are not authorized to rate this delivery');
+    }
+
+    if (delivery.status !== DeliveryStatus.COMPLETED) {
+      throw new BadRequestException('You can only rate completed deliveries');
+    }
+
+    const updated = await this.deliveryModel
+      .findByIdAndUpdate(
+        deliveryId,
+        { customerRating: rating, customerFeedback: feedback },
+        { new: true },
+      )
+      .populate('driverId')
+      .populate('motorcycleId')
+      .exec();
+
+    if (!updated) {
+      throw new NotFoundException('Delivery not found');
+    }
+
+    this.deliveryGateway.emitDeliveryStatusUpdate(deliveryId, updated);
+    return updated;
   }
 }

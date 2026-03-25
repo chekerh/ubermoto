@@ -5,6 +5,7 @@ import {
   Body,
   Param,
   Patch,
+  Query,
   UseGuards,
   HttpCode,
   HttpStatus,
@@ -12,7 +13,8 @@ import {
 } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
 import { AdminService } from './admin.service';
-import { DocumentStatus } from '../documents/schemas/document.schema';
+import { RejectDriverDto } from './dto/reject-driver.dto';
+import { UpdateAdminDocumentStatusDto } from './dto/update-admin-document-status.dto';
 import { RolesGuard } from '../auth/guards/roles.guard';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { Roles } from '../auth/decorators/roles.decorator';
@@ -85,7 +87,7 @@ export class AdminController {
   @ApiResponse({ status: 404, description: 'Driver not found' })
   rejectDriver(
     @Param('driverId') driverId: string,
-    @Body() body: { reason: string },
+    @Body() body: RejectDriverDto,
     @Request() req: AuthenticatedRequest,
   ) {
     return this.adminService.rejectDriver(driverId, body.reason, req.user.sub);
@@ -101,7 +103,7 @@ export class AdminController {
   @ApiResponse({ status: 404, description: 'Document not found' })
   updateDocumentStatus(
     @Param('documentId') documentId: string,
-    @Body() body: { status: DocumentStatus; rejectionReason?: string },
+    @Body() body: UpdateAdminDocumentStatusDto,
     @Request() req: AuthenticatedRequest,
   ) {
     return this.adminService.updateDocumentStatus(
@@ -130,5 +132,60 @@ export class AdminController {
   })
   getUserStats() {
     return this.adminService.getUserStats();
+  }
+
+  @Get('analytics/fraud')
+  @ApiOperation({ summary: 'Get fraud and risk analytics overview' })
+  @ApiResponse({
+    status: 200,
+    description: 'Fraud analytics metrics and suspicious activity summary',
+  })
+  getFraudAnalytics() {
+    return this.adminService.getFraudAnalytics();
+  }
+
+  @Get('analytics/revenue')
+  @ApiOperation({ summary: 'Get revenue analytics grouped by period and region' })
+  @ApiResponse({
+    status: 200,
+    description: 'Revenue analytics response',
+  })
+  getRevenueAnalytics(@Query('period') period?: string) {
+    return this.adminService.getRevenueAnalytics(period);
+  }
+
+  @Get('drivers/:driverId/activity')
+  @ApiOperation({ summary: 'Get driver operational activity and admin audit trail' })
+  @ApiResponse({
+    status: 200,
+    description: 'Driver activity details',
+  })
+  @ApiResponse({ status: 404, description: 'Driver not found' })
+  getDriverActivity(@Param('driverId') driverId: string) {
+    return this.adminService.getDriverActivity(driverId);
+  }
+
+  @Get('system/health')
+  @ApiOperation({ summary: 'Get extended system health for admin console' })
+  @ApiResponse({
+    status: 200,
+    description: 'System health summary',
+  })
+  getSystemHealth() {
+    return this.adminService.getSystemHealth();
+  }
+
+  @Get('reports/deliveries')
+  @ApiOperation({ summary: 'Get delivery activity report grouped by period' })
+  @ApiResponse({ status: 200, description: 'Delivery report' })
+  getDeliveriesReport(@Query('period') period?: string) {
+    return this.adminService.getDeliveriesReport(period);
+  }
+
+  @Get('reports/drivers')
+  @ApiOperation({ summary: 'Get driver performance report grouped by period' })
+  @ApiResponse({ status: 200, description: 'Driver report' })
+  getDriversReport(@Query('period') period?: string) {
+    return this.adminService.getDriversReport(period);
   }
 }

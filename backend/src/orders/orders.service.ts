@@ -1,7 +1,13 @@
 import { Injectable, BadRequestException, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import { Order, OrderDocument, OrderStatus, OrderType, PaymentMethod } from './schemas/order.schema';
+import {
+  Order,
+  OrderDocument,
+  OrderStatus,
+  OrderType,
+  PaymentMethod,
+} from './schemas/order.schema';
 import { CreateOrderDto } from './dto/create-order.dto';
 import { Product, ProductDocument } from '../catalog/schemas/product.schema';
 import { User, UserDocument } from '../users/schemas/user.schema';
@@ -101,5 +107,78 @@ export class OrdersService {
     const order = await this.orderModel.findByIdAndUpdate(id, { status }, { new: true }).exec();
     if (!order) throw new NotFoundException('Order not found');
     return order;
+  }
+
+  async reorder(userId: string, orderId: string): Promise<OrderDocument> {
+    const previous = await this.orderModel.findOne({ _id: orderId, userId }).exec();
+    if (!previous) {
+      throw new NotFoundException('Order not found');
+    }
+
+    const productIds = previous.items.map((i) => i.productId.toString());
+    const products = await this.productModel
+      .find({ _id: { $in: productIds }, isActive: true })
+      .exec();
+
+    if (!products.length) {
+      throw new BadRequestException('No products from the previous order are currently available');
+    }
+
+    const productById = new Map(products.map((p) => [p._id.toString(), p]));
+
+    let subtotal = 0;
+    const items = previous.items
+      .filter((item) => productById.has(item.productId.toString()))
+      .map((item) => {
+        const prod = productById.get(item.productId.toString())!;
+        subtotal += prod.price * item.quantity;
+        return {
+          productId: prod._id,
+          name: prod.name,
+          price: prod.price,
+          quantity: item.quantity,
+        };
+      });
+
+    const deliveryFee = previous.type === OrderType.RIDE ? 0 : Math.max(subtotal * 0.1, 3);
+    const total = subtotal + deliveryFee;
+
+    const reordered = new this.orderModel({
+      userId,
+      items,
+      subtotal,
+      deliveryFee,
+      total,
+      paymentMethod: PaymentMethod.COD,
+      type: previous.type,
+      address: previous.address,
+      region: previous.region,
+      status: OrderStatus.CONFIRMED,
+      surgeMultiplier: previous.surgeMultiplier || 1,
+    });
+
+    const saved = await reordered.save();
+
+    await this.userModel.findByIdAndUpdate(userId, {
+      $inc: { totalOrders: 1, lifetimeValue: total },
+    });
+
+    if (previous.type !== OrderType.RIDE && previous.address) {
+      try {
+        await this.deliveriesService.create(
+          {
+            pickupLocation: 'Store',
+            deliveryAddress: previous.address,
+            deliveryType: previous.type,
+            region: previous.region,
+          },
+          userId,
+        );
+      } catch (error) {
+        console.warn('Auto-delivery creation failed for reordered order:', saved._id, error);
+      }
+    }
+
+    return saved;
   }
 }

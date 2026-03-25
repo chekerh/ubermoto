@@ -5,14 +5,18 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
+import { Model, Types } from 'mongoose';
 import * as bcrypt from 'bcryptjs';
 import { User, UserDocument, UserRole } from './schemas/user.schema';
 import { UpdateProfileDto, ChangePasswordDto } from './dto/update-profile.dto';
+import { Product, ProductDocument } from '../catalog/schemas/product.schema';
 
 @Injectable()
 export class UsersService {
-  constructor(@InjectModel(User.name) private userModel: Model<UserDocument>) {}
+  constructor(
+    @InjectModel(User.name) private userModel: Model<UserDocument>,
+    @InjectModel(Product.name) private productModel: Model<ProductDocument>,
+  ) {}
 
   async findByEmail(email: string): Promise<UserDocument | null> {
     return this.userModel.findOne({ email }).exec();
@@ -174,5 +178,60 @@ export class UsersService {
         password: 'ACCOUNT_DELETED', // Prevent login
       })
       .exec();
+  }
+
+  async getFavorites(userId: string): Promise<ProductDocument[]> {
+    const user = await this.userModel.findById(userId).exec();
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+
+    const favoriteIds = user.favoriteProductIds || [];
+    if (!favoriteIds.length) {
+      return [];
+    }
+
+    return this.productModel.find({ _id: { $in: favoriteIds }, isActive: true }).exec();
+  }
+
+  async addFavorite(
+    userId: string,
+    productId: string,
+  ): Promise<{ success: boolean; message: string }> {
+    const user = await this.userModel.findById(userId).exec();
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+
+    const product = await this.productModel.findById(productId).exec();
+    if (!product || !product.isActive) {
+      throw new NotFoundException('Product not found');
+    }
+
+    await this.userModel
+      .findByIdAndUpdate(userId, {
+        $addToSet: { favoriteProductIds: new Types.ObjectId(productId) },
+      })
+      .exec();
+
+    return { success: true, message: 'Product added to favorites' };
+  }
+
+  async removeFavorite(
+    userId: string,
+    productId: string,
+  ): Promise<{ success: boolean; message: string }> {
+    const user = await this.userModel.findById(userId).exec();
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+
+    await this.userModel
+      .findByIdAndUpdate(userId, {
+        $pull: { favoriteProductIds: new Types.ObjectId(productId) },
+      })
+      .exec();
+
+    return { success: true, message: 'Product removed from favorites' };
   }
 }

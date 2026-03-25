@@ -1,8 +1,19 @@
-import { Body, Controller, Get, Param, Patch, Post, Delete, UseGuards, Request } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Param,
+  Patch,
+  Post,
+  Delete,
+  UseGuards,
+  Request,
+} from '@nestjs/common';
 import { SurgeService } from './surge.service';
 import { CreateSurgeRuleDto } from './dto/create-surge-rule.dto';
 import { UpdateSurgeRuleDto } from './dto/update-surge-rule.dto';
 import { PreviewSurgeDto } from './dto/preview-surge.dto';
+import { ToggleSurgeRuleDto } from './dto/toggle-surge-rule.dto';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../auth/guards/roles.guard';
 import { Roles } from '../auth/decorators/roles.decorator';
@@ -41,10 +52,10 @@ export class SurgeController {
   @Post(':id/toggle')
   toggle(
     @Param('id') id: string,
-    @Body('active') active: boolean,
+    @Body() body: ToggleSurgeRuleDto,
     @Request() req: AuthenticatedRequest,
   ) {
-    return this.surgeService.toggle(id, active, req.user.sub);
+    return this.surgeService.toggle(id, body.active, req.user.sub);
   }
 
   @Delete(':id')

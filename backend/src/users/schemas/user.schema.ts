@@ -1,5 +1,5 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { Document } from 'mongoose';
+import { Document, Types } from 'mongoose';
 
 export enum UserRole {
   CUSTOMER = 'CUSTOMER',
@@ -43,6 +43,9 @@ export class User {
 
   @Prop({ default: 0 })
   lifetimeValue?: number;
+
+  @Prop({ type: [{ type: Types.ObjectId, ref: 'Product' }], default: [] })
+  favoriteProductIds?: Types.ObjectId[];
 
   @Prop({
     type: {

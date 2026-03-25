@@ -104,18 +104,18 @@ describe('AuthService', () => {
     it('should throw UnauthorizedException when user not found', async () => {
       usersService.findByEmail!.mockResolvedValue(null);
 
-      await expect(
-        service.login({ email: 'nobody@example.com', password: 'x' }),
-      ).rejects.toThrow(UnauthorizedException);
+      await expect(service.login({ email: 'nobody@example.com', password: 'x' })).rejects.toThrow(
+        UnauthorizedException,
+      );
     });
 
     it('should throw UnauthorizedException when password is wrong', async () => {
       usersService.findByEmail!.mockResolvedValue(mockUser as any);
       (bcrypt.compare as jest.Mock).mockResolvedValue(false);
 
-      await expect(
-        service.login({ email: 'test@example.com', password: 'wrong' }),
-      ).rejects.toThrow(UnauthorizedException);
+      await expect(service.login({ email: 'test@example.com', password: 'wrong' })).rejects.toThrow(
+        UnauthorizedException,
+      );
     });
   });
 

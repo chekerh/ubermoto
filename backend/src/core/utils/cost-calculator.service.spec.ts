@@ -18,10 +18,7 @@ describe('CostCalculatorService', () => {
     };
 
     const module: TestingModule = await Test.createTestingModule({
-      providers: [
-        CostCalculatorService,
-        { provide: ConfigService, useValue: configService },
-      ],
+      providers: [CostCalculatorService, { provide: ConfigService, useValue: configService }],
     }).compile();
 
     service = module.get<CostCalculatorService>(CostCalculatorService);

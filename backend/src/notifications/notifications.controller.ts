@@ -3,6 +3,7 @@ import { NotificationsService } from './notifications.service';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../auth/guards/roles.guard';
 import { Request as ExpressRequest } from 'express';
+import { UpdateNotificationPreferencesDto } from './dto/update-notification-preferences.dto';
 
 interface AuthenticatedRequest extends ExpressRequest {
   user: { sub: string };
@@ -19,7 +20,7 @@ export class NotificationsController {
   }
 
   @Post()
-  updateMine(@Body('categories') categories: string[], @Request() req: AuthenticatedRequest) {
-    return this.notificationsService.updatePreferences(req.user.sub, categories || []);
+  updateMine(@Body() body: UpdateNotificationPreferencesDto, @Request() req: AuthenticatedRequest) {
+    return this.notificationsService.updatePreferences(req.user.sub, body.categories || []);
   }
 }
