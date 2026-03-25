@@ -39,6 +39,17 @@ This folder (`/product-workspace`) is the source of truth for building **UberMot
   - `POST /auth/register/merchant` creates merchant owner user + Merchant + MerchantMember
 - Enforced paid entitlements server-side for merchant catalog writes:
   - `@RequireFeature('merchant.catalog.write')` + `FeatureGuard` on catalog product CRUD
+- Added merchant ownership enforcement in `CatalogService`:
+  - merchant users can only create against merchants they belong to
+  - merchant users cannot transfer product ownership on update
+  - merchant users can update/delete only products under their merchant membership
+- Added merchant self-service billing endpoints:
+  - `POST /billing/merchant/me/checkout-session`
+  - `POST /billing/merchant/me/portal-session`
+  (derive merchant context from active membership)
+- Added frontend consumption scaffolding:
+  - `ContentService` (`/content/:key`)
+  - `MerchantBillingProvider` (plans + current entitlements)
 - Added dynamic content module in backend:
   - `GET /content/:key` (public published content)
   - `GET/PUT /admin/content/:key` (admin view + upsert/publish)

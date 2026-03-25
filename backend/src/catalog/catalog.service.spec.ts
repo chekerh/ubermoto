@@ -5,12 +5,14 @@ import { CatalogService } from './catalog.service';
 import { Product } from './schemas/product.schema';
 import { Category } from './schemas/category.schema';
 import { Merchant } from './schemas/merchant.schema';
+import { BillingService } from '../billing/billing.service';
 
 describe('CatalogService', () => {
   let service: CatalogService;
   let mockProductModel: any;
   let mockCategoryModel: any;
   let mockMerchantModel: any;
+  let mockBillingService: any;
 
   beforeEach(async () => {
     mockProductModel = {
@@ -44,6 +46,10 @@ describe('CatalogService', () => {
       exec: jest.fn(),
     };
 
+    mockBillingService = {
+      assertMerchantAccessOrThrow: jest.fn(),
+    };
+
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         CatalogService,
@@ -58,6 +64,10 @@ describe('CatalogService', () => {
         {
           provide: getModelToken(Merchant.name),
           useValue: mockMerchantModel,
+        },
+        {
+          provide: BillingService,
+          useValue: mockBillingService,
         },
       ],
     }).compile();

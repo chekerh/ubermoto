@@ -128,6 +128,18 @@ export class BillingService {
       .exec();
   }
 
+  private async resolveMerchantIdForUser(userId: string): Promise<string> {
+    const member = await this.merchantMemberModel
+      .findOne({ userId, isActive: true })
+      .sort({ createdAt: 1 })
+      .lean()
+      .exec();
+    if (!member?.merchantId) {
+      throw new NotFoundException('No active merchant membership found for this user');
+    }
+    return member.merchantId;
+  }
+
   async assertMerchantAccessOrThrow(merchantId: string, userId: string, userRole: string) {
     if (userRole === 'ADMIN') {
       return;
@@ -176,6 +188,24 @@ export class BillingService {
     return { url: session.url, sessionId: session.id };
   }
 
+  async createCheckoutSessionForUser(
+    planKey: string,
+    successUrl: string,
+    cancelUrl: string,
+    requesterUserId: string,
+    requesterRole: string,
+  ) {
+    const merchantId = await this.resolveMerchantIdForUser(requesterUserId);
+    return this.createCheckoutSession(
+      merchantId,
+      planKey,
+      successUrl,
+      cancelUrl,
+      requesterUserId,
+      requesterRole,
+    );
+  }
+
   async createPortalSession(
     merchantId: string,
     returnUrl: string,
@@ -192,6 +222,11 @@ export class BillingService {
       return_url: returnUrl,
     });
     return { url: portal.url };
+  }
+
+  async createPortalSessionForUser(returnUrl: string, requesterUserId: string, requesterRole: string) {
+    const merchantId = await this.resolveMerchantIdForUser(requesterUserId);
+    return this.createPortalSession(merchantId, returnUrl, requesterUserId, requesterRole);
   }
 
   async upsertSubscriptionFromStripe(

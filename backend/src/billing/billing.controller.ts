@@ -24,6 +24,8 @@ import { UserRole } from '../users/schemas/user.schema';
 import { CreateCheckoutSessionDto } from './dto/create-checkout-session.dto';
 import { CreatePortalSessionDto } from './dto/create-portal-session.dto';
 import { UpsertPlanDto } from './dto/upsert-plan.dto';
+import { CreateSelfCheckoutSessionDto } from './dto/create-self-checkout-session.dto';
+import { CreateSelfPortalSessionDto } from './dto/create-self-portal-session.dto';
 
 interface RawBodyRequest extends ExpressRequest {
   rawBody?: Buffer;
@@ -46,7 +48,7 @@ export class BillingController {
 
   @Post('merchant/checkout-session')
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(UserRole.ADMIN)
+  @Roles(UserRole.ADMIN, UserRole.MERCHANT)
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Create Stripe Checkout session for merchant subscription' })
   createCheckoutSession(
@@ -65,7 +67,7 @@ export class BillingController {
 
   @Post('merchant/portal-session')
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(UserRole.ADMIN)
+  @Roles(UserRole.ADMIN, UserRole.MERCHANT)
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Create Stripe billing portal session for merchant' })
   createPortalSession(@Body() dto: CreatePortalSessionDto, @Request() req: AuthenticatedRequest) {
@@ -75,6 +77,36 @@ export class BillingController {
       req.user.sub,
       req.user.role,
     );
+  }
+
+  @Post('merchant/me/checkout-session')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRole.MERCHANT, UserRole.ADMIN)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Create Stripe Checkout session using current user merchant membership' })
+  createCheckoutSessionForMe(
+    @Body() dto: CreateSelfCheckoutSessionDto,
+    @Request() req: AuthenticatedRequest,
+  ) {
+    return this.billingService.createCheckoutSessionForUser(
+      dto.planKey,
+      dto.successUrl,
+      dto.cancelUrl,
+      req.user.sub,
+      req.user.role,
+    );
+  }
+
+  @Post('merchant/me/portal-session')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRole.MERCHANT, UserRole.ADMIN)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Create Stripe billing portal session from current user merchant membership' })
+  createPortalSessionForMe(
+    @Body() dto: CreateSelfPortalSessionDto,
+    @Request() req: AuthenticatedRequest,
+  ) {
+    return this.billingService.createPortalSessionForUser(dto.returnUrl, req.user.sub, req.user.role);
   }
 
   @Get('me/entitlements')

@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException, ConflictException } from '@nestjs/common';
+import { Injectable, NotFoundException, ConflictException, ForbiddenException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, Types } from 'mongoose';
 import { Product, ProductDocument } from './schemas/product.schema';
@@ -9,6 +9,12 @@ import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { CreateCategoryDto } from './dto/create-category.dto';
 import { UpdateCategoryDto } from './dto/update-category.dto';
+import { BillingService } from '../billing/billing.service';
+
+interface CatalogRequester {
+  userId: string;
+  role: string;
+}
 
 @Injectable()
 export class CatalogService {
@@ -16,6 +22,7 @@ export class CatalogService {
     @InjectModel(Product.name) private productModel: Model<ProductDocument>,
     @InjectModel(Category.name) private categoryModel: Model<CategoryDocument>,
     @InjectModel(Merchant.name) private merchantModel: Model<MerchantDocument>,
+    private readonly billingService: BillingService,
   ) {}
 
   async createMerchant(dto: { name: string; region: string; logoUrl?: string }) {
@@ -93,7 +100,10 @@ export class CatalogService {
 
   // ── Product CRUD ──────────────────────────────────────────────────────
 
-  async createProduct(dto: CreateProductDto): Promise<ProductDocument> {
+  async createProduct(dto: CreateProductDto, requester?: CatalogRequester): Promise<ProductDocument> {
+    if (requester?.role === 'MERCHANT') {
+      await this.billingService.assertMerchantAccessOrThrow(dto.merchantId, requester.userId, requester.role);
+    }
     const productData: any = {
       ...dto,
       merchantId: new Types.ObjectId(dto.merchantId),
@@ -111,7 +121,22 @@ export class CatalogService {
     return product.save();
   }
 
-  async updateProduct(id: string, dto: UpdateProductDto): Promise<ProductDocument> {
+  async updateProduct(id: string, dto: UpdateProductDto, requester?: CatalogRequester): Promise<ProductDocument> {
+    const existing = await this.productModel.findById(id).exec();
+    if (!existing) {
+      throw new NotFoundException(`Product with ID ${id} not found`);
+    }
+    if (requester?.role === 'MERCHANT') {
+      await this.billingService.assertMerchantAccessOrThrow(
+        existing.merchantId.toString(),
+        requester.userId,
+        requester.role,
+      );
+      if (dto.merchantId && dto.merchantId !== existing.merchantId.toString()) {
+        throw new ForbiddenException('Merchant users cannot transfer product ownership');
+      }
+    }
+
     const updateData: any = { ...dto };
 
     if (dto.merchantId) {
@@ -133,11 +158,19 @@ export class CatalogService {
     return product;
   }
 
-  async deleteProduct(id: string): Promise<void> {
-    const result = await this.productModel.findByIdAndDelete(id).exec();
-    if (!result) {
+  async deleteProduct(id: string, requester?: CatalogRequester): Promise<void> {
+    const existing = await this.productModel.findById(id).exec();
+    if (!existing) {
       throw new NotFoundException(`Product with ID ${id} not found`);
     }
+    if (requester?.role === 'MERCHANT') {
+      await this.billingService.assertMerchantAccessOrThrow(
+        existing.merchantId.toString(),
+        requester.userId,
+        requester.role,
+      );
+    }
+    await this.productModel.findByIdAndDelete(id).exec();
   }
 
   // ── Category CRUD ─────────────────────────────────────────────────────

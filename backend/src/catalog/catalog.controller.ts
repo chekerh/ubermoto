@@ -8,6 +8,7 @@ import {
   Query,
   Body,
   UseGuards,
+  Request,
 } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth } from '@nestjs/swagger';
 import { CatalogService } from './catalog.service';
@@ -22,6 +23,13 @@ import { Roles } from '../auth/decorators/roles.decorator';
 import { UserRole } from '../users/schemas/user.schema';
 import { FeatureGuard } from '../billing/guards/feature.guard';
 import { RequireFeature } from '../billing/guards/require-feature.decorator';
+
+interface AuthenticatedRequest extends Request {
+  user: {
+    sub: string;
+    role: string;
+  };
+}
 
 @ApiTags('catalog')
 @Controller('catalog')
@@ -89,8 +97,11 @@ export class CatalogController {
   @ApiResponse({ status: 201, description: 'Product created successfully' })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
   @ApiResponse({ status: 403, description: 'Forbidden - Admin role required' })
-  createProduct(@Body() dto: CreateProductDto) {
-    return this.catalogService.createProduct(dto);
+  createProduct(@Body() dto: CreateProductDto, @Request() req: AuthenticatedRequest) {
+    return this.catalogService.createProduct(dto, {
+      userId: req.user.sub,
+      role: req.user.role,
+    });
   }
 
   @Patch('products/:id')
@@ -103,8 +114,11 @@ export class CatalogController {
   @ApiResponse({ status: 404, description: 'Product not found' })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
   @ApiResponse({ status: 403, description: 'Forbidden - Admin role required' })
-  updateProduct(@Param('id') id: string, @Body() dto: UpdateProductDto) {
-    return this.catalogService.updateProduct(id, dto);
+  updateProduct(@Param('id') id: string, @Body() dto: UpdateProductDto, @Request() req: AuthenticatedRequest) {
+    return this.catalogService.updateProduct(id, dto, {
+      userId: req.user.sub,
+      role: req.user.role,
+    });
   }
 
   @Delete('products/:id')
@@ -117,8 +131,11 @@ export class CatalogController {
   @ApiResponse({ status: 404, description: 'Product not found' })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
   @ApiResponse({ status: 403, description: 'Forbidden - Admin role required' })
-  async deleteProduct(@Param('id') id: string) {
-    await this.catalogService.deleteProduct(id);
+  async deleteProduct(@Param('id') id: string, @Request() req: AuthenticatedRequest) {
+    await this.catalogService.deleteProduct(id, {
+      userId: req.user.sub,
+      role: req.user.role,
+    });
     return { success: true, message: 'Product deleted successfully' };
   }
 
