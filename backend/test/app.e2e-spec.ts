@@ -112,4 +112,63 @@ describe('App (e2e)', () => {
         expect(res.body.deliveryAddress).toBe('Dropoff B');
       });
   });
+
+  it('GET /catalog/merchant/products — 401 without token', () => {
+    return request(httpServer).get('/catalog/merchant/products').expect(401);
+  });
+
+  it('POST /auth/register/merchant — memberships, entitlements, inventory list', async () => {
+    const ts = Date.now();
+    const email = `e2e-merchant-${ts}@example.test`;
+    const register = await request(httpServer)
+      .post('/auth/register/merchant')
+      .send({
+        email,
+        password: 'password1',
+        ownerName: 'E2E Owner',
+        merchantName: `E2E Store ${ts}`,
+        region: 'TND',
+      })
+      .expect(201);
+
+    const token = register.body?.access_token as string | undefined;
+    expect(token).toBeDefined();
+
+    const memRes = await request(httpServer)
+      .get('/billing/me/memberships')
+      .set('Authorization', `Bearer ${token}`)
+      .expect(200);
+
+    expect(Array.isArray(memRes.body)).toBe(true);
+    expect(memRes.body.length).toBeGreaterThanOrEqual(1);
+    const merchantId = memRes.body[0].merchantId as string;
+    expect(merchantId).toBeDefined();
+
+    await request(httpServer)
+      .get('/billing/me/entitlements')
+      .set('Authorization', `Bearer ${token}`)
+      .query({ merchantId })
+      .expect(200)
+      .expect((res) => {
+        expect(res.body).toHaveProperty('user');
+        expect(res.body).toHaveProperty('merchant');
+      });
+
+    await request(httpServer)
+      .get('/catalog/merchant/products')
+      .set('Authorization', `Bearer ${token}`)
+      .expect(200)
+      .expect((res) => {
+        expect(Array.isArray(res.body)).toBe(true);
+      });
+
+    await request(httpServer)
+      .get('/catalog/merchant/products')
+      .set('Authorization', `Bearer ${token}`)
+      .query({ merchantId })
+      .expect(200)
+      .expect((res) => {
+        expect(Array.isArray(res.body)).toBe(true);
+      });
+  });
 });

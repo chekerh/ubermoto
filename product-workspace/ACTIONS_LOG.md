@@ -140,3 +140,8 @@ This folder (`/product-workspace`) is the source of truth for building **UberMot
 - **Code**: single shared **`entitlementsServiceProvider`** (removed duplicate from `merchant_billing_provider.dart`) so Riverpod resolves one `EntitlementsService` instance.
 - **Conclusion**: product is **materially stronger** but **not** asserted production-launch-complete; see **`PRODUCTION_READINESS.md`**.
 
+### 2026-03-25 — Merchant path e2e
+
+- **`test/app.e2e-spec.ts`**: `GET /catalog/merchant/products` **401** without JWT; **`POST /auth/register/merchant`** then **`GET /billing/me/memberships`**, **`GET /billing/me/entitlements?merchantId=`**, and **`GET /catalog/merchant/products`** (with and without explicit `merchantId`).
+- **`npm run test:e2e`**: **7** tests passing (in-memory Mongo).
+

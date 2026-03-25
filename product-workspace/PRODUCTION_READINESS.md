@@ -8,7 +8,7 @@
 |--------|--------|
 | Backend unit tests (`backend/`: `npm test`) | 116 passed |
 | Backend build (`npm run build`) | Pass |
-| Backend e2e (`npm run test:e2e`, needs Mongo) | 5 passed (health, auth, deliveries smoke) |
+| Backend e2e (`npm run test:e2e`, in-memory Mongo) | 7 passed (adds merchant register + billing + `/catalog/merchant/products`) |
 | Flutter tests (`flutter test`) | All passed |
 | `dart analyze` | 0 errors; remaining findings are **info** (style) across legacy Stitch/widgets |
 | `.env` / `node_modules` / `dist` tracked in git | Not found (`.gitignore` covers `.env`, `node_modules`, build dirs) |

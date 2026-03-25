@@ -9,7 +9,7 @@
 
 ### Near-term engineering
 
-1. **E2E**: Extend `test/app.e2e-spec.ts` (or split files) for merchant register → entitlements → product CRUD with seeded plans (Stripe mocked or skipped).
+1. **E2E**: Done for **merchant register → memberships → entitlements → inventory list** (`test/app.e2e-spec.ts`). Next: **product CRUD** with seeded plan entitlements (or Stripe/webhook mock) for `merchant.catalog.write`.
 2. **Stripe production**: Deep links / universal links for checkout return; document env vars in `backend/.env.example`.
 3. **Customer/driver**: Replace or bridge critical Stitch flows with tested Flutter navigation where product requires it.
 
