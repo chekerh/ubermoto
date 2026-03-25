@@ -26,4 +26,3 @@ export class MerchantRegisterDto {
   @IsString()
   ownerName!: string;
 }
-

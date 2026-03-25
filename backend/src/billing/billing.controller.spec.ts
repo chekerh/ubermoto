@@ -73,4 +73,3 @@ describe('BillingController (Stripe webhook)', () => {
     expect(res).toEqual({ received: true, duplicate: true });
   });
 });
-

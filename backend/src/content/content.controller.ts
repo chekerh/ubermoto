@@ -84,4 +84,3 @@ export class ContentController {
     return doc;
   }
 }
-

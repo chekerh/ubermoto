@@ -8,9 +8,11 @@ describe('HealthController', () => {
   let mockAdminCommand: jest.Mock;
 
   const createController = (readyState: number, pingOk: boolean) => {
-    mockAdminCommand = jest.fn().mockImplementation(() =>
-      pingOk ? Promise.resolve({ ok: 1 }) : Promise.reject(new Error('ping failed')),
-    );
+    mockAdminCommand = jest
+      .fn()
+      .mockImplementation(() =>
+        pingOk ? Promise.resolve({ ok: 1 }) : Promise.reject(new Error('ping failed')),
+      );
     const mockConnection = {
       readyState,
       db: {

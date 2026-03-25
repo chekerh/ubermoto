@@ -123,9 +123,9 @@ describe('CatalogService', () => {
       });
       mockProductModel.countDocuments.mockResolvedValue(1);
 
-      await expect(
-        service.createProduct(dto, { userId: 'u1', role: 'MERCHANT' }),
-      ).rejects.toThrow('Plan limit reached');
+      await expect(service.createProduct(dto, { userId: 'u1', role: 'MERCHANT' })).rejects.toThrow(
+        'Plan limit reached',
+      );
     });
   });
 

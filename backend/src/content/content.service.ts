@@ -16,7 +16,12 @@ export class ContentService {
         throw new BadRequestException('pricing_table requires plans[]');
       }
       for (const p of data.plans) {
-        if (!p || typeof p !== 'object' || typeof p.key !== 'string' || typeof p.title !== 'string') {
+        if (
+          !p ||
+          typeof p !== 'object' ||
+          typeof p.key !== 'string' ||
+          typeof p.title !== 'string'
+        ) {
           throw new BadRequestException('Invalid pricing_table plan entry');
         }
       }
@@ -52,7 +57,12 @@ export class ContentService {
     if (!doc) {
       throw new NotFoundException('Content not found');
     }
-    return { key: doc.key, schemaVersion: doc.schemaVersion, data: doc.data, publishedAt: doc.publishedAt };
+    return {
+      key: doc.key,
+      schemaVersion: doc.schemaVersion,
+      data: doc.data,
+      publishedAt: doc.publishedAt,
+    };
   }
 
   async listPublished() {
@@ -102,4 +112,3 @@ export class ContentService {
     return doc;
   }
 }
-

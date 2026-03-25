@@ -25,4 +25,3 @@ export class StripeWebhookEvent {
 }
 
 export const StripeWebhookEventSchema = SchemaFactory.createForClass(StripeWebhookEvent);
-

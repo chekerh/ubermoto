@@ -129,7 +129,11 @@ export class CatalogController {
   @ApiResponse({ status: 404, description: 'Product not found' })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
   @ApiResponse({ status: 403, description: 'Forbidden - Admin role required' })
-  updateProduct(@Param('id') id: string, @Body() dto: UpdateProductDto, @Request() req: AuthenticatedRequest) {
+  updateProduct(
+    @Param('id') id: string,
+    @Body() dto: UpdateProductDto,
+    @Request() req: AuthenticatedRequest,
+  ) {
     return this.catalogService.updateProduct(id, dto, {
       userId: req.user.sub,
       role: req.user.role,

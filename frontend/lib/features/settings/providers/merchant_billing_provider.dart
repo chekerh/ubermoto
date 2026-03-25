@@ -2,7 +2,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../services/billing_service.dart';
 import '../../../services/entitlements_service.dart';
-import '../../auth/providers/entitlements_provider.dart';
+import '../../auth/providers/entitlements_provider.dart'
+    show entitlementsProvider, entitlementsServiceProvider;
 
 class MerchantBillingState {
   final bool isLoading;
@@ -49,7 +50,6 @@ class MerchantBillingState {
 }
 
 final billingServiceProvider = Provider((ref) => BillingService());
-final entitlementsServiceProvider = Provider((ref) => EntitlementsService());
 
 class MerchantBillingNotifier extends StateNotifier<MerchantBillingState> {
   MerchantBillingNotifier(

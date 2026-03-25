@@ -132,3 +132,11 @@ This folder (`/product-workspace`) is the source of truth for building **UberMot
 - **Logout / clearInvalidAuth**: clears **`entitlementsProvider`** and resets **`merchantBillingProvider`** so the next session does not flash another user’s billing state.
 - **Merchant home**: warning when **`merchant.catalog.write`** is false; **Manage products** disabled until the plan grants catalog access.
 
+### 2026-03-25 — Hardening review (no launch claim)
+
+- **Automated validation run**: backend `npm test` (116), `npm run build`, `npm run test:e2e` (5); frontend `flutter test` (pass); `dart analyze` — **0 errors** (legacy **info**-level lints remain in Stitch/widgets).
+- **Git hygiene**: working tree clean; no tracked `node_modules`, `.env`, or `dist`/`build` outputs; `.gitignore` includes `.env`, certs, `backend/uploads/`, Flutter tooling noise.
+- **Docs**: added **`PRODUCTION_READINESS.md`** (explicit gaps: live Stripe, hosting, security depth, E2E for paid flows, ops/legal); rewrote **`NEXT_STEPS.md`** to match implemented vs remaining work.
+- **Code**: single shared **`entitlementsServiceProvider`** (removed duplicate from `merchant_billing_provider.dart`) so Riverpod resolves one `EntitlementsService` instance.
+- **Conclusion**: product is **materially stronger** but **not** asserted production-launch-complete; see **`PRODUCTION_READINESS.md`**.
+

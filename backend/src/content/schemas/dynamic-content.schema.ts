@@ -27,4 +27,3 @@ export class DynamicContent {
 }
 
 export const DynamicContentSchema = SchemaFactory.createForClass(DynamicContent);
-

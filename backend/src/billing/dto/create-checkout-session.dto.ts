@@ -13,4 +13,3 @@ export class CreateCheckoutSessionDto {
   @IsUrl()
   cancelUrl!: string;
 }
-

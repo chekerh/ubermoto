@@ -23,4 +23,3 @@ export class UpsertPlanDto {
   @IsBoolean()
   isActive?: boolean;
 }
-

@@ -22,4 +22,3 @@ export class Entitlement {
 }
 
 export const EntitlementSchema = SchemaFactory.createForClass(Entitlement);
-

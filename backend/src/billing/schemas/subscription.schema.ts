@@ -25,7 +25,10 @@ export class Subscription {
   @Prop({ required: true })
   planKey!: string;
 
-  @Prop({ required: true, enum: ['trialing', 'active', 'past_due', 'canceled', 'incomplete', 'unpaid'] })
+  @Prop({
+    required: true,
+    enum: ['trialing', 'active', 'past_due', 'canceled', 'incomplete', 'unpaid'],
+  })
   status!: SubscriptionStatus;
 
   @Prop()
@@ -39,4 +42,3 @@ export class Subscription {
 }
 
 export const SubscriptionSchema = SchemaFactory.createForClass(Subscription);
-

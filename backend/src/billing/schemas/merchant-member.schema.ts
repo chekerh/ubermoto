@@ -22,4 +22,3 @@ export class MerchantMember {
 
 export const MerchantMemberSchema = SchemaFactory.createForClass(MerchantMember);
 MerchantMemberSchema.index({ merchantId: 1, userId: 1 }, { unique: true });
-

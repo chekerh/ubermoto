@@ -28,4 +28,3 @@ export class Plan {
 }
 
 export const PlanSchema = SchemaFactory.createForClass(Plan);
-

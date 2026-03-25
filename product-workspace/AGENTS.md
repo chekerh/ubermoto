@@ -11,6 +11,7 @@
 - Frontend: `flutter test`, `dart analyze`
 - Security: verify guards on new endpoints, webhook signature verification
 - Ops: update `/product-workspace/ACTIONS_LOG.md` and relevant specs
+- Do **not** claim production launch complete without `PRODUCTION_READINESS.md`-class criteria (Stripe live, hosting, legal, etc.).
 
 ### Repo constraints
 - Backend code stays under `backend/`

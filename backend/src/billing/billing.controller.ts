@@ -84,7 +84,9 @@ export class BillingController {
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(UserRole.MERCHANT, UserRole.ADMIN)
   @ApiBearerAuth()
-  @ApiOperation({ summary: 'Create Stripe Checkout session using current user merchant membership' })
+  @ApiOperation({
+    summary: 'Create Stripe Checkout session using current user merchant membership',
+  })
   createCheckoutSessionForMe(
     @Body() dto: CreateSelfCheckoutSessionDto,
     @Request() req: AuthenticatedRequest,
@@ -104,7 +106,9 @@ export class BillingController {
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(UserRole.MERCHANT, UserRole.ADMIN)
   @ApiBearerAuth()
-  @ApiOperation({ summary: 'Create Stripe billing portal session from current user merchant membership' })
+  @ApiOperation({
+    summary: 'Create Stripe billing portal session from current user merchant membership',
+  })
   createPortalSessionForMe(
     @Body() dto: CreateSelfPortalSessionDto,
     @Request() req: AuthenticatedRequest,
@@ -121,7 +125,10 @@ export class BillingController {
   @UseGuards(JwtAuthGuard, RolesGuard)
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Get effective entitlements for current user and merchant membership' })
-  getMyEntitlements(@Request() req: AuthenticatedRequest, @Query('merchantId') merchantId?: string) {
+  getMyEntitlements(
+    @Request() req: AuthenticatedRequest,
+    @Query('merchantId') merchantId?: string,
+  ) {
     return this.billingService.getEntitlementsForUser(req.user.sub, req.user.role, merchantId);
   }
 
@@ -138,9 +145,13 @@ export class BillingController {
   @Roles(UserRole.MERCHANT, UserRole.ADMIN)
   @ApiBearerAuth()
   @ApiOperation({
-    summary: 'Get merchant billing summary for current user (merchant profile, subscription, entitlements)',
+    summary:
+      'Get merchant billing summary for current user (merchant profile, subscription, entitlements)',
   })
-  getMyMerchantSummary(@Request() req: AuthenticatedRequest, @Query('merchantId') merchantId?: string) {
+  getMyMerchantSummary(
+    @Request() req: AuthenticatedRequest,
+    @Query('merchantId') merchantId?: string,
+  ) {
     return this.billingService.getMerchantSummaryForUser(req.user.sub, req.user.role, merchantId);
   }
 
@@ -151,7 +162,10 @@ export class BillingController {
   @ApiOperation({
     summary: 'Product count vs plan limit for current merchant context (upgrade UX)',
   })
-  getMyMerchantUsage(@Request() req: AuthenticatedRequest, @Query('merchantId') merchantId?: string) {
+  getMyMerchantUsage(
+    @Request() req: AuthenticatedRequest,
+    @Query('merchantId') merchantId?: string,
+  ) {
     return this.billingService.getMerchantUsageForUser(req.user.sub, req.user.role, merchantId);
   }
 
@@ -229,4 +243,3 @@ export class BillingController {
     return { received: true };
   }
 }
-

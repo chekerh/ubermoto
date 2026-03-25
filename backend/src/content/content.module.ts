@@ -6,10 +6,12 @@ import { ContentService } from './content.service';
 import { DynamicContent, DynamicContentSchema } from './schemas/dynamic-content.schema';
 
 @Module({
-  imports: [MongooseModule.forFeature([{ name: DynamicContent.name, schema: DynamicContentSchema }]), AdminModule],
+  imports: [
+    MongooseModule.forFeature([{ name: DynamicContent.name, schema: DynamicContentSchema }]),
+    AdminModule,
+  ],
   controllers: [ContentController],
   providers: [ContentService],
   exports: [ContentService],
 })
 export class ContentModule {}
-

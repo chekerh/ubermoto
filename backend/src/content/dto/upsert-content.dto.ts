@@ -16,4 +16,3 @@ export class UpsertContentDto {
   @IsBoolean()
   publish?: boolean;
 }
-

@@ -30,8 +30,7 @@ export class FeatureGuard implements CanActivate {
     }
 
     const merchantId =
-      (req.query?.merchantId as string | undefined) ||
-      (req.body?.merchantId as string | undefined);
+      (req.query?.merchantId as string | undefined) || (req.body?.merchantId as string | undefined);
 
     const ent = await this.billingService.getEntitlementsForUser(user.sub, user.role, merchantId);
     const has = !!ent?.merchant?.features?.[featureKey];
@@ -41,4 +40,3 @@ export class FeatureGuard implements CanActivate {
     return true;
   }
 }
-

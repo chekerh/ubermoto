@@ -54,7 +54,10 @@ export class DocumentsService {
     try {
       fs.unlinkSync(absolute);
     } catch (err) {
-      this.logger.error(`Failed to delete file ${absolute}`, err instanceof Error ? err.stack : String(err));
+      this.logger.error(
+        `Failed to delete file ${absolute}`,
+        err instanceof Error ? err.stack : String(err),
+      );
     }
   }
 

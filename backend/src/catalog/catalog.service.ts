@@ -137,9 +137,16 @@ export class CatalogService {
 
   // ── Product CRUD ──────────────────────────────────────────────────────
 
-  async createProduct(dto: CreateProductDto, requester?: CatalogRequester): Promise<ProductDocument> {
+  async createProduct(
+    dto: CreateProductDto,
+    requester?: CatalogRequester,
+  ): Promise<ProductDocument> {
     if (requester?.role === 'MERCHANT') {
-      await this.billingService.assertMerchantAccessOrThrow(dto.merchantId, requester.userId, requester.role);
+      await this.billingService.assertMerchantAccessOrThrow(
+        dto.merchantId,
+        requester.userId,
+        requester.role,
+      );
       const entitlements = await this.billingService.getEntitlementsForUser(
         requester.userId,
         requester.role,
@@ -149,7 +156,9 @@ export class CatalogService {
       const maxProducts =
         typeof maxProductsRaw === 'number'
           ? maxProductsRaw
-          : (typeof maxProductsRaw === 'string' ? Number(maxProductsRaw) : NaN);
+          : typeof maxProductsRaw === 'string'
+            ? Number(maxProductsRaw)
+            : NaN;
       if (Number.isFinite(maxProducts) && maxProducts > 0) {
         const currentCount = await this.productModel.countDocuments({
           merchantId: new Types.ObjectId(dto.merchantId),
@@ -178,7 +187,11 @@ export class CatalogService {
     return product.save();
   }
 
-  async updateProduct(id: string, dto: UpdateProductDto, requester?: CatalogRequester): Promise<ProductDocument> {
+  async updateProduct(
+    id: string,
+    dto: UpdateProductDto,
+    requester?: CatalogRequester,
+  ): Promise<ProductDocument> {
     const existing = await this.productModel.findById(id).exec();
     if (!existing) {
       throw new NotFoundException(`Product with ID ${id} not found`);

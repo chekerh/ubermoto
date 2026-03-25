@@ -7,4 +7,3 @@ export class CreatePortalSessionDto {
   @IsUrl()
   returnUrl!: string;
 }
-

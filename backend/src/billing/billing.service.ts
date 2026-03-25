@@ -1,9 +1,18 @@
-import { BadRequestException, ForbiddenException, Injectable, Logger, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  ForbiddenException,
+  Injectable,
+  Logger,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import crypto from 'crypto';
 import Stripe from 'stripe';
-import { StripeWebhookEvent, StripeWebhookEventDocument } from './schemas/stripe-webhook-event.schema';
+import {
+  StripeWebhookEvent,
+  StripeWebhookEventDocument,
+} from './schemas/stripe-webhook-event.schema';
 import { Plan, PlanDocument } from './schemas/plan.schema';
 import { Subscription, SubscriptionDocument } from './schemas/subscription.schema';
 import { Entitlement, EntitlementDocument } from './schemas/entitlement.schema';
@@ -141,7 +150,10 @@ export class BillingService {
       return [];
     }
     const merchantIds = memberships.map((m) => m.merchantId);
-    const merchants = await this.merchantModel.find({ _id: { $in: merchantIds } }).lean().exec();
+    const merchants = await this.merchantModel
+      .find({ _id: { $in: merchantIds } })
+      .lean()
+      .exec();
     const merchantMap = new Map(merchants.map((m: any) => [String(m._id), m]));
     return memberships.map((m) => {
       const merchant = merchantMap.get(m.merchantId);
@@ -177,7 +189,9 @@ export class BillingService {
     if (userRole === 'ADMIN') {
       return;
     }
-    const member = await this.merchantMemberModel.findOne({ merchantId, userId, isActive: true }).exec();
+    const member = await this.merchantMemberModel
+      .findOne({ merchantId, userId, isActive: true })
+      .exec();
     if (!member) {
       throw new ForbiddenException('You do not have access to this merchant');
     }
@@ -418,7 +432,10 @@ export class BillingService {
   async getEntitlementsForUser(userId: string, userRole: string, merchantId?: string) {
     let memberMerchantId = merchantId;
     if (!memberMerchantId) {
-      const member = await this.merchantMemberModel.findOne({ userId, isActive: true }).lean().exec();
+      const member = await this.merchantMemberModel
+        .findOne({ userId, isActive: true })
+        .lean()
+        .exec();
       memberMerchantId = member?.merchantId;
     }
     if (!memberMerchantId) {
@@ -428,7 +445,10 @@ export class BillingService {
       };
     }
     await this.assertMerchantAccessOrThrow(memberMerchantId, userId, userRole);
-    const sub = await this.subscriptionModel.findOne({ merchantId: memberMerchantId }).lean().exec();
+    const sub = await this.subscriptionModel
+      .findOne({ merchantId: memberMerchantId })
+      .lean()
+      .exec();
     const ent = await this.entitlementModel.findOne({ merchantId: memberMerchantId }).lean().exec();
     return {
       user: { role: userRole, features: {}, limits: {} },
@@ -471,4 +491,3 @@ export class BillingService {
     await this.markStripeEventProcessed(event.id);
   }
 }
-
