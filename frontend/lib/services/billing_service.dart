@@ -134,5 +134,20 @@ class BillingService {
       throw NetworkException('Failed to load merchant summary: ${e.toString()}');
     }
   }
+
+  Future<List<Map<String, dynamic>>> getMyMemberships() async {
+    try {
+      final res = await ApiService.get('/billing/me/memberships', requiresAuth: true);
+      final decoded = jsonDecode(res.body);
+      if (decoded is! List) {
+        throw const ServerException('Invalid memberships response');
+      }
+      return decoded.whereType<Map>().map((e) => Map<String, dynamic>.from(e)).toList();
+    } on AppException {
+      rethrow;
+    } catch (e) {
+      throw NetworkException('Failed to load memberships: ${e.toString()}');
+    }
+  }
 }
 

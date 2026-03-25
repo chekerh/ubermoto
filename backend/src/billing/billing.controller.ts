@@ -117,6 +117,14 @@ export class BillingController {
     return this.billingService.getEntitlementsForUser(req.user.sub, req.user.role, merchantId);
   }
 
+  @Get('me/memberships')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'List current user active merchant memberships' })
+  getMyMemberships(@Request() req: AuthenticatedRequest) {
+    return this.billingService.listMembershipsForUser(req.user.sub);
+  }
+
   @Get('merchant/me/summary')
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(UserRole.MERCHANT, UserRole.ADMIN)

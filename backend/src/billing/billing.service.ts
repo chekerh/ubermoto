@@ -128,6 +128,35 @@ export class BillingService {
       .exec();
   }
 
+  async listMembershipsForUser(userId: string) {
+    const memberships = await this.merchantMemberModel
+      .find({ userId, isActive: true })
+      .sort({ createdAt: 1 })
+      .lean()
+      .exec();
+    if (!memberships.length) {
+      return [];
+    }
+    const merchantIds = memberships.map((m) => m.merchantId);
+    const merchants = await this.merchantModel.find({ _id: { $in: merchantIds } }).lean().exec();
+    const merchantMap = new Map(merchants.map((m: any) => [String(m._id), m]));
+    return memberships.map((m) => {
+      const merchant = merchantMap.get(m.merchantId);
+      return {
+        merchantId: m.merchantId,
+        membershipRole: m.role,
+        merchant: merchant
+          ? {
+              id: String((merchant as any)._id),
+              name: merchant.name,
+              region: merchant.region,
+              isActive: merchant.isActive,
+            }
+          : null,
+      };
+    });
+  }
+
   private async resolveMerchantIdForUser(userId: string): Promise<string> {
     const member = await this.merchantMemberModel
       .findOne({ userId, isActive: true })

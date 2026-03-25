@@ -8,6 +8,8 @@ class MerchantBillingState {
   final List<dynamic> plans;
   final Map<String, dynamic>? entitlements;
   final Map<String, dynamic>? merchantSummary;
+  final List<Map<String, dynamic>> memberships;
+  final String? selectedMerchantId;
   final String? error;
 
   const MerchantBillingState({
@@ -15,6 +17,8 @@ class MerchantBillingState {
     this.plans = const [],
     this.entitlements,
     this.merchantSummary,
+    this.memberships = const [],
+    this.selectedMerchantId,
     this.error,
   });
 
@@ -23,6 +27,8 @@ class MerchantBillingState {
     List<dynamic>? plans,
     Map<String, dynamic>? entitlements,
     Map<String, dynamic>? merchantSummary,
+    List<Map<String, dynamic>>? memberships,
+    String? selectedMerchantId,
     String? error,
   }) {
     return MerchantBillingState(
@@ -30,6 +36,8 @@ class MerchantBillingState {
       plans: plans ?? this.plans,
       entitlements: entitlements ?? this.entitlements,
       merchantSummary: merchantSummary ?? this.merchantSummary,
+      memberships: memberships ?? this.memberships,
+      selectedMerchantId: selectedMerchantId ?? this.selectedMerchantId,
       error: error,
     );
   }
@@ -47,9 +55,13 @@ class MerchantBillingNotifier extends StateNotifier<MerchantBillingState> {
   Future<void> refresh() async {
     state = state.copyWith(isLoading: true, error: null);
     try {
+      final memberships = await _billing.getMyMemberships();
+      final selected =
+          state.selectedMerchantId ??
+          (memberships.isNotEmpty ? memberships.first['merchantId']?.toString() : null);
       final results = await Future.wait([
         _billing.listPlans(),
-        _entitlements.getMyEntitlements(),
+        _entitlements.getMyEntitlements(merchantId: selected),
         _billing.getMerchantSummaryForMe(),
       ]);
       state = state.copyWith(
@@ -57,6 +69,21 @@ class MerchantBillingNotifier extends StateNotifier<MerchantBillingState> {
         plans: results[0] as List<dynamic>,
         entitlements: results[1] as Map<String, dynamic>,
         merchantSummary: results[2] as Map<String, dynamic>,
+        memberships: memberships,
+        selectedMerchantId: selected,
+      );
+    } catch (e) {
+      state = state.copyWith(isLoading: false, error: e.toString());
+    }
+  }
+
+  Future<void> selectMerchant(String merchantId) async {
+    state = state.copyWith(selectedMerchantId: merchantId, isLoading: true, error: null);
+    try {
+      final entitlements = await _entitlements.getMyEntitlements(merchantId: merchantId);
+      state = state.copyWith(
+        isLoading: false,
+        entitlements: entitlements,
       );
     } catch (e) {
       state = state.copyWith(isLoading: false, error: e.toString());

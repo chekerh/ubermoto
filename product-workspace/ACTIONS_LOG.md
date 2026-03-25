@@ -61,6 +61,10 @@ This folder (`/product-workspace`) is the source of truth for building **UberMot
   - `home_announcement_banner`
   - `feature_flags`
 - Added `PricingContentProvider` for dynamic pricing card consumption in frontend.
+- Added multi-merchant billing readiness:
+  - `GET /billing/me/memberships`
+  - frontend merchant billing state now tracks memberships + selected merchant
+  - entitlements now request `/billing/me/entitlements` with optional `merchantId`
 - Added dynamic content module in backend:
   - `GET /content/:key` (public published content)
   - `GET/PUT /admin/content/:key` (admin view + upsert/publish)
