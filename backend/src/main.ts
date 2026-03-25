@@ -7,6 +7,8 @@ import { AllExceptionsFilter } from './common/filters/all-exceptions.filter';
 import { validateProductionEnvironment } from './config/bootstrap-validation';
 import helmet from 'helmet';
 import compression from 'compression';
+import bodyParser from 'body-parser';
+import { Response, NextFunction } from 'express';
 
 async function bootstrap(): Promise<void> {
   validateProductionEnvironment();
@@ -14,6 +16,16 @@ async function bootstrap(): Promise<void> {
   // Initialize Sentry
   initializeSentry();
   const app = await NestFactory.create(AppModule);
+
+  // Stripe webhook signature verification needs access to raw request body.
+  app.use(
+    '/billing/webhooks/stripe',
+    bodyParser.raw({ type: 'application/json' }),
+    (req: any, _res: Response, next: NextFunction) => {
+      req.rawBody = req.body;
+      next();
+    },
+  );
 
   app.use(compression());
 

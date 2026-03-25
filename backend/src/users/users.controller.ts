@@ -193,4 +193,19 @@ export class UsersController {
       })),
     };
   }
+
+  @Get('me/entitlements')
+  @ApiOperation({ summary: 'Get current user entitlements (v1: role-based baseline)' })
+  @ApiResponse({ status: 200, description: 'Entitlements payload' })
+  getEntitlements(@Request() req: AuthenticatedRequest) {
+    // v1 foundation: role gates only. Next: merge merchant subscription entitlements.
+    return {
+      user: {
+        role: req.user.role,
+        features: {},
+        limits: {},
+      },
+      merchant: null,
+    };
+  }
 }

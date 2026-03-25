@@ -24,6 +24,8 @@ import { NotificationsModule } from './notifications/notifications.module';
 import { PromoCodesModule } from './promo-codes/promo-codes.module';
 import { SupportModule } from './support/support.module';
 import { DatabaseConfigService } from './config/database-config.service';
+import { BillingModule } from './billing/billing.module';
+import { ContentModule } from './content/content.module';
 
 @Module({
   imports: [
@@ -60,6 +62,8 @@ import { DatabaseConfigService } from './config/database-config.service';
     RecommendationsModule,
     NotificationsModule,
     SupportModule,
+    BillingModule,
+    ContentModule,
   ],
   providers: [
     DatabaseConfigService,
