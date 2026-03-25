@@ -9,6 +9,7 @@ import { Subscription, SubscriptionDocument } from './schemas/subscription.schem
 import { Entitlement, EntitlementDocument } from './schemas/entitlement.schema';
 import { MerchantMember, MerchantMemberDocument } from './schemas/merchant-member.schema';
 import { Merchant, MerchantDocument } from '../catalog/schemas/merchant.schema';
+import { Product, ProductDocument } from '../catalog/schemas/product.schema';
 
 @Injectable()
 export class BillingService {
@@ -28,6 +29,8 @@ export class BillingService {
     private readonly merchantMemberModel: Model<MerchantMemberDocument>,
     @InjectModel(Merchant.name)
     private readonly merchantModel: Model<MerchantDocument>,
+    @InjectModel(Product.name)
+    private readonly productModel: Model<ProductDocument>,
   ) {
     const stripeKey = process.env.STRIPE_SECRET_KEY?.trim();
     this.stripe = new Stripe(stripeKey || 'sk_test_missing', {
@@ -223,8 +226,14 @@ export class BillingService {
     cancelUrl: string,
     requesterUserId: string,
     requesterRole: string,
+    merchantIdOverride?: string,
   ) {
-    const merchantId = await this.resolveMerchantIdForUser(requesterUserId);
+    let merchantId = merchantIdOverride;
+    if (merchantId) {
+      await this.assertMerchantAccessOrThrow(merchantId, requesterUserId, requesterRole);
+    } else {
+      merchantId = await this.resolveMerchantIdForUser(requesterUserId);
+    }
     return this.createCheckoutSession(
       merchantId,
       planKey,
@@ -253,9 +262,37 @@ export class BillingService {
     return { url: portal.url };
   }
 
-  async createPortalSessionForUser(returnUrl: string, requesterUserId: string, requesterRole: string) {
-    const merchantId = await this.resolveMerchantIdForUser(requesterUserId);
+  async createPortalSessionForUser(
+    returnUrl: string,
+    requesterUserId: string,
+    requesterRole: string,
+    merchantIdOverride?: string,
+  ) {
+    let merchantId = merchantIdOverride;
+    if (merchantId) {
+      await this.assertMerchantAccessOrThrow(merchantId, requesterUserId, requesterRole);
+    } else {
+      merchantId = await this.resolveMerchantIdForUser(requesterUserId);
+    }
     return this.createPortalSession(merchantId, returnUrl, requesterUserId, requesterRole);
+  }
+
+  async getMerchantUsageForUser(
+    requesterUserId: string,
+    requesterRole: string,
+    merchantIdOverride?: string,
+  ) {
+    const merchantId = merchantIdOverride || (await this.resolveMerchantIdForUser(requesterUserId));
+    await this.assertMerchantAccessOrThrow(merchantId, requesterUserId, requesterRole);
+    const ent = await this.entitlementModel.findOne({ merchantId }).lean().exec();
+    const maxRaw = ent?.limits?.['merchant.products.max'];
+    const max = typeof maxRaw === 'number' && Number.isFinite(maxRaw) ? maxRaw : null;
+    const used = await this.productModel.countDocuments({ merchantId }).exec();
+    const remaining = max !== null ? Math.max(0, max - used) : null;
+    return {
+      merchantId,
+      products: { used, max, remaining },
+    };
   }
 
   async getMerchantSummaryForUser(

@@ -26,16 +26,34 @@ See `project-architecture/API_MAP.md` for the current implemented map.
 
 ### Billing (merchant)
 #### POST `/billing/merchant/checkout-session`
-- **Auth**: JWT + ADMIN (current implementation)
-- **Body**: `{ planKey, successUrl, cancelUrl }`
+- **Auth**: JWT + MERCHANT or ADMIN
+- **Body**: `{ merchantId, planKey, successUrl, cancelUrl }`
 - **Response**: `{ url }`
+
+#### POST `/billing/merchant/me/checkout-session`
+- **Auth**: JWT + MERCHANT or ADMIN
+- **Body**: `{ planKey, successUrl, cancelUrl, merchantId? }` — optional `merchantId` scopes checkout to a membership when the user has several merchants
+
+#### POST `/billing/merchant/me/portal-session`
+- **Auth**: JWT + MERCHANT or ADMIN
+- **Body**: `{ returnUrl, merchantId? }`
+
+#### GET `/billing/merchant/me/summary`
+- **Auth**: JWT + MERCHANT or ADMIN
+- **Query**: optional `merchantId`
+
+#### GET `/billing/merchant/me/usage`
+- **Auth**: JWT + MERCHANT or ADMIN
+- **Query**: optional `merchantId`
+- **Response**: `{ merchantId, products: { used, max, remaining } }` — `max`/`remaining` are `null` when the plan has no product cap
 
 #### POST `/billing/webhooks/stripe`
 - **Auth**: none (Stripe signature verification)
 - **Behavior**: store `WebhookEvent`, process idempotently, update `Subscription` + `Entitlement`
 
-#### GET `/billing/merchant/portal`
-- **Auth**: JWT
+#### POST `/billing/merchant/portal-session`
+- **Auth**: JWT + MERCHANT or ADMIN
+- **Body**: `{ merchantId, returnUrl }`
 - **Response**: `{ url }` (Stripe customer portal)
 
 ### Plans (admin)

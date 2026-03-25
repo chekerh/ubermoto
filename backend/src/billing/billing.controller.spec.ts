@@ -10,6 +10,7 @@ import { Subscription } from './schemas/subscription.schema';
 import { Entitlement } from './schemas/entitlement.schema';
 import { MerchantMember } from './schemas/merchant-member.schema';
 import { Merchant } from '../catalog/schemas/merchant.schema';
+import { Product } from '../catalog/schemas/product.schema';
 
 describe('BillingController (Stripe webhook)', () => {
   let controller: BillingController;
@@ -18,6 +19,7 @@ describe('BillingController (Stripe webhook)', () => {
   const mockModel = {
     create: jest.fn(),
     updateOne: jest.fn().mockReturnValue({ exec: jest.fn() }),
+    countDocuments: jest.fn().mockReturnValue({ exec: jest.fn().mockResolvedValue(0) }),
   };
 
   beforeEach(async () => {
@@ -31,6 +33,7 @@ describe('BillingController (Stripe webhook)', () => {
         { provide: getModelToken(Entitlement.name), useValue: mockModel },
         { provide: getModelToken(MerchantMember.name), useValue: mockModel },
         { provide: getModelToken(Merchant.name), useValue: mockModel },
+        { provide: getModelToken(Product.name), useValue: mockModel },
       ],
     }).compile();
 

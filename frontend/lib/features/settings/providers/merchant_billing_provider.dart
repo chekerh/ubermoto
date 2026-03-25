@@ -8,6 +8,7 @@ class MerchantBillingState {
   final List<dynamic> plans;
   final Map<String, dynamic>? entitlements;
   final Map<String, dynamic>? merchantSummary;
+  final Map<String, dynamic>? merchantUsage;
   final List<Map<String, dynamic>> memberships;
   final String? selectedMerchantId;
   final String? error;
@@ -17,6 +18,7 @@ class MerchantBillingState {
     this.plans = const [],
     this.entitlements,
     this.merchantSummary,
+    this.merchantUsage,
     this.memberships = const [],
     this.selectedMerchantId,
     this.error,
@@ -27,6 +29,7 @@ class MerchantBillingState {
     List<dynamic>? plans,
     Map<String, dynamic>? entitlements,
     Map<String, dynamic>? merchantSummary,
+    Map<String, dynamic>? merchantUsage,
     List<Map<String, dynamic>>? memberships,
     String? selectedMerchantId,
     String? error,
@@ -36,6 +39,7 @@ class MerchantBillingState {
       plans: plans ?? this.plans,
       entitlements: entitlements ?? this.entitlements,
       merchantSummary: merchantSummary ?? this.merchantSummary,
+      merchantUsage: merchantUsage ?? this.merchantUsage,
       memberships: memberships ?? this.memberships,
       selectedMerchantId: selectedMerchantId ?? this.selectedMerchantId,
       error: error,
@@ -63,12 +67,14 @@ class MerchantBillingNotifier extends StateNotifier<MerchantBillingState> {
         _billing.listPlans(),
         _entitlements.getMyEntitlements(merchantId: selected),
         _billing.getMerchantSummaryForMe(merchantId: selected),
+        _billing.getMerchantUsageForMe(merchantId: selected),
       ]);
       state = state.copyWith(
         isLoading: false,
         plans: results[0] as List<dynamic>,
         entitlements: results[1] as Map<String, dynamic>,
         merchantSummary: results[2] as Map<String, dynamic>,
+        merchantUsage: results[3] as Map<String, dynamic>,
         memberships: memberships,
         selectedMerchantId: selected,
       );
@@ -83,11 +89,13 @@ class MerchantBillingNotifier extends StateNotifier<MerchantBillingState> {
       final results = await Future.wait([
         _entitlements.getMyEntitlements(merchantId: merchantId),
         _billing.getMerchantSummaryForMe(merchantId: merchantId),
+        _billing.getMerchantUsageForMe(merchantId: merchantId),
       ]);
       state = state.copyWith(
         isLoading: false,
         entitlements: results[0],
         merchantSummary: results[1],
+        merchantUsage: results[2],
       );
     } catch (e) {
       state = state.copyWith(isLoading: false, error: e.toString());

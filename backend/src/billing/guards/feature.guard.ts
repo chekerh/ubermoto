@@ -25,8 +25,15 @@ export class FeatureGuard implements CanActivate {
       throw new ForbiddenException('Missing user context');
     }
 
-    // If no merchant entitlements exist, treat as not entitled.
-    const ent = await this.billingService.getEntitlementsForUser(user.sub, user.role, req.body?.merchantId);
+    if (user.role === 'ADMIN') {
+      return true;
+    }
+
+    const merchantId =
+      (req.query?.merchantId as string | undefined) ||
+      (req.body?.merchantId as string | undefined);
+
+    const ent = await this.billingService.getEntitlementsForUser(user.sub, user.role, merchantId);
     const has = !!ent?.merchant?.features?.[featureKey];
     if (!has) {
       throw new ForbiddenException(`Missing entitlement: ${featureKey}`);

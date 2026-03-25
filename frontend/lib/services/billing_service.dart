@@ -76,15 +76,20 @@ class BillingService {
     required String planKey,
     required String successUrl,
     required String cancelUrl,
+    String? merchantId,
   }) async {
     try {
+      final body = <String, dynamic>{
+        'planKey': planKey,
+        'successUrl': successUrl,
+        'cancelUrl': cancelUrl,
+      };
+      if (merchantId != null && merchantId.isNotEmpty) {
+        body['merchantId'] = merchantId;
+      }
       final res = await ApiService.post(
         '/billing/merchant/me/checkout-session',
-        {
-          'planKey': planKey,
-          'successUrl': successUrl,
-          'cancelUrl': cancelUrl,
-        },
+        body,
         requiresAuth: true,
       );
       final decoded = jsonDecode(res.body) as Map<String, dynamic>;
@@ -100,13 +105,18 @@ class BillingService {
     }
   }
 
-  Future<String> createPortalSessionForMe({required String returnUrl}) async {
+  Future<String> createPortalSessionForMe({
+    required String returnUrl,
+    String? merchantId,
+  }) async {
     try {
+      final body = <String, dynamic>{'returnUrl': returnUrl};
+      if (merchantId != null && merchantId.isNotEmpty) {
+        body['merchantId'] = merchantId;
+      }
       final res = await ApiService.post(
         '/billing/merchant/me/portal-session',
-        {
-          'returnUrl': returnUrl,
-        },
+        body,
         requiresAuth: true,
       );
       final decoded = jsonDecode(res.body) as Map<String, dynamic>;
@@ -135,6 +145,22 @@ class BillingService {
       rethrow;
     } catch (e) {
       throw NetworkException('Failed to load merchant summary: ${e.toString()}');
+    }
+  }
+
+  Future<Map<String, dynamic>> getMerchantUsageForMe({String? merchantId}) async {
+    try {
+      final endpoint = merchantId == null || merchantId.isEmpty
+          ? '/billing/merchant/me/usage'
+          : '/billing/merchant/me/usage?merchantId=$merchantId';
+      final res = await ApiService.get(endpoint, requiresAuth: true);
+      final decoded = jsonDecode(res.body);
+      if (decoded is Map<String, dynamic>) return decoded;
+      throw const ServerException('Invalid merchant usage response');
+    } on AppException {
+      rethrow;
+    } catch (e) {
+      throw NetworkException('Failed to load merchant usage: ${e.toString()}');
     }
   }
 

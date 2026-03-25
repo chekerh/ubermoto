@@ -8,6 +8,7 @@ import { Subscription, SubscriptionSchema } from './schemas/subscription.schema'
 import { Entitlement, EntitlementSchema } from './schemas/entitlement.schema';
 import { MerchantMember, MerchantMemberSchema } from './schemas/merchant-member.schema';
 import { Merchant, MerchantSchema } from '../catalog/schemas/merchant.schema';
+import { Product, ProductSchema } from '../catalog/schemas/product.schema';
 import { FeatureGuard } from './guards/feature.guard';
 
 @Module({
@@ -19,6 +20,7 @@ import { FeatureGuard } from './guards/feature.guard';
       { name: Entitlement.name, schema: EntitlementSchema },
       { name: MerchantMember.name, schema: MerchantMemberSchema },
       { name: Merchant.name, schema: MerchantSchema },
+      { name: Product.name, schema: ProductSchema },
     ]),
   ],
   controllers: [BillingController],

@@ -90,3 +90,10 @@ This folder (`/product-workspace`) is the source of truth for building **UberMot
   - backend build: **pass**
   - flutter tests: previously pass during this build cycle; entitlement additions compile clean
 
+### 2026-03-25 (continued)
+
+- **FeatureGuard**: `ADMIN` bypasses merchant feature checks (admin catalog was incorrectly blocked); `merchantId` resolved from **query or body** for entitlement checks (PATCH/DELETE catalog with `?merchantId=`).
+- **Billing**: `GET /billing/merchant/me/usage` returns product count vs `merchant.products.max` for upgrade UX; optional `merchantId` on `POST /billing/merchant/me/checkout-session` and `POST /billing/merchant/me/portal-session` for multi-merchant users.
+- **Frontend**: `BillingService.getMerchantUsageForMe`; `MerchantBillingState.merchantUsage` loaded on billing refresh / merchant switch.
+- **Docs**: `API_SPEC.md` billing section aligned with implemented routes (portal-session POST, me/* routes, usage).
+

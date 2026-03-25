@@ -94,6 +94,7 @@ export class BillingController {
       dto.cancelUrl,
       req.user.sub,
       req.user.role,
+      dto.merchantId,
     );
   }
 
@@ -106,7 +107,12 @@ export class BillingController {
     @Body() dto: CreateSelfPortalSessionDto,
     @Request() req: AuthenticatedRequest,
   ) {
-    return this.billingService.createPortalSessionForUser(dto.returnUrl, req.user.sub, req.user.role);
+    return this.billingService.createPortalSessionForUser(
+      dto.returnUrl,
+      req.user.sub,
+      req.user.role,
+      dto.merchantId,
+    );
   }
 
   @Get('me/entitlements')
@@ -134,6 +140,17 @@ export class BillingController {
   })
   getMyMerchantSummary(@Request() req: AuthenticatedRequest, @Query('merchantId') merchantId?: string) {
     return this.billingService.getMerchantSummaryForUser(req.user.sub, req.user.role, merchantId);
+  }
+
+  @Get('merchant/me/usage')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRole.MERCHANT, UserRole.ADMIN)
+  @ApiBearerAuth()
+  @ApiOperation({
+    summary: 'Product count vs plan limit for current merchant context (upgrade UX)',
+  })
+  getMyMerchantUsage(@Request() req: AuthenticatedRequest, @Query('merchantId') merchantId?: string) {
+    return this.billingService.getMerchantUsageForUser(req.user.sub, req.user.role, merchantId);
   }
 
   @Post('admin/plans/upsert')
