@@ -14,6 +14,12 @@ See `project-architecture/API_MAP.md` for the current implemented map.
 
 ## New endpoints to implement (billing/entitlements/content)
 
+### Catalog (merchant inventory)
+#### GET `/catalog/merchant/products`
+- **Auth**: JWT + **MERCHANT** or **ADMIN**
+- **Query**: optional `merchantId` — merchants default to their first membership; **ADMIN** must pass `merchantId`
+- **Response**: array of products for that merchant (**includes** `isActive: false`), sorted by `updatedAt` desc
+
 ### Entitlements
 #### GET `/users/me/entitlements`
 - **Auth**: JWT (any) — returns effective user + merchant payload

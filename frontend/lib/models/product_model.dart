@@ -11,6 +11,7 @@ class ProductModel {
   final List<CategoryModel> categories;
   final List<String> images;
   final List<String> tags;
+  final bool isActive;
 
   ProductModel({
     required this.id,
@@ -22,6 +23,7 @@ class ProductModel {
     this.categories = const [],
     this.images = const [],
     this.tags = const [],
+    this.isActive = true,
   });
 
   factory ProductModel.fromJson(Map<String, dynamic> json) {
@@ -33,10 +35,12 @@ class ProductModel {
       stock: json['stock'] ?? 0,
       merchant: json['merchantId'] != null ? MerchantModel.fromJson(json['merchantId']) : null,
       categories: (json['categoryIds'] as List<dynamic>? ?? [])
-          .map((e) => CategoryModel.fromJson(e as Map<String, dynamic>))
+          .whereType<Map>()
+          .map((e) => CategoryModel.fromJson(Map<String, dynamic>.from(e)))
           .toList(),
       images: (json['images'] as List<dynamic>? ?? []).map((e) => e.toString()).toList(),
       tags: (json['tags'] as List<dynamic>? ?? []).map((e) => e.toString()).toList(),
+      isActive: json['isActive'] != false,
     );
   }
 }

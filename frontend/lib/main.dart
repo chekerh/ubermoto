@@ -6,6 +6,7 @@ import 'core/theme/app_theme.dart';
 import 'features/auth/providers/auth_provider.dart';
 import 'services/monitoring_service.dart';
 import 'features/merchant/merchant_home_screen.dart';
+import 'features/merchant/merchant_products_screen.dart';
 import 'stitch/stitch_viewer.dart';
 
 void main() async {
@@ -192,6 +193,7 @@ class NassibApp extends StatelessWidget {
       home: const _AuthGate(),
       routes: <String, WidgetBuilder>{
         '/merchant/home': (_) => const MerchantHomeScreen(),
+        '/merchant/products': (_) => const MerchantProductsScreen(),
         for (final entry in stitchScreens.entries)
           entry.key: (_) => StitchViewer(
                 assetPath: entry.value['asset'] as String,

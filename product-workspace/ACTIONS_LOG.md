@@ -109,3 +109,9 @@ This folder (`/product-workspace`) is the source of truth for building **UberMot
 - **Stitch**: registration bridge sends `merchantName` / `region`; `_submitRegistration` handles role `merchant` and navigates to `/merchant/home` via existing `_routeForRole`.
 - **HTML**: both `user_registration_role_selection_1` and `_2` include store/region fields and a **Marchand** role option.
 
+### 2026-03-25 — Merchant product management
+
+- **Backend**: `GET /catalog/merchant/products` (JWT MERCHANT/ADMIN) lists **all** products for a merchant; access enforced via `BillingService`; `BillingService.resolveMerchantIdForUser` is public for reuse.
+- **Flutter**: `CatalogService` authenticated list/create/patch/delete; **`MerchantProductsScreen`** (`/merchant/products`) with add/edit/delete, **`merchant.catalog.write`** errors surfaced via SnackBar; billing usage refresh after mutations; **`ProductModel.isActive`** + safer category parsing.
+- **Merchant home**: **Manage products** opens the inventory screen.
+

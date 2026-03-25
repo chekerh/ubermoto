@@ -1,4 +1,10 @@
-import { Injectable, NotFoundException, ConflictException, ForbiddenException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  ConflictException,
+  ForbiddenException,
+  BadRequestException,
+} from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, Types } from 'mongoose';
 import { Product, ProductDocument } from './schemas/product.schema';
@@ -68,6 +74,37 @@ export class CatalogService {
       .populate('merchantId', 'name logoUrl')
       .populate('categoryIds', 'name')
       .exec();
+  }
+
+  /** All products for one merchant (active and inactive) — callers must enforce access. */
+  async listProductsForMerchant(merchantId: string): Promise<ProductDocument[]> {
+    return this.productModel
+      .find({ merchantId: new Types.ObjectId(merchantId) })
+      .sort({ updatedAt: -1 })
+      .populate('merchantId', 'name logoUrl')
+      .populate('categoryIds', 'name slug')
+      .exec();
+  }
+
+  async listMerchantScopedProducts(
+    userId: string,
+    role: string,
+    merchantIdOverride?: string,
+  ): Promise<ProductDocument[]> {
+    let merchantId = merchantIdOverride?.trim();
+    if (role === 'MERCHANT') {
+      if (!merchantId) {
+        merchantId = await this.billingService.resolveMerchantIdForUser(userId);
+      }
+      await this.billingService.assertMerchantAccessOrThrow(merchantId, userId, role);
+    } else if (role === 'ADMIN') {
+      if (!merchantId) {
+        throw new BadRequestException('merchantId query parameter is required');
+      }
+    } else {
+      throw new ForbiddenException();
+    }
+    return this.listProductsForMerchant(merchantId);
   }
 
   async getProduct(id: string): Promise<ProductDocument | null> {

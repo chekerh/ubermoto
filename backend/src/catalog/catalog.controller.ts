@@ -53,6 +53,21 @@ export class CatalogController {
     return this.catalogService.listActiveMerchants();
   }
 
+  @Get('merchant/products')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRole.MERCHANT, UserRole.ADMIN)
+  @ApiBearerAuth()
+  @ApiOperation({
+    summary: 'List products for a merchant (inventory; includes inactive)',
+  })
+  @ApiResponse({ status: 200, description: 'Products for the merchant' })
+  listMerchantProducts(
+    @Query('merchantId') merchantId: string | undefined,
+    @Request() req: AuthenticatedRequest,
+  ) {
+    return this.catalogService.listMerchantScopedProducts(req.user.sub, req.user.role, merchantId);
+  }
+
   @Get('products')
   @ApiOperation({ summary: 'List products with filters' })
   @ApiResponse({ status: 200, description: 'Returns filtered product list' })

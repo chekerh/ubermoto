@@ -206,6 +206,14 @@ class _MerchantHomeScreenState extends ConsumerState<MerchantHomeScreen> {
               ),
               const SizedBox(height: 12),
             ],
+            FilledButton.icon(
+              onPressed: billingState.memberships.isEmpty
+                  ? null
+                  : () => Navigator.of(context).pushNamed('/merchant/products'),
+              icon: const Icon(Icons.inventory_2_outlined),
+              label: const Text('Manage products'),
+            ),
+            const SizedBox(height: 20),
             Text('Subscription', style: Theme.of(context).textTheme.titleSmall),
             const SizedBox(height: 8),
             Card(

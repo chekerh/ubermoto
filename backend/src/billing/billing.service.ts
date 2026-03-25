@@ -160,7 +160,8 @@ export class BillingService {
     });
   }
 
-  private async resolveMerchantIdForUser(userId: string): Promise<string> {
+  /** First active membership (by `createdAt`); used when API omits `merchantId`. */
+  async resolveMerchantIdForUser(userId: string): Promise<string> {
     const member = await this.merchantMemberModel
       .findOne({ userId, isActive: true })
       .sort({ createdAt: 1 })
