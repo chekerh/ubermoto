@@ -55,12 +55,25 @@ export class ContentService {
     return { key: doc.key, schemaVersion: doc.schemaVersion, data: doc.data, publishedAt: doc.publishedAt };
   }
 
+  async listPublished() {
+    return this.dynamicContentModel
+      .find({ status: 'published' })
+      .select('key schemaVersion status publishedAt')
+      .sort({ key: 1 })
+      .lean()
+      .exec();
+  }
+
   async getAdminView(key: string) {
     const doc = await this.dynamicContentModel.findOne({ key }).lean().exec();
     if (!doc) {
       throw new NotFoundException('Content not found');
     }
     return doc;
+  }
+
+  async listAdmin() {
+    return this.dynamicContentModel.find().sort({ updatedAt: -1 }).lean().exec();
   }
 
   async upsert(

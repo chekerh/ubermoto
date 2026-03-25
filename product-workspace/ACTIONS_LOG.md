@@ -53,6 +53,14 @@ This folder (`/product-workspace`) is the source of truth for building **UberMot
   - `ContentService` (`/content/:key`)
   - `MerchantBillingProvider` (plans + current entitlements)
   - `AnnouncementProvider` for admin-managed `home_announcement_banner`
+- Added content listing/admin management support:
+  - `GET /content` (published keys)
+  - `GET /admin/content` (admin listing)
+- Added `seed:content` script to bootstrap:
+  - `pricing_table`
+  - `home_announcement_banner`
+  - `feature_flags`
+- Added `PricingContentProvider` for dynamic pricing card consumption in frontend.
 - Added dynamic content module in backend:
   - `GET /content/:key` (public published content)
   - `GET/PUT /admin/content/:key` (admin view + upsert/publish)

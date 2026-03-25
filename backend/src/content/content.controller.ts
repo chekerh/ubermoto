@@ -22,11 +22,28 @@ export class ContentController {
   ) {}
 
   @Public()
+  @Get('content')
+  @ApiOperation({ summary: 'List published dynamic content keys' })
+  @ApiResponse({ status: 200, description: 'Published content key list' })
+  listPublished() {
+    return this.contentService.listPublished();
+  }
+
+  @Public()
   @Get('content/:key')
   @ApiOperation({ summary: 'Get published dynamic content by key' })
   @ApiResponse({ status: 200, description: 'Published content payload' })
   getPublished(@Param('key') key: string) {
     return this.contentService.getPublished(key);
+  }
+
+  @Get('admin/content')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRole.ADMIN)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Admin: list all dynamic content docs' })
+  listAdmin() {
+    return this.contentService.listAdmin();
   }
 
   @Get('admin/content/:key')
