@@ -20,6 +20,7 @@ describe('CatalogService', () => {
       findById: jest.fn().mockReturnThis(),
       findByIdAndUpdate: jest.fn().mockReturnThis(),
       findByIdAndDelete: jest.fn().mockReturnThis(),
+      countDocuments: jest.fn(),
       populate: jest.fn().mockReturnThis(),
       limit: jest.fn().mockReturnThis(),
       exec: jest.fn(),
@@ -48,6 +49,7 @@ describe('CatalogService', () => {
 
     mockBillingService = {
       assertMerchantAccessOrThrow: jest.fn(),
+      getEntitlementsForUser: jest.fn(),
     };
 
     const module: TestingModule = await Test.createTestingModule({
@@ -104,6 +106,24 @@ describe('CatalogService', () => {
       await service.createProduct(dto);
       expect(ProductConstructor).toHaveBeenCalled();
       expect(saveMock).toHaveBeenCalled();
+    });
+
+    it('should enforce merchant.products.max for merchant requesters', async () => {
+      const dto = {
+        name: 'Harissa Spicy',
+        price: 15,
+        stock: 100,
+        merchantId: '507f1f77bcf86cd799439011',
+      } as any;
+
+      mockBillingService.getEntitlementsForUser.mockResolvedValue({
+        merchant: { limits: { 'merchant.products.max': 1 } },
+      });
+      mockProductModel.countDocuments.mockResolvedValue(1);
+
+      await expect(
+        service.createProduct(dto, { userId: 'u1', role: 'MERCHANT' }),
+      ).rejects.toThrow('Plan limit reached');
     });
   });
 

@@ -103,6 +103,26 @@ export class CatalogService {
   async createProduct(dto: CreateProductDto, requester?: CatalogRequester): Promise<ProductDocument> {
     if (requester?.role === 'MERCHANT') {
       await this.billingService.assertMerchantAccessOrThrow(dto.merchantId, requester.userId, requester.role);
+      const entitlements = await this.billingService.getEntitlementsForUser(
+        requester.userId,
+        requester.role,
+        dto.merchantId,
+      );
+      const maxProductsRaw = entitlements?.merchant?.limits?.['merchant.products.max'];
+      const maxProducts =
+        typeof maxProductsRaw === 'number'
+          ? maxProductsRaw
+          : (typeof maxProductsRaw === 'string' ? Number(maxProductsRaw) : NaN);
+      if (Number.isFinite(maxProducts) && maxProducts > 0) {
+        const currentCount = await this.productModel.countDocuments({
+          merchantId: new Types.ObjectId(dto.merchantId),
+        });
+        if (currentCount >= maxProducts) {
+          throw new ForbiddenException(
+            `Plan limit reached: merchant.products.max=${maxProducts}. Upgrade to add more products.`,
+          );
+        }
+      }
     }
     const productData: any = {
       ...dto,
