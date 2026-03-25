@@ -32,7 +32,7 @@ interface RawBodyRequest extends ExpressRequest {
 }
 
 interface AuthenticatedRequest extends ExpressRequest {
-  user: { sub: string; role: string };
+  user: { sub: string; role: string; email?: string };
 }
 
 @ApiTags('billing')
@@ -62,6 +62,7 @@ export class BillingController {
       dto.cancelUrl,
       req.user.sub,
       req.user.role,
+      req.user.email,
     );
   }
 
@@ -95,6 +96,7 @@ export class BillingController {
       req.user.sub,
       req.user.role,
       dto.merchantId,
+      req.user.email,
     );
   }
 

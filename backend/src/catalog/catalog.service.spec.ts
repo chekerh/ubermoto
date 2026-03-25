@@ -1,6 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { getModelToken } from '@nestjs/mongoose';
-import { NotFoundException, ConflictException } from '@nestjs/common';
+import { NotFoundException, ConflictException, BadRequestException } from '@nestjs/common';
 import { CatalogService } from './catalog.service';
 import { Product } from './schemas/product.schema';
 import { Category } from './schemas/category.schema';
@@ -21,6 +21,7 @@ describe('CatalogService', () => {
       findByIdAndUpdate: jest.fn().mockReturnThis(),
       findByIdAndDelete: jest.fn().mockReturnThis(),
       countDocuments: jest.fn(),
+      sort: jest.fn().mockReturnThis(),
       populate: jest.fn().mockReturnThis(),
       limit: jest.fn().mockReturnThis(),
       exec: jest.fn(),
@@ -50,6 +51,7 @@ describe('CatalogService', () => {
     mockBillingService = {
       assertMerchantAccessOrThrow: jest.fn(),
       getEntitlementsForUser: jest.fn(),
+      resolveMerchantIdForUser: jest.fn(),
     };
 
     const module: TestingModule = await Test.createTestingModule({
@@ -266,6 +268,58 @@ describe('CatalogService', () => {
 
       expect(result).toEqual([{ id: '64a1b2c3d4e5f6789012345', name: 'Demo', region: 'TND' }]);
       expect(mockMerchantModel.find).toHaveBeenCalledWith({ isActive: true });
+    });
+  });
+
+  describe('listMerchantScopedProducts', () => {
+    it('merchant: resolves default merchant id and returns products', async () => {
+      const mid = '507f1f77bcf86cd799439011';
+      mockBillingService.resolveMerchantIdForUser.mockResolvedValue(mid);
+      mockBillingService.assertMerchantAccessOrThrow.mockResolvedValue(undefined);
+      const products = [{ _id: 'p1', name: 'Item' }];
+      mockProductModel.exec.mockResolvedValue(products);
+
+      const result = await service.listMerchantScopedProducts('user1', 'MERCHANT', undefined);
+
+      expect(mockBillingService.resolveMerchantIdForUser).toHaveBeenCalledWith('user1');
+      expect(mockBillingService.assertMerchantAccessOrThrow).toHaveBeenCalledWith(
+        mid,
+        'user1',
+        'MERCHANT',
+      );
+      expect(result).toEqual(products);
+      expect(mockProductModel.find).toHaveBeenCalled();
+    });
+
+    it('merchant: uses explicit merchantId after access check', async () => {
+      const mid = '507f1f77bcf86cd799439011';
+      mockBillingService.assertMerchantAccessOrThrow.mockResolvedValue(undefined);
+      mockProductModel.exec.mockResolvedValue([]);
+
+      await service.listMerchantScopedProducts('user1', 'MERCHANT', mid);
+
+      expect(mockBillingService.resolveMerchantIdForUser).not.toHaveBeenCalled();
+      expect(mockBillingService.assertMerchantAccessOrThrow).toHaveBeenCalledWith(
+        mid,
+        'user1',
+        'MERCHANT',
+      );
+    });
+
+    it('admin: requires merchantId', async () => {
+      await expect(service.listMerchantScopedProducts('a1', 'ADMIN', undefined)).rejects.toThrow(
+        BadRequestException,
+      );
+    });
+
+    it('admin: lists products for given merchantId', async () => {
+      const mid = '507f1f77bcf86cd799439011';
+      mockProductModel.exec.mockResolvedValue([{ _id: 'p1' }]);
+
+      const result = await service.listMerchantScopedProducts('a1', 'ADMIN', mid);
+
+      expect(mockBillingService.assertMerchantAccessOrThrow).not.toHaveBeenCalled();
+      expect(result).toEqual([{ _id: 'p1' }]);
     });
   });
 });

@@ -4,6 +4,7 @@ import '../../../services/auth_service.dart';
 import '../../../services/user_service.dart';
 import '../../../core/utils/storage_service.dart';
 import './entitlements_provider.dart';
+import '../../settings/providers/merchant_billing_provider.dart';
 
 class AuthState {
   final bool isLoading;
@@ -44,14 +45,19 @@ final authStateProvider = StateNotifierProvider<AuthNotifier, AuthState>((ref) {
   return AuthNotifier(
     authService: ref.read(authServiceProvider),
     userService: ref.read(userServiceProvider),
-    onAuthenticated: () => ref.read(entitlementsProvider.notifier).refresh(),
+    onAuthenticated: (user) async {
+      await ref.read(entitlementsProvider.notifier).refresh();
+      if (user.role.toUpperCase() == 'MERCHANT') {
+        await ref.read(merchantBillingProvider.notifier).refresh();
+      }
+    },
   )..init();
 });
 
 class AuthNotifier extends StateNotifier<AuthState> {
   final AuthService authService;
   final UserService userService;
-  final Future<void> Function() onAuthenticated;
+  final Future<void> Function(UserModel user) onAuthenticated;
 
   AuthNotifier({
     required this.authService,
@@ -167,7 +173,7 @@ class AuthNotifier extends StateNotifier<AuthState> {
         user: user,
         error: null,
       );
-      await onAuthenticated();
+      await onAuthenticated(user);
     } catch (e) {
       state = state.copyWith(
         isLoading: false,

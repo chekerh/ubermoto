@@ -39,6 +39,7 @@ See `project-architecture/API_MAP.md` for the current implemented map.
 #### POST `/billing/merchant/me/checkout-session`
 - **Auth**: JWT + MERCHANT or ADMIN
 - **Body**: `{ planKey, successUrl, cancelUrl, merchantId? }` — optional `merchantId` scopes checkout to a membership when the user has several merchants
+- **Stripe**: for merchants without a Stripe customer yet, Checkout **`customer_email`** is prefilled from the **authenticated user’s email** when the JWT includes it
 
 #### POST `/billing/merchant/me/portal-session`
 - **Auth**: JWT + MERCHANT or ADMIN

@@ -190,6 +190,7 @@ export class BillingService {
     cancelUrl: string,
     requesterUserId: string,
     requesterRole: string,
+    requesterEmail?: string,
   ) {
     await this.assertMerchantAccessOrThrow(merchantId, requesterUserId, requesterRole);
     const merchant = await this.merchantModel.findById(merchantId).lean().exec();
@@ -199,10 +200,18 @@ export class BillingService {
     const plan = await this.getActivePlanByKey(planKey);
     const existingSub = await this.subscriptionModel.findOne({ merchantId }).lean().exec();
 
+    const emailCandidate = requesterEmail?.trim();
+    const useRequesterEmail = !!emailCandidate && emailCandidate.includes('@');
+    const syntheticEmail = `${merchant.name.replace(/\s+/g, '.').toLowerCase()}@merchant.local`;
+
     const session = await this.stripe.checkout.sessions.create({
       mode: 'subscription',
       customer: existingSub?.stripeCustomerId,
-      customer_email: existingSub?.stripeCustomerId ? undefined : `${merchant.name.replace(/\s+/g, '.').toLowerCase()}@merchant.local`,
+      customer_email: existingSub?.stripeCustomerId
+        ? undefined
+        : useRequesterEmail
+          ? emailCandidate
+          : syntheticEmail,
       line_items: [{ price: plan.stripePriceId, quantity: 1 }],
       success_url: successUrl,
       cancel_url: cancelUrl,
@@ -228,6 +237,7 @@ export class BillingService {
     requesterUserId: string,
     requesterRole: string,
     merchantIdOverride?: string,
+    requesterEmail?: string,
   ) {
     let merchantId = merchantIdOverride;
     if (merchantId) {
@@ -242,6 +252,7 @@ export class BillingService {
       cancelUrl,
       requesterUserId,
       requesterRole,
+      requesterEmail,
     );
   }
 

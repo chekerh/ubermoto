@@ -115,3 +115,9 @@ This folder (`/product-workspace`) is the source of truth for building **UberMot
 - **Flutter**: `CatalogService` authenticated list/create/patch/delete; **`MerchantProductsScreen`** (`/merchant/products`) with add/edit/delete, **`merchant.catalog.write`** errors surfaced via SnackBar; billing usage refresh after mutations; **`ProductModel.isActive`** + safer category parsing.
 - **Merchant home**: **Manage products** opens the inventory screen.
 
+### 2026-03-25 — Stripe email + merchant billing on auth
+
+- **Billing**: first-time Checkout `customer_email` uses the **JWT user email** when present (falls back to synthetic `store@merchant.local`); `BillingController` types include `user.email`.
+- **Flutter**: after profile load, **`onAuthenticated(UserModel)`** runs entitlements refresh and, for **MERCHANT**, **`merchantBillingProvider.refresh()`** (avoids Riverpod self-read cycle).
+- **Tests**: `CatalogService.listMerchantScopedProducts` coverage (merchant default/explicit id, admin rules).
+
