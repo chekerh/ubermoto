@@ -5,6 +5,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'core/theme/app_theme.dart';
 import 'features/auth/providers/auth_provider.dart';
 import 'services/monitoring_service.dart';
+import 'features/merchant/merchant_home_screen.dart';
 import 'stitch/stitch_viewer.dart';
 
 void main() async {
@@ -189,7 +190,8 @@ class NassibApp extends StatelessWidget {
       darkTheme: AppTheme.darkTheme,
       themeMode: ThemeMode.system,
       home: const _AuthGate(),
-      routes: {
+      routes: <String, WidgetBuilder>{
+        '/merchant/home': (_) => const MerchantHomeScreen(),
         for (final entry in stitchScreens.entries)
           entry.key: (_) => StitchViewer(
                 assetPath: entry.value['asset'] as String,
@@ -242,6 +244,10 @@ class _AuthGate extends ConsumerWidget {
           title: 'Admin Console',
           routeName: '/admin/console',
         );
+      }
+
+      if (role == 'MERCHANT') {
+        return const MerchantHomeScreen();
       }
     }
 

@@ -97,3 +97,9 @@ This folder (`/product-workspace`) is the source of truth for building **UberMot
 - **Frontend**: `BillingService.getMerchantUsageForMe`; `MerchantBillingState.merchantUsage` loaded on billing refresh / merchant switch.
 - **Docs**: `API_SPEC.md` billing section aligned with implemented routes (portal-session POST, me/* routes, usage).
 
+### 2026-03-25 — Merchant shell UI
+
+- **Routing**: `MERCHANT` role opens a native **`MerchantHomeScreen`** from `_AuthGate`; named route `/merchant/home`; Stitch login/register `_routeForRole` includes `MERCHANT`.
+- **Billing UX**: screen loads plans, summary, **catalog usage** (`used` / `max`), multi-store dropdown, **Subscribe** (Stripe Checkout via `url_launcher`) with **selected `merchantId`**, and **Portal** when subscription status allows.
+- **Dependency**: `url_launcher` for external Stripe URLs (placeholder `https://example.com/...` return URLs until deep links are configured).
+

@@ -2675,6 +2675,7 @@ class _StitchViewerState extends ConsumerState<StitchViewer> {
     if (normalized == 'CUSTOMER') return '/customer/home';
     if (normalized == 'DRIVER') return '/driver/dashboard';
     if (normalized == 'ADMIN') return '/admin/console';
+    if (normalized == 'MERCHANT') return '/merchant/home';
     return null;
   }
 

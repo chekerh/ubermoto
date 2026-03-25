@@ -47,6 +47,7 @@ dependencies:
   shared_preferences: ^2.3.0
   shimmer: ^3.0.0
   socket_io_client: ^2.0.3
+  url_launcher: ^6.3.1
   uuid: ^4.4.0
   vibration: ^2.1.0
   web: ^1.1.1
