@@ -927,11 +927,13 @@ class _StitchViewerState extends ConsumerState<StitchViewer> {
             const email = (document.getElementById('register-email')?.value || '').trim();
             const password = (document.getElementById('register-password')?.value || '').trim();
             const license = (document.getElementById('register-license')?.value || '').trim();
+            const merchantName = (document.getElementById('register-store-name')?.value || '').trim();
+            const region = (document.getElementById('register-region')?.value || '').trim();
             const role = (document.querySelector('input[name="role"]:checked')?.value || 'client').trim();
 
             window.StitchBridge.postMessage(JSON.stringify({
               action: 'register_submit',
-              payload: { name, phone, email, password, license, role }
+              payload: { name, phone, email, password, license, merchantName, region, role }
             }));
           });
         }
@@ -2629,13 +2631,33 @@ class _StitchViewerState extends ConsumerState<StitchViewer> {
       return;
     }
 
+    final merchantName =
+        (payload['merchantName'] ?? payload['storeName'] ?? '').toString().trim();
+    final region = (payload['region'] ?? '').toString().trim();
+
+    if (roleValue == 'merchant') {
+      if (merchantName.isEmpty || region.isEmpty) {
+        _showMessage('Merchant signup needs store name and region (e.g. TND).');
+        return;
+      }
+    } else if (roleValue == 'driver') {
+      if (phone.isEmpty || license.isEmpty) {
+        _showMessage('Driver registration needs phone and license number.');
+        return;
+      }
+    }
+
     setState(() => _isActionLoading = true);
     try {
-      if (roleValue == 'driver') {
-        if (phone.isEmpty || license.isEmpty) {
-          _showMessage('Driver registration needs phone and license number.');
-          return;
-        }
+      if (roleValue == 'merchant') {
+        await ref.read(authStateProvider.notifier).registerMerchant(
+              email: email,
+              password: password,
+              ownerName: name,
+              merchantName: merchantName,
+              region: region,
+            );
+      } else if (roleValue == 'driver') {
         await ref.read(authStateProvider.notifier).registerDriver(
               email: email,
               password: password,

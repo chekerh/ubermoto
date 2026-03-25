@@ -61,6 +61,39 @@ class AuthService {
     }
   }
 
+  Future<AuthResponseModel> registerMerchant({
+    required String email,
+    required String password,
+    required String ownerName,
+    required String merchantName,
+    required String region,
+  }) async {
+    try {
+      final response = await ApiService.post(
+        AppConfig.merchantRegisterEndpoint,
+        {
+          'email': email,
+          'password': password,
+          'ownerName': ownerName,
+          'merchantName': merchantName,
+          'region': region,
+        },
+      );
+
+      final json = jsonDecode(response.body) as Map<String, dynamic>;
+      final authResponse = AuthResponseModel.fromJson(json);
+
+      await StorageService.saveToken(authResponse.accessToken);
+      await StorageService.saveUserEmail(email);
+
+      return authResponse;
+    } on AppException {
+      rethrow;
+    } catch (e) {
+      throw NetworkException('Merchant registration failed: ${e.toString()}');
+    }
+  }
+
   Future<AuthResponseModel> registerDriver(
     String email,
     String password,

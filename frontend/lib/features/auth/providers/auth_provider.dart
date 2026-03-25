@@ -130,6 +130,33 @@ class AuthNotifier extends StateNotifier<AuthState> {
     }
   }
 
+  Future<void> registerMerchant({
+    required String email,
+    required String password,
+    required String ownerName,
+    required String merchantName,
+    required String region,
+  }) async {
+    state = state.copyWith(isLoading: true, error: null);
+    try {
+      await authService.registerMerchant(
+        email: email,
+        password: password,
+        ownerName: ownerName,
+        merchantName: merchantName,
+        region: region,
+      );
+      await refreshUser();
+    } catch (e) {
+      state = state.copyWith(
+        isLoading: false,
+        isInitialized: true,
+        isAuthenticated: false,
+        error: e.toString(),
+      );
+    }
+  }
+
   Future<void> refreshUser() async {
     try {
       final user = await userService.getProfile();

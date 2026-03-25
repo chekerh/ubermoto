@@ -103,3 +103,9 @@ This folder (`/product-workspace`) is the source of truth for building **UberMot
 - **Billing UX**: screen loads plans, summary, **catalog usage** (`used` / `max`), multi-store dropdown, **Subscribe** (Stripe Checkout via `url_launcher`) with **selected `merchantId`**, and **Portal** when subscription status allows.
 - **Dependency**: `url_launcher` for external Stripe URLs (placeholder `https://example.com/...` return URLs until deep links are configured).
 
+### 2026-03-25 — Merchant self-registration (app)
+
+- **API**: `AppConfig.merchantRegisterEndpoint` → `POST /auth/register/merchant`; `AuthService.registerMerchant` + `AuthNotifier.registerMerchant` (owner + store + region).
+- **Stitch**: registration bridge sends `merchantName` / `region`; `_submitRegistration` handles role `merchant` and navigates to `/merchant/home` via existing `_routeForRole`.
+- **HTML**: both `user_registration_role_selection_1` and `_2` include store/region fields and a **Marchand** role option.
+

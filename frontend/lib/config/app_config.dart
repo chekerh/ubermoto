@@ -32,6 +32,7 @@ class AppConfig {
   static const String registerEndpoint = '/auth/register'; // deprecated
   static const String customerRegisterEndpoint = '/auth/register/customer';
   static const String driverRegisterEndpoint = '/auth/register/driver';
+  static const String merchantRegisterEndpoint = '/auth/register/merchant';
   static const String deliveriesEndpoint = '/deliveries';
   static const String motorcyclesEndpoint = '/motorcycles';
   static const String driversEndpoint = '/drivers';
