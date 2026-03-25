@@ -6,6 +6,9 @@ import { DriversService } from '../drivers/drivers.service';
 import { LoginDto } from './dto/login.dto';
 import { CustomerRegisterDto, DriverRegisterDto, RegisterDto } from './dto/register.dto';
 import { UserRole } from '../users/schemas/user.schema';
+import { MerchantRegisterDto } from './dto/register-merchant.dto';
+import { CatalogService } from '../catalog/catalog.service';
+import { BillingService } from '../billing/billing.service';
 
 export interface JwtPayload {
   sub: string;
@@ -23,6 +26,8 @@ export class AuthService {
     private readonly usersService: UsersService,
     private readonly driversService: DriversService,
     private readonly jwtService: JwtService,
+    private readonly catalogService: CatalogService,
+    private readonly billingService: BillingService,
   ) {}
 
   async registerCustomer(registerDto: CustomerRegisterDto): Promise<AuthResponse> {
@@ -73,6 +78,34 @@ export class AuthService {
     });
 
     return this.generateToken(driverUserId, user.email, user.role);
+  }
+
+  async registerMerchant(registerDto: MerchantRegisterDto): Promise<AuthResponse> {
+    const existingUser = await this.usersService.findByEmail(registerDto.email);
+    if (existingUser) {
+      throw new ConflictException('User with this email already exists');
+    }
+
+    const hashedPassword = await bcrypt.hash(registerDto.password, 10);
+    const user = await this.usersService.create(
+      registerDto.email,
+      hashedPassword,
+      registerDto.ownerName,
+      UserRole.MERCHANT,
+    );
+
+    const merchant = await this.catalogService.createMerchant({
+      name: registerDto.merchantName,
+      region: registerDto.region,
+    });
+
+    await this.billingService.addOrUpdateMerchantMembership(
+      merchant._id.toString(),
+      user._id.toString(),
+      'owner',
+    );
+
+    return this.generateToken(user._id.toString(), user.email, user.role);
   }
 
   // Keep backward compatibility (deprecated)

@@ -5,6 +5,8 @@ import { DriversService } from '../drivers/drivers.service';
 import { JwtService } from '@nestjs/jwt';
 import { UnauthorizedException, ConflictException } from '@nestjs/common';
 import * as bcrypt from 'bcryptjs';
+import { CatalogService } from '../catalog/catalog.service';
+import { BillingService } from '../billing/billing.service';
 
 // Mock bcryptjs so tests never depend on real hashing
 jest.mock('bcryptjs', () => ({
@@ -17,6 +19,8 @@ describe('AuthService', () => {
   let usersService: any;
   let driversService: any;
   let jwtService: any;
+  let catalogService: any;
+  let billingService: any;
 
   const mockUser = {
     _id: { toString: () => '507f1f77bcf86cd799439011' },
@@ -45,12 +49,22 @@ describe('AuthService', () => {
       sign: jest.fn().mockReturnValue('mock.jwt.token'),
     };
 
+    catalogService = {
+      createMerchant: jest.fn(),
+    };
+
+    billingService = {
+      addOrUpdateMerchantMembership: jest.fn(),
+    };
+
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         AuthService,
         { provide: UsersService, useValue: usersService },
         { provide: DriversService, useValue: driversService },
         { provide: JwtService, useValue: jwtService },
+        { provide: CatalogService, useValue: catalogService },
+        { provide: BillingService, useValue: billingService },
       ],
     }).compile();
 

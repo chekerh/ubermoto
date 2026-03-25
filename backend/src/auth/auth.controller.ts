@@ -3,6 +3,7 @@ import { ApiTags, ApiOperation, ApiResponse, ApiBody } from '@nestjs/swagger';
 import { AuthService, AuthResponse } from './auth.service';
 import { LoginDto } from './dto/login.dto';
 import { RegisterDto, CustomerRegisterDto, DriverRegisterDto } from './dto/register.dto';
+import { MerchantRegisterDto } from './dto/register-merchant.dto';
 
 @ApiTags('auth')
 @Controller('auth')
@@ -43,6 +44,16 @@ export class AuthController {
   @ApiResponse({ status: 409, description: 'User already exists' })
   async registerDriver(@Body() registerDto: DriverRegisterDto): Promise<AuthResponse> {
     return this.authService.registerDriver(registerDto);
+  }
+
+  @Post('register/merchant')
+  @HttpCode(HttpStatus.CREATED)
+  @ApiOperation({ summary: 'Register a new merchant owner (creates merchant + membership)' })
+  @ApiBody({ type: MerchantRegisterDto })
+  @ApiResponse({ status: 201, description: 'Merchant successfully registered' })
+  @ApiResponse({ status: 409, description: 'User already exists' })
+  async registerMerchant(@Body() registerDto: MerchantRegisterDto): Promise<AuthResponse> {
+    return this.authService.registerMerchant(registerDto);
   }
 
   // Keep backward compatibility (deprecated)

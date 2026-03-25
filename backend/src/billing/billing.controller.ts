@@ -1,16 +1,113 @@
-import { Controller, Post, Headers, Req, BadRequestException, HttpCode, HttpStatus } from '@nestjs/common';
-import { Request } from 'express';
+import {
+  Body,
+  Controller,
+  Get,
+  Headers,
+  HttpCode,
+  HttpStatus,
+  BadRequestException,
+  Post,
+  Query,
+  Req,
+  Request,
+  UseGuards,
+} from '@nestjs/common';
+import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
+import { Request as ExpressRequest } from 'express';
 import Stripe from 'stripe';
 import { BillingService } from './billing.service';
 import { Public } from '../common/decorators/public.decorator';
+import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+import { RolesGuard } from '../auth/guards/roles.guard';
+import { Roles } from '../auth/decorators/roles.decorator';
+import { UserRole } from '../users/schemas/user.schema';
+import { CreateCheckoutSessionDto } from './dto/create-checkout-session.dto';
+import { CreatePortalSessionDto } from './dto/create-portal-session.dto';
+import { UpsertPlanDto } from './dto/upsert-plan.dto';
 
-interface RawBodyRequest extends Request {
+interface RawBodyRequest extends ExpressRequest {
   rawBody?: Buffer;
 }
 
+interface AuthenticatedRequest extends ExpressRequest {
+  user: { sub: string; role: string };
+}
+
+@ApiTags('billing')
 @Controller('billing')
 export class BillingController {
   constructor(private readonly billingService: BillingService) {}
+
+  @Get('plans')
+  @ApiOperation({ summary: 'List active pricing plans' })
+  listPlans() {
+    return this.billingService.listPlans();
+  }
+
+  @Post('merchant/checkout-session')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRole.ADMIN)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Create Stripe Checkout session for merchant subscription' })
+  createCheckoutSession(
+    @Body() dto: CreateCheckoutSessionDto,
+    @Request() req: AuthenticatedRequest,
+  ) {
+    return this.billingService.createCheckoutSession(
+      dto.merchantId,
+      dto.planKey,
+      dto.successUrl,
+      dto.cancelUrl,
+      req.user.sub,
+      req.user.role,
+    );
+  }
+
+  @Post('merchant/portal-session')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRole.ADMIN)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Create Stripe billing portal session for merchant' })
+  createPortalSession(@Body() dto: CreatePortalSessionDto, @Request() req: AuthenticatedRequest) {
+    return this.billingService.createPortalSession(
+      dto.merchantId,
+      dto.returnUrl,
+      req.user.sub,
+      req.user.role,
+    );
+  }
+
+  @Get('me/entitlements')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Get effective entitlements for current user and merchant membership' })
+  getMyEntitlements(@Request() req: AuthenticatedRequest, @Query('merchantId') merchantId?: string) {
+    return this.billingService.getEntitlementsForUser(req.user.sub, req.user.role, merchantId);
+  }
+
+  @Post('admin/plans/upsert')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRole.ADMIN)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Admin: upsert a plan definition' })
+  upsertPlan(@Body() dto: UpsertPlanDto) {
+    return this.billingService.upsertPlan(dto);
+  }
+
+  @Post('admin/merchant-membership')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRole.ADMIN)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Admin: assign user to merchant for entitlement context' })
+  addMembership(
+    @Body() body: { merchantId: string; userId: string; role?: 'owner' | 'manager' | 'analyst' },
+  ) {
+    return this.billingService.addOrUpdateMerchantMembership(
+      body.merchantId,
+      body.userId,
+      body.role || 'manager',
+    );
+  }
 
   /**
    * Stripe requires signature verification against the **raw** request body.

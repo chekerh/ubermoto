@@ -19,6 +19,7 @@ import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../auth/guards/roles.guard';
 import { Roles } from '../auth/decorators/roles.decorator';
 import { UserRole } from './schemas/user.schema';
+import { BillingService } from '../billing/billing.service';
 
 interface AuthenticatedRequest extends Request {
   user: {
@@ -33,7 +34,10 @@ interface AuthenticatedRequest extends Request {
 @UseGuards(JwtAuthGuard, RolesGuard)
 @ApiBearerAuth()
 export class UsersController {
-  constructor(private readonly usersService: UsersService) {}
+  constructor(
+    private readonly usersService: UsersService,
+    private readonly billingService: BillingService,
+  ) {}
 
   @Get('me')
   @ApiOperation({ summary: 'Get current user profile' })
@@ -198,14 +202,6 @@ export class UsersController {
   @ApiOperation({ summary: 'Get current user entitlements (v1: role-based baseline)' })
   @ApiResponse({ status: 200, description: 'Entitlements payload' })
   getEntitlements(@Request() req: AuthenticatedRequest) {
-    // v1 foundation: role gates only. Next: merge merchant subscription entitlements.
-    return {
-      user: {
-        role: req.user.role,
-        features: {},
-        limits: {},
-      },
-      merchant: null,
-    };
+    return this.billingService.getEntitlementsForUser(req.user.sub, req.user.role);
   }
 }

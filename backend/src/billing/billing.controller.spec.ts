@@ -5,6 +5,11 @@ import Stripe from 'stripe';
 import { BillingController } from './billing.controller';
 import { BillingService } from './billing.service';
 import { StripeWebhookEvent } from './schemas/stripe-webhook-event.schema';
+import { Plan } from './schemas/plan.schema';
+import { Subscription } from './schemas/subscription.schema';
+import { Entitlement } from './schemas/entitlement.schema';
+import { MerchantMember } from './schemas/merchant-member.schema';
+import { Merchant } from '../catalog/schemas/merchant.schema';
 
 describe('BillingController (Stripe webhook)', () => {
   let controller: BillingController;
@@ -21,6 +26,11 @@ describe('BillingController (Stripe webhook)', () => {
       providers: [
         BillingService,
         { provide: getModelToken(StripeWebhookEvent.name), useValue: mockModel },
+        { provide: getModelToken(Plan.name), useValue: mockModel },
+        { provide: getModelToken(Subscription.name), useValue: mockModel },
+        { provide: getModelToken(Entitlement.name), useValue: mockModel },
+        { provide: getModelToken(MerchantMember.name), useValue: mockModel },
+        { provide: getModelToken(Merchant.name), useValue: mockModel },
       ],
     }).compile();
 

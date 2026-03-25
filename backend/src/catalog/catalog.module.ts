@@ -5,6 +5,7 @@ import { CatalogService } from './catalog.service';
 import { Merchant, MerchantSchema } from './schemas/merchant.schema';
 import { Category, CategorySchema } from './schemas/category.schema';
 import { Product, ProductSchema } from './schemas/product.schema';
+import { BillingModule } from '../billing/billing.module';
 
 @Module({
   imports: [
@@ -13,6 +14,7 @@ import { Product, ProductSchema } from './schemas/product.schema';
       { name: Category.name, schema: CategorySchema },
       { name: Product.name, schema: ProductSchema },
     ]),
+    BillingModule,
   ],
   controllers: [CatalogController],
   providers: [CatalogService],

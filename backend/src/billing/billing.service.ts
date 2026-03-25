@@ -1,9 +1,14 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { BadRequestException, ForbiddenException, Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import crypto from 'crypto';
 import Stripe from 'stripe';
 import { StripeWebhookEvent, StripeWebhookEventDocument } from './schemas/stripe-webhook-event.schema';
+import { Plan, PlanDocument } from './schemas/plan.schema';
+import { Subscription, SubscriptionDocument } from './schemas/subscription.schema';
+import { Entitlement, EntitlementDocument } from './schemas/entitlement.schema';
+import { MerchantMember, MerchantMemberDocument } from './schemas/merchant-member.schema';
+import { Merchant, MerchantDocument } from '../catalog/schemas/merchant.schema';
 
 @Injectable()
 export class BillingService {
@@ -13,6 +18,16 @@ export class BillingService {
   constructor(
     @InjectModel(StripeWebhookEvent.name)
     private readonly stripeWebhookEventModel: Model<StripeWebhookEventDocument>,
+    @InjectModel(Plan.name)
+    private readonly planModel: Model<PlanDocument>,
+    @InjectModel(Subscription.name)
+    private readonly subscriptionModel: Model<SubscriptionDocument>,
+    @InjectModel(Entitlement.name)
+    private readonly entitlementModel: Model<EntitlementDocument>,
+    @InjectModel(MerchantMember.name)
+    private readonly merchantMemberModel: Model<MerchantMemberDocument>,
+    @InjectModel(Merchant.name)
+    private readonly merchantModel: Model<MerchantDocument>,
   ) {
     const stripeKey = process.env.STRIPE_SECRET_KEY?.trim();
     this.stripe = new Stripe(stripeKey || 'sk_test_missing', {
@@ -59,13 +74,237 @@ export class BillingService {
       .exec();
   }
 
-  /**
-   * v1: webhook foundation only.
-   * Later: update Subscription + Entitlement models based on event types.
-   */
+  private isBillableStatus(status: string): boolean {
+    return ['trialing', 'active', 'past_due'].includes(status);
+  }
+
+  async upsertPlan(dto: {
+    key: string;
+    name: string;
+    description: string;
+    stripePriceId: string;
+    features: Record<string, boolean>;
+    limits: Record<string, number>;
+    isActive?: boolean;
+  }) {
+    return this.planModel
+      .findOneAndUpdate(
+        { key: dto.key },
+        {
+          $set: {
+            ...dto,
+            isActive: dto.isActive ?? true,
+          },
+        },
+        { upsert: true, new: true },
+      )
+      .lean()
+      .exec();
+  }
+
+  async listPlans() {
+    return this.planModel.find().sort({ key: 1 }).lean().exec();
+  }
+
+  async getActivePlanByKey(planKey: string): Promise<PlanDocument> {
+    const plan = await this.planModel.findOne({ key: planKey, isActive: true }).exec();
+    if (!plan) {
+      throw new NotFoundException(`Active plan '${planKey}' not found`);
+    }
+    return plan;
+  }
+
+  async addOrUpdateMerchantMembership(
+    merchantId: string,
+    userId: string,
+    role: 'owner' | 'manager' | 'analyst' = 'manager',
+  ) {
+    await this.merchantMemberModel
+      .updateOne(
+        { merchantId, userId },
+        { $set: { merchantId, userId, role, isActive: true } },
+        { upsert: true },
+      )
+      .exec();
+  }
+
+  async assertMerchantAccessOrThrow(merchantId: string, userId: string, userRole: string) {
+    if (userRole === 'ADMIN') {
+      return;
+    }
+    const member = await this.merchantMemberModel.findOne({ merchantId, userId, isActive: true }).exec();
+    if (!member) {
+      throw new ForbiddenException('You do not have access to this merchant');
+    }
+  }
+
+  async createCheckoutSession(
+    merchantId: string,
+    planKey: string,
+    successUrl: string,
+    cancelUrl: string,
+    requesterUserId: string,
+    requesterRole: string,
+  ) {
+    await this.assertMerchantAccessOrThrow(merchantId, requesterUserId, requesterRole);
+    const merchant = await this.merchantModel.findById(merchantId).lean().exec();
+    if (!merchant) {
+      throw new NotFoundException('Merchant not found');
+    }
+    const plan = await this.getActivePlanByKey(planKey);
+    const existingSub = await this.subscriptionModel.findOne({ merchantId }).lean().exec();
+
+    const session = await this.stripe.checkout.sessions.create({
+      mode: 'subscription',
+      customer: existingSub?.stripeCustomerId,
+      customer_email: existingSub?.stripeCustomerId ? undefined : `${merchant.name.replace(/\s+/g, '.').toLowerCase()}@merchant.local`,
+      line_items: [{ price: plan.stripePriceId, quantity: 1 }],
+      success_url: successUrl,
+      cancel_url: cancelUrl,
+      metadata: {
+        merchantId,
+        planKey: plan.key,
+      },
+      subscription_data: {
+        metadata: { merchantId, planKey: plan.key },
+      },
+    });
+
+    if (!session.url) {
+      throw new BadRequestException('Failed to create Stripe checkout session URL');
+    }
+    return { url: session.url, sessionId: session.id };
+  }
+
+  async createPortalSession(
+    merchantId: string,
+    returnUrl: string,
+    requesterUserId: string,
+    requesterRole: string,
+  ) {
+    await this.assertMerchantAccessOrThrow(merchantId, requesterUserId, requesterRole);
+    const sub = await this.subscriptionModel.findOne({ merchantId }).lean().exec();
+    if (!sub?.stripeCustomerId) {
+      throw new NotFoundException('No Stripe customer found for merchant');
+    }
+    const portal = await this.stripe.billingPortal.sessions.create({
+      customer: sub.stripeCustomerId,
+      return_url: returnUrl,
+    });
+    return { url: portal.url };
+  }
+
+  async upsertSubscriptionFromStripe(
+    stripeSubscriptionId: string,
+    stripeCustomerId: string,
+    status: string,
+    planKey: string,
+    merchantId: string,
+    periodStart?: number,
+    periodEnd?: number,
+    cancelAtPeriodEnd?: boolean,
+  ) {
+    const sub = await this.subscriptionModel
+      .findOneAndUpdate(
+        { stripeSubscriptionId },
+        {
+          $set: {
+            stripeSubscriptionId,
+            stripeCustomerId,
+            status,
+            planKey,
+            merchantId,
+            currentPeriodStart: periodStart ? new Date(periodStart * 1000) : undefined,
+            currentPeriodEnd: periodEnd ? new Date(periodEnd * 1000) : undefined,
+            cancelAtPeriodEnd: !!cancelAtPeriodEnd,
+          },
+        },
+        { upsert: true, new: true },
+      )
+      .exec();
+    await this.recomputeEntitlementsForMerchant(merchantId, status, planKey);
+    return sub;
+  }
+
+  async recomputeEntitlementsForMerchant(merchantId: string, status: string, planKey: string) {
+    const plan = await this.planModel.findOne({ key: planKey }).lean().exec();
+    if (!plan) {
+      this.logger.warn(`Cannot recompute entitlements: plan ${planKey} not found`);
+      return;
+    }
+    const enabled = this.isBillableStatus(status);
+    const features = enabled ? plan.features : {};
+    const limits = enabled ? plan.limits : {};
+    await this.entitlementModel
+      .updateOne(
+        { merchantId },
+        {
+          $set: {
+            merchantId,
+            planKey: plan.key,
+            features,
+            limits,
+            computedAt: new Date(),
+          },
+        },
+        { upsert: true },
+      )
+      .exec();
+  }
+
+  async getEntitlementsForUser(userId: string, userRole: string, merchantId?: string) {
+    let memberMerchantId = merchantId;
+    if (!memberMerchantId) {
+      const member = await this.merchantMemberModel.findOne({ userId, isActive: true }).lean().exec();
+      memberMerchantId = member?.merchantId;
+    }
+    if (!memberMerchantId) {
+      return {
+        user: { role: userRole, features: {}, limits: {} },
+        merchant: null,
+      };
+    }
+    await this.assertMerchantAccessOrThrow(memberMerchantId, userId, userRole);
+    const sub = await this.subscriptionModel.findOne({ merchantId: memberMerchantId }).lean().exec();
+    const ent = await this.entitlementModel.findOne({ merchantId: memberMerchantId }).lean().exec();
+    return {
+      user: { role: userRole, features: {}, limits: {} },
+      merchant: {
+        merchantId: memberMerchantId,
+        subscriptionStatus: sub?.status ?? 'none',
+        planKey: sub?.planKey ?? ent?.planKey ?? 'none',
+        features: ent?.features ?? {},
+        limits: ent?.limits ?? {},
+      },
+    };
+  }
+
   async handleStripeWebhookEvent(event: Stripe.Event): Promise<void> {
-    // Placeholder: only mark processed. Real handling is added in the next iteration.
     this.logger.log(`Stripe event received: ${event.type} (${event.id})`);
+    if (
+      event.type === 'customer.subscription.created' ||
+      event.type === 'customer.subscription.updated' ||
+      event.type === 'customer.subscription.deleted'
+    ) {
+      const sub = event.data.object as Stripe.Subscription;
+      const metadata = sub.metadata || {};
+      const merchantId = metadata.merchantId;
+      const planKey = metadata.planKey;
+      if (merchantId && planKey) {
+        await this.upsertSubscriptionFromStripe(
+          sub.id,
+          String(sub.customer),
+          sub.status,
+          planKey,
+          merchantId,
+          sub.current_period_start,
+          sub.current_period_end,
+          sub.cancel_at_period_end,
+        );
+      } else {
+        this.logger.warn(`Subscription event ${sub.id} missing merchantId/planKey metadata`);
+      }
+    }
     await this.markStripeEventProcessed(event.id);
   }
 }

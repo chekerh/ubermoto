@@ -20,6 +20,8 @@ import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../auth/guards/roles.guard';
 import { Roles } from '../auth/decorators/roles.decorator';
 import { UserRole } from '../users/schemas/user.schema';
+import { FeatureGuard } from '../billing/guards/feature.guard';
+import { RequireFeature } from '../billing/guards/require-feature.decorator';
 
 @ApiTags('catalog')
 @Controller('catalog')
@@ -79,8 +81,9 @@ export class CatalogController {
   // ── Product CRUD (Admin Only) ──────────────────────────────────────────
 
   @Post('products')
-  @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(UserRole.ADMIN)
+  @UseGuards(JwtAuthGuard, RolesGuard, FeatureGuard)
+  @Roles(UserRole.ADMIN, UserRole.MERCHANT)
+  @RequireFeature('merchant.catalog.write')
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Create new product (Admin only)' })
   @ApiResponse({ status: 201, description: 'Product created successfully' })
@@ -91,8 +94,9 @@ export class CatalogController {
   }
 
   @Patch('products/:id')
-  @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(UserRole.ADMIN)
+  @UseGuards(JwtAuthGuard, RolesGuard, FeatureGuard)
+  @Roles(UserRole.ADMIN, UserRole.MERCHANT)
+  @RequireFeature('merchant.catalog.write')
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Update product (Admin only)' })
   @ApiResponse({ status: 200, description: 'Product updated successfully' })
@@ -104,8 +108,9 @@ export class CatalogController {
   }
 
   @Delete('products/:id')
-  @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(UserRole.ADMIN)
+  @UseGuards(JwtAuthGuard, RolesGuard, FeatureGuard)
+  @Roles(UserRole.ADMIN, UserRole.MERCHANT)
+  @RequireFeature('merchant.catalog.write')
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Delete product (Admin only)' })
   @ApiResponse({ status: 200, description: 'Product deleted successfully' })

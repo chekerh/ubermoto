@@ -15,15 +15,18 @@ See `project-architecture/API_MAP.md` for the current implemented map.
 ## New endpoints to implement (billing/entitlements/content)
 
 ### Entitlements
-#### GET `/me/entitlements`
-- **Auth**: JWT (any)
+#### GET `/users/me/entitlements`
+- **Auth**: JWT (any) — returns effective user + merchant payload
+
+#### GET `/billing/me/entitlements`
+- **Auth**: JWT (any), optional `merchantId` query to scope membership
 - **Response**:
   - `user`: `{ role, features, limits }`
   - `merchant`: optional `{ merchantId, planKey, status, features, limits }`
 
 ### Billing (merchant)
 #### POST `/billing/merchant/checkout-session`
-- **Auth**: JWT (merchant admin user; v1 we may map merchant ownership via admin)
+- **Auth**: JWT + ADMIN (current implementation)
 - **Body**: `{ planKey, successUrl, cancelUrl }`
 - **Response**: `{ url }`
 
@@ -36,12 +39,15 @@ See `project-architecture/API_MAP.md` for the current implemented map.
 - **Response**: `{ url }` (Stripe customer portal)
 
 ### Plans (admin)
-#### GET `/admin/plans`
-- Auth: ADMIN/CONTENT_MANAGER (read)
-#### POST `/admin/plans`
-- Auth: ADMIN/SUPER_ADMIN (write)
-#### PATCH `/admin/plans/:key`
-- Auth: ADMIN/SUPER_ADMIN
+#### GET `/billing/plans`
+- Auth: Public
+#### POST `/billing/admin/plans/upsert`
+- Auth: ADMIN
+
+### Merchant membership (admin)
+#### POST `/billing/admin/merchant-membership`
+- Auth: ADMIN
+- Body: `{ merchantId, userId, role }`
 
 ### Dynamic content/settings (admin)
 #### GET `/content/:key`

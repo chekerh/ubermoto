@@ -18,6 +18,16 @@ export class CatalogService {
     @InjectModel(Merchant.name) private merchantModel: Model<MerchantDocument>,
   ) {}
 
+  async createMerchant(dto: { name: string; region: string; logoUrl?: string }) {
+    const merchant = new this.merchantModel({
+      name: dto.name,
+      region: dto.region,
+      logoUrl: dto.logoUrl,
+      isActive: true,
+    });
+    return merchant.save();
+  }
+
   async listCategories(): Promise<CategoryDocument[]> {
     return this.categoryModel.find({ isActive: true }).sort({ name: 1 }).exec();
   }

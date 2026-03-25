@@ -6,6 +6,8 @@ import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
 import { UsersModule } from '../users/users.module';
 import { DriversModule } from '../drivers/drivers.module';
+import { CatalogModule } from '../catalog/catalog.module';
+import { BillingModule } from '../billing/billing.module';
 import { JwtStrategy } from './strategies/jwt.strategy';
 import { RolesGuard } from './guards/roles.guard';
 import { VerifiedDriverGuard } from './guards/verified-driver.guard';
@@ -15,6 +17,8 @@ import { JwtAuthGuard } from './guards/jwt-auth.guard';
   imports: [
     UsersModule,
     DriversModule,
+    CatalogModule,
+    BillingModule,
     PassportModule,
     JwtModule.registerAsync({
       imports: [ConfigModule],
