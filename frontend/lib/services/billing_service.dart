@@ -122,9 +122,12 @@ class BillingService {
     }
   }
 
-  Future<Map<String, dynamic>> getMerchantSummaryForMe() async {
+  Future<Map<String, dynamic>> getMerchantSummaryForMe({String? merchantId}) async {
     try {
-      final res = await ApiService.get('/billing/merchant/me/summary', requiresAuth: true);
+      final endpoint = merchantId == null || merchantId.isEmpty
+          ? '/billing/merchant/me/summary'
+          : '/billing/merchant/me/summary?merchantId=$merchantId';
+      final res = await ApiService.get(endpoint, requiresAuth: true);
       final decoded = jsonDecode(res.body);
       if (decoded is Map<String, dynamic>) return decoded;
       throw const ServerException('Invalid merchant summary response');

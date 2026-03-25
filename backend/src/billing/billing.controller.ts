@@ -132,8 +132,8 @@ export class BillingController {
   @ApiOperation({
     summary: 'Get merchant billing summary for current user (merchant profile, subscription, entitlements)',
   })
-  getMyMerchantSummary(@Request() req: AuthenticatedRequest) {
-    return this.billingService.getMerchantSummaryForUser(req.user.sub, req.user.role);
+  getMyMerchantSummary(@Request() req: AuthenticatedRequest, @Query('merchantId') merchantId?: string) {
+    return this.billingService.getMerchantSummaryForUser(req.user.sub, req.user.role, merchantId);
   }
 
   @Post('admin/plans/upsert')

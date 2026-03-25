@@ -62,7 +62,7 @@ class MerchantBillingNotifier extends StateNotifier<MerchantBillingState> {
       final results = await Future.wait([
         _billing.listPlans(),
         _entitlements.getMyEntitlements(merchantId: selected),
-        _billing.getMerchantSummaryForMe(),
+        _billing.getMerchantSummaryForMe(merchantId: selected),
       ]);
       state = state.copyWith(
         isLoading: false,
@@ -80,10 +80,14 @@ class MerchantBillingNotifier extends StateNotifier<MerchantBillingState> {
   Future<void> selectMerchant(String merchantId) async {
     state = state.copyWith(selectedMerchantId: merchantId, isLoading: true, error: null);
     try {
-      final entitlements = await _entitlements.getMyEntitlements(merchantId: merchantId);
+      final results = await Future.wait([
+        _entitlements.getMyEntitlements(merchantId: merchantId),
+        _billing.getMerchantSummaryForMe(merchantId: merchantId),
+      ]);
       state = state.copyWith(
         isLoading: false,
-        entitlements: entitlements,
+        entitlements: results[0],
+        merchantSummary: results[1],
       );
     } catch (e) {
       state = state.copyWith(isLoading: false, error: e.toString());

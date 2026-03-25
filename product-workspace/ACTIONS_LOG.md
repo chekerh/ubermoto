@@ -65,6 +65,9 @@ This folder (`/product-workspace`) is the source of truth for building **UberMot
   - `GET /billing/me/memberships`
   - frontend merchant billing state now tracks memberships + selected merchant
   - entitlements now request `/billing/me/entitlements` with optional `merchantId`
+- Fixed merchant summary scoping mismatch for multi-merchant users:
+  - `GET /billing/merchant/me/summary` now accepts optional `merchantId`
+  - frontend merchant selection now refreshes both entitlements and merchant summary for selected merchant
 - Added server-side paid limit enforcement:
   - merchant product create now enforces `merchant.products.max` from entitlements
   - added catalog unit test coverage for limit breach behavior

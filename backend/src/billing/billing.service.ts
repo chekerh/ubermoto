@@ -258,8 +258,12 @@ export class BillingService {
     return this.createPortalSession(merchantId, returnUrl, requesterUserId, requesterRole);
   }
 
-  async getMerchantSummaryForUser(requesterUserId: string, requesterRole: string) {
-    const merchantId = await this.resolveMerchantIdForUser(requesterUserId);
+  async getMerchantSummaryForUser(
+    requesterUserId: string,
+    requesterRole: string,
+    merchantIdOverride?: string,
+  ) {
+    const merchantId = merchantIdOverride || (await this.resolveMerchantIdForUser(requesterUserId));
     await this.assertMerchantAccessOrThrow(merchantId, requesterUserId, requesterRole);
     const merchant = await this.merchantModel.findById(merchantId).lean().exec();
     const sub = await this.subscriptionModel.findOne({ merchantId }).lean().exec();
