@@ -127,3 +127,8 @@ This folder (`/product-workspace`) is the source of truth for building **UberMot
 - **`MerchantBillingNotifier`** after successful **refresh** / **selectMerchant**, syncs **`entitlementsProvider`** to the active **`selectedMerchantId`** so app-wide entitlement reads match the store switcher.
 - **Auth**: **MERCHANT** login only runs **`merchantBillingProvider.refresh()`** (which triggers the sync); non-merchants still call **`entitlementsProvider.refresh()`** without `merchantId`.
 
+### 2026-03-25 — Logout reset + catalog entitlement UX
+
+- **Logout / clearInvalidAuth**: clears **`entitlementsProvider`** and resets **`merchantBillingProvider`** so the next session does not flash another user’s billing state.
+- **Merchant home**: warning when **`merchant.catalog.write`** is false; **Manage products** disabled until the plan grants catalog access.
+

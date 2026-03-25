@@ -110,6 +110,10 @@ class MerchantBillingNotifier extends StateNotifier<MerchantBillingState> {
       state = state.copyWith(isLoading: false, error: e.toString());
     }
   }
+
+  void reset() {
+    state = const MerchantBillingState();
+  }
 }
 
 final merchantBillingProvider =

@@ -10,6 +10,15 @@ const _kStripeMerchantSuccessUrl = 'https://example.com/nassib/merchant/billing/
 const _kStripeMerchantCancelUrl = 'https://example.com/nassib/merchant/billing/cancel';
 const _kStripePortalReturnUrl = 'https://example.com/nassib/merchant/billing/portal-return';
 
+bool _merchantHasCatalogWrite(Map<String, dynamic>? payload) {
+  final m = payload?['merchant'];
+  if (m is! Map) return false;
+  final features = m['features'];
+  if (features is! Map) return false;
+  final v = features['merchant.catalog.write'];
+  return v == true;
+}
+
 class MerchantHomeScreen extends ConsumerStatefulWidget {
   const MerchantHomeScreen({super.key});
 
@@ -100,6 +109,12 @@ class _MerchantHomeScreenState extends ConsumerState<MerchantHomeScreen> {
         subStatus == 'trialing' ||
         subStatus == 'past_due';
 
+    final canManageCatalog = _merchantHasCatalogWrite(billingState.entitlements);
+    final showCatalogLockedBanner = billingState.memberships.isNotEmpty &&
+        !billingState.isLoading &&
+        billingState.entitlements != null &&
+        !canManageCatalog;
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('Merchant'),
@@ -150,6 +165,20 @@ class _MerchantHomeScreenState extends ConsumerState<MerchantHomeScreen> {
                 padding: EdgeInsets.all(32),
                 child: Center(child: CircularProgressIndicator()),
               ),
+            if (showCatalogLockedBanner) ...[
+              Card(
+                color: Theme.of(context).colorScheme.secondaryContainer,
+                child: Padding(
+                  padding: const EdgeInsets.all(12),
+                  child: Text(
+                    'Catalog editing is not enabled on your current plan. Subscribe to a '
+                    'merchant plan that includes catalog access, then refresh.',
+                    style: Theme.of(context).textTheme.bodyMedium,
+                  ),
+                ),
+              ),
+              const SizedBox(height: 12),
+            ],
             if (billingState.memberships.length > 1) ...[
               Text('Store', style: Theme.of(context).textTheme.titleSmall),
               const SizedBox(height: 8),
@@ -207,7 +236,7 @@ class _MerchantHomeScreenState extends ConsumerState<MerchantHomeScreen> {
               const SizedBox(height: 12),
             ],
             FilledButton.icon(
-              onPressed: billingState.memberships.isEmpty
+              onPressed: billingState.memberships.isEmpty || !canManageCatalog
                   ? null
                   : () => Navigator.of(context).pushNamed('/merchant/products'),
               icon: const Icon(Icons.inventory_2_outlined),

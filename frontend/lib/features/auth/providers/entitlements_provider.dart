@@ -32,6 +32,10 @@ class EntitlementsNotifier extends StateNotifier<EntitlementsState> {
       state = state.copyWith(isLoading: false, error: e.toString());
     }
   }
+
+  void clear() {
+    state = const EntitlementsState();
+  }
 }
 
 final entitlementsServiceProvider = Provider((ref) => EntitlementsService());

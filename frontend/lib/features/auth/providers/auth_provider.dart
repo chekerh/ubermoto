@@ -53,6 +53,10 @@ final authStateProvider = StateNotifierProvider<AuthNotifier, AuthState>((ref) {
         await ref.read(entitlementsProvider.notifier).refresh();
       }
     },
+    onLogout: () async {
+      ref.read(entitlementsProvider.notifier).clear();
+      ref.read(merchantBillingProvider.notifier).reset();
+    },
   )..init();
 });
 
@@ -60,11 +64,13 @@ class AuthNotifier extends StateNotifier<AuthState> {
   final AuthService authService;
   final UserService userService;
   final Future<void> Function(UserModel user) onAuthenticated;
+  final Future<void> Function() onLogout;
 
   AuthNotifier({
     required this.authService,
     required this.userService,
     required this.onAuthenticated,
+    required this.onLogout,
   }) : super(const AuthState());
 
   Future<void> init() async {
@@ -189,6 +195,7 @@ class AuthNotifier extends StateNotifier<AuthState> {
 
   Future<void> logout() async {
     await StorageService.clearAll();
+    await onLogout();
     state = const AuthState(
       isAuthenticated: false,
       user: null,
@@ -212,6 +219,7 @@ class AuthNotifier extends StateNotifier<AuthState> {
 
   Future<void> clearInvalidAuth() async {
     await StorageService.clearAll();
+    await onLogout();
     state = const AuthState(
       isAuthenticated: false,
       user: null,
