@@ -22,7 +22,7 @@ A comprehensive full-stack motorcycle delivery marketplace built with modern tec
 - **Responsive Design:** Mobile-first approach across all platforms
 - **Offline Support:** Graceful handling of network interruptions
 - **Performance Optimized:** Fast loading and smooth interactions
-- **Comprehensive Testing:** 89% backend, 87% frontend coverage
+- **Automated tests:** backend Jest (unit + MongoDB Memory Server e2e smoke); Flutter `flutter test` for providers/models — run `npm test` / `npm run test:e2e` / `flutter test` for current counts (coverage varies by run)
 
 ## 🏗️ Architecture
 
