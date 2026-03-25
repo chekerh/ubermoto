@@ -1,17 +1,22 @@
 # Dependencies
 node_modules/
-package-lock.json
-yarn.lock
+
+# Track lockfiles for reproducible installs (backend + root workspace).
+# yarn.lock — uncomment if this repo standardizes on Yarn only:
+# yarn.lock
 
 # Build outputs
 dist/
 build/
 *.tsbuildinfo
 
-# Environment variables
+# Environment variables (allow *.example templates)
 .env
 .env.local
 .env.*.local
+.env.development
+.env.production
+.env.staging
 
 # Logs
 logs/
@@ -42,18 +47,36 @@ Thumbs.db
 # Testing
 coverage/
 .nyc_output/
+.eslintcache
 
 # Temporary files
 *.tmp
 *.temp
 *.bak
 
-# Debug logs
+# Debug / agent (local only)
 .cursor/
+
+# Certificates and signing (never commit real keys)
+*.pem
+*.p12
+*.jks
+*.keystore
+id_rsa
+id_ed25519
 
 # Project specific
 backend/port-config.json
 backend/uploads/
 frontend/.dart_tool/
 frontend/.flutter-plugins*
+frontend/.flutter-plugins-dependencies
+frontend/.packages
 tools/
+
+# Android / iOS local overrides (may contain SDK paths or signing secrets)
+**/android/local.properties
+**/android/key.properties
+**/ios/Pods/
+**/ios/.symlinks/
+**/ios/**/xcuserdata/
