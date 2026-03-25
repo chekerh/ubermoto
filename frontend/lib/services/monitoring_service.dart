@@ -1,12 +1,12 @@
-import 'package:firebase_core/firebase_core.dart';
+import 'package:flutter/foundation.dart';
 
 class MonitoringService {
   static Future<void> initialize() async {
     try {
       // Initialize Firebase Analytics or other monitoring
-      print('Monitoring service initialized');
+      debugPrint('Monitoring service initialized');
     } catch (e) {
-      print('Failed to initialize monitoring: $e');
+      debugPrint('Failed to initialize monitoring: $e');
     }
   }
 }

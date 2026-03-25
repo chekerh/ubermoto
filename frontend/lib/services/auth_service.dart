@@ -3,7 +3,6 @@ import '../config/app_config.dart';
 import '../core/errors/app_exception.dart';
 import '../core/utils/storage_service.dart';
 import '../models/auth_response_model.dart';
-import '../models/user_model.dart';
 import 'api_service.dart';
 
 class AuthService {

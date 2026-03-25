@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
-import 'dart:io';
 import 'unified_map_widget.dart';
 import '../core/map/types.dart';
 import '../services/osrm_service.dart';
-import '../core/utils/map_utils.dart';
 
 class DeliveryMap extends StatefulWidget {
   final MapPoint pickupLocation;
@@ -77,7 +75,7 @@ class _DeliveryMapState extends State<DeliveryMap> {
 
   List<SimpleMarker> _getMarkers() {
     final markers = <SimpleMarker>[];
-    
+
     // Pickup marker
     markers.add(const SimpleMarker(
       latitude: 24.7136, // Default Riyadh coordinates
@@ -86,7 +84,7 @@ class _DeliveryMapState extends State<DeliveryMap> {
       icon: Icons.location_on,
       label: 'Pickup',
     ));
-    
+
     // Delivery marker
     markers.add(const SimpleMarker(
       latitude: 24.7236, // Slightly different for demo
@@ -95,7 +93,7 @@ class _DeliveryMapState extends State<DeliveryMap> {
       icon: Icons.flag,
       label: 'Delivery',
     ));
-    
+
     // Driver marker (if available)
     if (widget.driverLocation != null && widget.status == 'IN_TRANSIT') {
       markers.add(const SimpleMarker(
@@ -106,7 +104,7 @@ class _DeliveryMapState extends State<DeliveryMap> {
         label: 'Driver',
       ));
     }
-    
+
     return markers;
   }
 
@@ -118,7 +116,9 @@ class _DeliveryMapState extends State<DeliveryMap> {
         if (_isLoading || _isUsingFallbackRoute)
           Container(
             padding: const EdgeInsets.all(8),
-            color: _isUsingFallbackRoute ? Colors.orange.withValues(alpha: 0.1) : Colors.blue.withValues(alpha: 0.1),
+            color: _isUsingFallbackRoute
+                ? Colors.orange.withValues(alpha: 0.1)
+                : Colors.blue.withValues(alpha: 0.1),
             child: Row(
               children: [
                 if (_isLoading)
@@ -133,14 +133,16 @@ class _DeliveryMapState extends State<DeliveryMap> {
                 Text(
                   _isLoading ? 'Loading route...' : 'Using offline route',
                   style: TextStyle(
-                    color: _isUsingFallbackRoute ? Colors.orange[700] : Colors.blue[700],
+                    color: _isUsingFallbackRoute
+                        ? Colors.orange[700]
+                        : Colors.blue[700],
                     fontSize: 12,
                   ),
                 ),
               ],
             ),
           ),
-        
+
         // Map
         Expanded(
           child: UnifiedMapWidget(
@@ -160,7 +162,7 @@ class _DeliveryMapState extends State<DeliveryMap> {
             },
           ),
         ),
-        
+
         // Route info
         Container(
           padding: const EdgeInsets.all(16),
@@ -184,7 +186,8 @@ class _DeliveryMapState extends State<DeliveryMap> {
                     size: 20,
                   ),
                   const SizedBox(width: 8),
-                  Text('Pickup: ${widget.pickupLocation.lat.toStringAsFixed(4)}, ${widget.pickupLocation.lng.toStringAsFixed(4)}'),
+                  Text(
+                      'Pickup: ${widget.pickupLocation.lat.toStringAsFixed(4)}, ${widget.pickupLocation.lng.toStringAsFixed(4)}'),
                 ],
               ),
               const SizedBox(height: 4),
@@ -196,7 +199,8 @@ class _DeliveryMapState extends State<DeliveryMap> {
                     size: 20,
                   ),
                   const SizedBox(width: 8),
-                  Text('Delivery: ${widget.deliveryLocation.lat.toStringAsFixed(4)}, ${widget.deliveryLocation.lng.toStringAsFixed(4)}'),
+                  Text(
+                      'Delivery: ${widget.deliveryLocation.lat.toStringAsFixed(4)}, ${widget.deliveryLocation.lng.toStringAsFixed(4)}'),
                 ],
               ),
               if (widget.driverLocation != null) ...[
@@ -209,7 +213,8 @@ class _DeliveryMapState extends State<DeliveryMap> {
                       size: 20,
                     ),
                     const SizedBox(width: 8),
-                    Text('Driver: ${widget.driverLocation!.lat.toStringAsFixed(4)}, ${widget.driverLocation!.lng.toStringAsFixed(4)}'),
+                    Text(
+                        'Driver: ${widget.driverLocation!.lat.toStringAsFixed(4)}, ${widget.driverLocation!.lng.toStringAsFixed(4)}'),
                   ],
                 ),
               ],

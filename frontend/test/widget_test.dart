@@ -116,8 +116,7 @@ void main() {
       for (final entry in uiTranslations.entries) {
         for (final langEntry in entry.value.entries) {
           expect(langEntry.value.isNotEmpty, isTrue,
-              reason:
-                  '"${entry.key}" has empty ${langEntry.key} translation');
+              reason: '"${entry.key}" has empty ${langEntry.key} translation');
         }
       }
     });
@@ -178,8 +177,7 @@ void main() {
       notifier.addToCart(products[0].id); // e.g. 2.500
       notifier.addToCart(products[1].id); // e.g. 1.800
       final state = container.read(productCatalogProvider);
-      expect(state.cartSubtotal,
-          products[0].price + products[1].price);
+      expect(state.cartSubtotal, products[0].price + products[1].price);
     });
 
     test('deliveryFee is 2.0 when cart has items, 0 when empty', () {
@@ -197,8 +195,8 @@ void main() {
       final container = ProviderContainer();
       addTearDown(container.dispose);
       final notifier = container.read(productCatalogProvider.notifier);
-      notifier.addToCart(
-          container.read(productCatalogProvider).products.first.id);
+      notifier
+          .addToCart(container.read(productCatalogProvider).products.first.id);
       notifier.clearCart();
       expect(container.read(productCatalogProvider).cart, isEmpty);
     });

@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'draggable_bottom_sheet.dart';
-import '../../core/animations/sheet_animations.dart';
 
 enum ServiceType { motorTaxi, delivery }
 
@@ -19,8 +18,6 @@ class ServiceSelectorSheet extends StatelessWidget {
     required BuildContext context,
     ServiceType? initialSelection,
   }) {
-    ServiceType? selected = initialSelection;
-
     return DraggableBottomSheet.show<ServiceType>(
       context: context,
       initialChildSize: 0.3,
@@ -29,7 +26,6 @@ class ServiceSelectorSheet extends StatelessWidget {
       child: ServiceSelectorSheet(
         selectedService: initialSelection,
         onServiceSelected: (service) {
-          selected = service;
           Navigator.of(context).pop(service);
         },
       ),

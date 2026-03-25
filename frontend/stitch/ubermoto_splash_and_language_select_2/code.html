@@ -45,11 +45,11 @@
 <body class="bg-background-light dark:bg-background-dark font-display text-slate-900 dark:text-slate-100 antialiased min-h-screen pb-6">
 <header class="fixed top-0 w-full z-40 bg-background-light/90 dark:bg-background-dark/90 backdrop-blur-md pt-12 pb-4 px-6 border-b border-slate-200 dark:border-slate-800">
 <div class="flex items-center justify-between">
-<button class="p-2 -ml-2 rounded-full hover:bg-slate-200 dark:hover:bg-slate-800 transition-colors">
+<button id="splash2-back-btn" class="p-2 -ml-2 rounded-full hover:bg-slate-200 dark:hover:bg-slate-800 transition-colors">
 <span class="material-symbols-outlined text-slate-800 dark:text-white">arrow_back</span>
 </button>
 <h1 class="text-lg font-bold text-slate-800 dark:text-white">Earnings &amp; Payouts</h1>
-<button class="p-2 -mr-2 rounded-full hover:bg-slate-200 dark:hover:bg-slate-800 transition-colors">
+<button id="splash2-help-btn" class="p-2 -mr-2 rounded-full hover:bg-slate-200 dark:hover:bg-slate-800 transition-colors">
 <span class="material-symbols-outlined text-slate-800 dark:text-white">help</span>
 </button>
 </div>
@@ -79,7 +79,7 @@
 <div class="text-xs text-slate-500">Processing</div>
 </div>
 </div>
-<button class="w-full mt-6 bg-primary hover:bg-primary-dark active:bg-primary-dark text-white font-bold py-3.5 rounded-xl shadow-lg shadow-primary/20 transition-all flex items-center justify-center gap-2">
+<button id="splash2-payout-btn" class="w-full mt-6 bg-primary hover:bg-primary-dark active:bg-primary-dark text-white font-bold py-3.5 rounded-xl shadow-lg shadow-primary/20 transition-all flex items-center justify-center gap-2">
 <span>Request Payout</span>
 <span class="material-symbols-outlined text-lg">payments</span>
 </button>
@@ -145,7 +145,7 @@
 </div>
 <div class="flex justify-between items-center mb-4 mt-8">
 <h3 class="font-bold text-lg text-slate-800 dark:text-white">Recent Transactions</h3>
-<a class="text-primary text-sm font-semibold hover:text-primary-dark" href="#">View All</a>
+<a id="splash2-viewall-btn" class="text-primary text-sm font-semibold hover:text-primary-dark" href="#">View All</a>
 </div>
 <div class="flex flex-col gap-3">
 <div class="bg-white dark:bg-surface-dark p-4 rounded-xl shadow-sm border border-slate-100 dark:border-slate-800 flex items-center justify-between">
@@ -224,22 +224,22 @@
 </main>
 <nav class="fixed bottom-0 w-full bg-white dark:bg-surface-dark border-t border-slate-200 dark:border-slate-800 px-6 py-3 pb-8 z-50">
 <div class="flex justify-between items-center">
-<button class="flex flex-col items-center gap-1 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300">
+<button id="splash2-nav-home" class="flex flex-col items-center gap-1 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300">
 <span class="material-symbols-outlined">home</span>
 <span class="text-[10px] font-medium">Home</span>
 </button>
-<button class="flex flex-col items-center gap-1 text-primary">
+<button id="splash2-nav-earnings" class="flex flex-col items-center gap-1 text-primary">
 <span class="material-symbols-outlined fill-1">account_balance_wallet</span>
 <span class="text-[10px] font-medium">Earnings</span>
 </button>
-<button class="relative -top-6 bg-slate-900 dark:bg-primary text-white p-4 rounded-full shadow-lg shadow-primary/30 dark:shadow-black/50">
+<button id="splash2-nav-scanner" class="relative -top-6 bg-slate-900 dark:bg-primary text-white p-4 rounded-full shadow-lg shadow-primary/30 dark:shadow-black/50">
 <span class="material-symbols-outlined text-2xl">qr_code_scanner</span>
 </button>
-<button class="flex flex-col items-center gap-1 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300">
+<button id="splash2-nav-activity" class="flex flex-col items-center gap-1 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300">
 <span class="material-symbols-outlined">history</span>
 <span class="text-[10px] font-medium">Activity</span>
 </button>
-<button class="flex flex-col items-center gap-1 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300">
+<button id="splash2-nav-profile" class="flex flex-col items-center gap-1 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300">
 <span class="material-symbols-outlined">person</span>
 <span class="text-[10px] font-medium">Profile</span>
 </button>

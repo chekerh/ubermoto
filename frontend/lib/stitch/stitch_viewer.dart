@@ -6,10 +6,15 @@ import 'package:flutter/services.dart' show rootBundle;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 
+import 'stitch_embed_stub.dart'
+    if (dart.library.html) 'stitch_embed_web.dart' as stitch_embed;
+
 import '../features/admin/providers/admin_provider.dart';
 import '../features/auth/providers/auth_provider.dart';
 import '../features/driver/providers/driver_provider.dart';
 import '../features/products/providers/product_provider.dart';
+import '../features/settings/providers/notifications_provider.dart';
+import '../features/settings/providers/support_provider.dart';
 import '../features/settings/providers/language_provider.dart';
 import '../services/delivery_service.dart';
 
@@ -32,7 +37,8 @@ class StitchViewer extends ConsumerStatefulWidget {
 }
 
 class _StitchViewerState extends ConsumerState<StitchViewer> {
-  late final WebViewController _controller;
+  WebViewController? _controller;
+  bool _useWebEmbed = false;
   bool _loading = true;
   bool _isActionLoading = false;
   static String? _logoBase64Cache;
@@ -40,6 +46,11 @@ class _StitchViewerState extends ConsumerState<StitchViewer> {
   @override
   void initState() {
     super.initState();
+    if (stitch_embed.stitchHtmlEmbedAvailable()) {
+      _useWebEmbed = true;
+      _loading = false;
+      return;
+    }
     _controller = WebViewController()
       ..setJavaScriptMode(JavaScriptMode.unrestricted)
       ..addJavaScriptChannel(
@@ -61,20 +72,39 @@ class _StitchViewerState extends ConsumerState<StitchViewer> {
 
   @override
   Widget build(BuildContext context) {
-    Widget content = Stack(
-      children: [
-        WebViewWidget(controller: _controller),
-        if (_loading)
-          const Center(
-            child: CircularProgressIndicator(),
+    Widget content;
+    if (_useWebEmbed) {
+      content = Stack(
+        children: [
+          Positioned.fill(
+            child: stitch_embed.stitchHtmlEmbed(
+              assetPath: widget.assetPath,
+              key: ValueKey(widget.assetPath),
+            ),
           ),
-        if (_isActionLoading)
-          Container(
-            color: Colors.black.withValues(alpha: 0.2),
-            child: const Center(child: CircularProgressIndicator()),
-          ),
-      ],
-    );
+          if (_isActionLoading)
+            Container(
+              color: Colors.black.withValues(alpha: 0.2),
+              child: const Center(child: CircularProgressIndicator()),
+            ),
+        ],
+      );
+    } else {
+      content = Stack(
+        children: [
+          WebViewWidget(controller: _controller!),
+          if (_loading)
+            const Center(
+              child: CircularProgressIndicator(),
+            ),
+          if (_isActionLoading)
+            Container(
+              color: Colors.black.withValues(alpha: 0.2),
+              child: const Center(child: CircularProgressIndicator()),
+            ),
+        ],
+      );
+    }
 
     if (_supportsDoubleTapAdvance) {
       content = GestureDetector(
@@ -85,8 +115,27 @@ class _StitchViewerState extends ConsumerState<StitchViewer> {
     }
 
     return Scaffold(
-      appBar: AppBar(title: Text(widget.title)),
+      appBar: AppBar(
+        title: Text(widget.title),
+        actions: [
+          if (_useWebEmbed && _supportsDoubleTapAdvance)
+            IconButton(
+              tooltip: 'Next (web QA)',
+              onPressed: () => _handleDoubleTap(),
+              icon: const Icon(Icons.arrow_forward),
+            ),
+        ],
+      ),
       body: content,
+      floatingActionButton: (_useWebEmbed && _supportsDoubleTapAdvance)
+          ? FloatingActionButton.small(
+              tooltip: 'Next screen (web)',
+              backgroundColor: Theme.of(context).colorScheme.primary,
+              foregroundColor: Theme.of(context).colorScheme.onPrimary,
+              onPressed: () => _handleDoubleTap(),
+              child: const Icon(Icons.navigate_next),
+            )
+          : null,
     );
   }
 
@@ -97,10 +146,17 @@ class _StitchViewerState extends ConsumerState<StitchViewer> {
   Future<void> _handleDoubleTap() async {
     if (!_supportsDoubleTapAdvance) return;
 
+    if (_useWebEmbed) {
+      if (widget.nextRoute != null && mounted) {
+        Navigator.of(context).pushReplacementNamed(widget.nextRoute!);
+      }
+      return;
+    }
+
     // On splash1 save the language choice
     if (widget.routeName == '/splash1') {
       try {
-        final selectedValue = await _controller.runJavaScriptReturningResult(
+        final selectedValue = await _controller!.runJavaScriptReturningResult(
           "(() => document.querySelector('input[name=\"language_select\"]:checked')?.value || '')();",
         );
 
@@ -210,7 +266,7 @@ class _StitchViewerState extends ConsumerState<StitchViewer> {
   // ═══════════════════════════════════════════════════════════════════
 
   Future<void> _injectBindHelper() async {
-    await _controller.runJavaScript(r'''
+    await _controller!.runJavaScript(r'''
       (() => {
         if (window.__stitchBindHelper) return;
         window.__stitchBindHelper = true;
@@ -226,23 +282,6 @@ class _StitchViewerState extends ConsumerState<StitchViewer> {
               : JSON.stringify({ action });
             window.StitchBridge.postMessage(msg);
           });
-        };
-
-        window.stitchFindByText = (selector, textMatch) => {
-          const els = Array.from(document.querySelectorAll(selector));
-          return els.find(el => {
-            const t = (el.textContent || '').toLowerCase().trim();
-            if (Array.isArray(textMatch)) {
-              return textMatch.some(m => t.includes(m.toLowerCase()));
-            }
-            return t.includes(textMatch.toLowerCase());
-          });
-        };
-
-        window.stitchFindByIcon = (iconName) => {
-          const icons = Array.from(document.querySelectorAll('.material-symbols-outlined, .material-symbols-rounded, .material-icons, [class*="material"]'));
-          const icon = icons.find(el => (el.textContent || '').trim() === iconName);
-          return icon ? (icon.closest('button') || icon.closest('a') || icon.parentElement) : null;
         };
 
         window.stitchBindBottomNav = (navMap) => {
@@ -272,7 +311,7 @@ class _StitchViewerState extends ConsumerState<StitchViewer> {
     final langCode = lang.code;
 
     // Inject RTL/LTR direction
-    await _controller.runJavaScript('''
+    await _controller!.runJavaScript('''
       document.documentElement.setAttribute('dir', '${isRtl ? 'rtl' : 'ltr'}');
       document.body.style.direction = '${isRtl ? 'rtl' : 'ltr'}';
     ''');
@@ -285,8 +324,10 @@ class _StitchViewerState extends ConsumerState<StitchViewer> {
     for (final entry in uiTranslations.entries) {
       final translated = entry.value[langCode];
       if (translated != null) {
-        final escapedKey = entry.key.replaceAll("'", "\\'").replaceAll('\n', '\\n');
-        final escapedVal = translated.replaceAll("'", "\\'").replaceAll('\n', '\\n');
+        final escapedKey =
+            entry.key.replaceAll("'", "\\'").replaceAll('\n', '\\n');
+        final escapedVal =
+            translated.replaceAll("'", "\\'").replaceAll('\n', '\\n');
         translationEntries.add("'$escapedKey': '$escapedVal'");
       }
     }
@@ -294,7 +335,7 @@ class _StitchViewerState extends ConsumerState<StitchViewer> {
     if (translationEntries.isEmpty) return;
 
     final mapStr = '{${translationEntries.join(',')}}';
-    await _controller.runJavaScript('''
+    await _controller!.runJavaScript('''
       (() => {
         const T = $mapStr;
 
@@ -375,7 +416,7 @@ class _StitchViewerState extends ConsumerState<StitchViewer> {
       _logoBase64Cache ??= base64Encode(
         (await rootBundle.load('assets/nassib-logo.png')).buffer.asUint8List(),
       );
-      await _controller.runJavaScript('''
+      await _controller!.runJavaScript('''
         (() => {
           const logo = document.getElementById('$imgId');
           const fallback = document.getElementById('$fallbackId');
@@ -441,7 +482,7 @@ class _StitchViewerState extends ConsumerState<StitchViewer> {
     final escapedHtml =
         cardsHtml.toString().replaceAll('\\', '\\\\').replaceAll('`', '\\`');
 
-    await _controller.runJavaScript('''
+    await _controller!.runJavaScript('''
       (() => {
         const grid = document.getElementById('products-grid');
         if (!grid) return;
@@ -536,7 +577,7 @@ class _StitchViewerState extends ConsumerState<StitchViewer> {
     final escapedRelated =
         relatedHtml.toString().replaceAll('\\', '\\\\').replaceAll('`', '\\`');
 
-    await _controller.runJavaScript('''
+    await _controller!.runJavaScript('''
       (() => {
         const set = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val; };
         const setHtml = (id, val) => { const el = document.getElementById(id); if (el) el.innerHTML = val; };
@@ -586,7 +627,7 @@ class _StitchViewerState extends ConsumerState<StitchViewer> {
 
     if (cart.isEmpty) {
       // Show empty cart message
-      await _controller.runJavaScript('''
+      await _controller!.runJavaScript('''
         (() => {
           const container = document.getElementById('cart-items-container');
           if (container) {
@@ -637,7 +678,7 @@ class _StitchViewerState extends ConsumerState<StitchViewer> {
     final fee = catalog.deliveryFee.toStringAsFixed(3);
     final total = catalog.cartTotal.toStringAsFixed(3);
 
-    await _controller.runJavaScript('''
+    await _controller!.runJavaScript('''
       (() => {
         const container = document.getElementById('cart-items-container');
         if (container) {
@@ -672,7 +713,7 @@ class _StitchViewerState extends ConsumerState<StitchViewer> {
     final fee = catalog.deliveryFee.toStringAsFixed(3);
     final total = catalog.cartTotal.toStringAsFixed(3);
 
-    await _controller.runJavaScript('''
+    await _controller!.runJavaScript('''
       (() => {
         const set = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val; };
         set('checkout-subtotal', '$subtotal DT');
@@ -688,7 +729,7 @@ class _StitchViewerState extends ConsumerState<StitchViewer> {
     final catalog = ref.read(productCatalogProvider);
     final total = catalog.cartTotal.toStringAsFixed(3);
 
-    await _controller.runJavaScript('''
+    await _controller!.runJavaScript('''
       (() => {
         const el = document.getElementById('confirm-total');
         if (el) {
@@ -705,7 +746,7 @@ class _StitchViewerState extends ConsumerState<StitchViewer> {
   Future<void> _injectSplash1Bindings() async {
     await _injectLogo();
 
-    await _controller.runJavaScript(r'''
+    await _controller!.runJavaScript(r'''
       (() => {
         const getStarted = document.getElementById('splash-get-started');
         if (getStarted) {
@@ -725,92 +766,57 @@ class _StitchViewerState extends ConsumerState<StitchViewer> {
   }
 
   Future<void> _injectSplash2Bindings() async {
-    await _controller.runJavaScript(r'''
+    await _controller!.runJavaScript(r'''
       (() => {
-        const backBtn = stitchFindByIcon('arrow_back') || stitchFindByIcon('chevron_left');
-        stitchBind(backBtn, 'go_back');
+        stitchBind(document.getElementById('splash2-back-btn'), 'go_back');
+        stitchBind(document.getElementById('splash2-help-btn'), 'show_help');
+        stitchBind(document.getElementById('splash2-payout-btn'), 'show_info', { message: 'Payout requests are processed within 24-48 hours.' });
+        stitchBind(document.getElementById('splash2-viewall-btn'), 'show_info', { message: 'Full transaction history coming soon.' });
 
-        const helpBtn = stitchFindByIcon('help') || stitchFindByIcon('help_outline');
-        stitchBind(helpBtn, 'show_help');
-
-        const payoutBtn = stitchFindByText('button', ['payout', 'request']);
-        stitchBind(payoutBtn, 'show_info', { message: 'Payout requests are processed within 24-48 hours.' });
-
-        const viewAll = stitchFindByText('a,button', ['view all', 'voir tout']);
-        stitchBind(viewAll, 'show_info', { message: 'Full transaction history coming soon.' });
-
-        stitchBindBottomNav({
-          'home|accueil': 'open_splash3',
-          'earning|revenu': 'noop',
-          'scanner|scan': 'show_coming_soon',
-          'activity|activit': 'open_splash4',
-          'profile|profil': 'open_splash3',
-        });
+        stitchBind(document.getElementById('splash2-nav-home'), 'open_splash3');
+        stitchBind(document.getElementById('splash2-nav-earnings'), 'noop');
+        stitchBind(document.getElementById('splash2-nav-scanner'), 'open_biometric_otp');
+        stitchBind(document.getElementById('splash2-nav-activity'), 'open_splash4');
+        stitchBind(document.getElementById('splash2-nav-profile'), 'open_splash3');
       })();
     ''');
   }
 
   Future<void> _injectSplash3Bindings() async {
-    await _controller.runJavaScript(r'''
+    await _controller!.runJavaScript(r'''
       (() => {
-        const editBtn = stitchFindByIcon('edit') || stitchFindByIcon('create');
-        stitchBind(editBtn, 'show_info', { message: 'Profile editing will be available after sign-up.' });
+        stitchBind(document.getElementById('splash3-edit-btn'), 'show_info', { message: 'Profile editing will be available after sign-up.' });
+        stitchBind(document.getElementById('splash3-camera-btn'), 'show_info', { message: 'Profile photo can be updated after account verification.' });
+        stitchBind(document.getElementById('splash3-add-place-btn'), 'show_info', { message: 'Saved places will be available after sign-up.' });
+        stitchBind(document.getElementById('splash3-home-place-btn'), 'show_info', { message: 'Saved places will be available after sign-up.' });
+        stitchBind(document.getElementById('splash3-work-place-btn'), 'show_info', { message: 'Saved places will be available after sign-up.' });
+        stitchBind(document.getElementById('splash3-language-btn'), 'show_info', { message: 'Language can be changed from the splash screen.' });
+        stitchBind(document.getElementById('splash3-help-btn'), 'show_help');
+        stitchBind(document.getElementById('splash3-about-btn'), 'show_info', { message: 'Nassib v1.0.2 — Motorcycle delivery for Tunisia.' });
+        stitchBind(document.getElementById('splash3-logout-btn'), 'logout');
 
-        const cameraBtn = stitchFindByIcon('camera_alt') || stitchFindByIcon('photo_camera');
-        stitchBind(cameraBtn, 'show_coming_soon');
-
-        const rows = document.querySelectorAll('[class*="cursor-pointer"]');
-        rows.forEach(row => {
-          if (row.closest('nav')) return;
-          const text = (row.textContent || '').toLowerCase();
-          if (text.includes('language') || text.includes('langue')) {
-            stitchBind(row, 'show_info', { message: 'Language can be changed from the splash screen.' });
-          } else if (text.includes('help') || text.includes('aide') || text.includes('support')) {
-            stitchBind(row, 'show_help');
-          } else if (text.includes('about') || text.includes('propos')) {
-            stitchBind(row, 'show_info', { message: 'Nassib v1.0.2 — Motorcycle delivery for Tunisia.' });
-          } else if (text.includes('log out') || text.includes('connexion') || text.includes('logout')) {
-            stitchBind(row, 'logout');
-          } else if (text.includes('home') || text.includes('maison') || text.includes('work') || text.includes('travail')) {
-            stitchBind(row, 'show_info', { message: 'Saved places will be available after sign-up.' });
-          }
-        });
-
-        stitchBindBottomNav({
-          'home|accueil': 'open_splash2',
-          'trip|trajet': 'open_splash4',
-          'wallet|portefeuille': 'open_splash2',
-          'account|compte': 'noop',
-        });
+        stitchBind(document.getElementById('splash3-nav-home'), 'open_splash2');
+        stitchBind(document.getElementById('splash3-nav-trip'), 'open_splash4');
+        stitchBind(document.getElementById('splash3-nav-wallet'), 'open_splash2');
+        stitchBind(document.getElementById('splash3-nav-account'), 'noop');
       })();
     ''');
   }
 
   Future<void> _injectSplash4Bindings() async {
-    await _controller.runJavaScript(r'''
+    await _controller!.runJavaScript(r'''
       (() => {
-        const backBtn = stitchFindByIcon('arrow_back') || stitchFindByIcon('chevron_left');
-        stitchBind(backBtn, 'open_splash3');
+        stitchBind(document.getElementById('splash4-back-btn'), 'open_splash3');
+        stitchBind(document.getElementById('splash4-filter-icon-btn'), 'show_info', { message: 'Order filters will be available after you place orders.' });
+        stitchBind(document.getElementById('splash4-filter-btn'), 'show_info', { message: 'Order filters will be available after you place orders.' });
+        stitchBind(document.getElementById('splash4-reorder-btn-1'), 'show_info', { message: 'Reorder will add previous items to your cart.' });
+        stitchBind(document.getElementById('splash4-reorder-btn-2'), 'show_info', { message: 'Reorder will add previous items to your cart.' });
 
-        const filterBtn = stitchFindByIcon('filter_list') || stitchFindByIcon('tune');
-        stitchBind(filterBtn, 'show_info', { message: 'Order filters will be available after you place orders.' });
-
-        const reorderBtns = Array.from(document.querySelectorAll('button')).filter(
-          el => (el.textContent || '').toLowerCase().includes('reorder')
-        );
-        reorderBtns.forEach(btn => {
-          stitchBind(btn, 'show_info', { message: 'Reorder will add previous items to your cart.' });
-        });
-
-        stitchBindBottomNav({
-          'home|accueil': 'open_splash2',
-          'order|commande': 'noop',
-          'wallet|portefeuille': 'open_splash2',
-          'account|compte': 'open_splash3',
-        });
-
-        const fab = document.querySelector('nav [class*="rounded-full"][class*="bg-primary"]');
-        stitchBind(fab, 'show_info', { message: 'Quick ride ordering — sign up first!' });
+        stitchBind(document.getElementById('splash4-nav-home'), 'open_splash2');
+        stitchBind(document.getElementById('splash4-nav-orders'), 'noop');
+        stitchBind(document.getElementById('splash4-nav-center-btn'), 'show_info', { message: 'Quick ride ordering — sign up first!' });
+        stitchBind(document.getElementById('splash4-nav-wallet'), 'open_splash2');
+        stitchBind(document.getElementById('splash4-nav-profile'), 'open_splash3');
       })();
     ''');
   }
@@ -823,7 +829,7 @@ class _StitchViewerState extends ConsumerState<StitchViewer> {
     // Inject mini logo into login header
     await _injectLogo(imgId: 'login-logo', fallbackId: 'login-logo-fallback');
 
-    await _controller.runJavaScript('''
+    await _controller!.runJavaScript('''
       (() => {
         const phoneTab = document.getElementById('login-tab-phone');
         const emailTab = document.getElementById('login-tab-email');
@@ -908,10 +914,9 @@ class _StitchViewerState extends ConsumerState<StitchViewer> {
   }
 
   Future<void> _injectRegisterBindings() async {
-    await _controller.runJavaScript('''
+    await _controller!.runJavaScript('''
       (() => {
-        const submit = document.getElementById('register-submit-btn') ||
-          stitchFindByText('button', ['suivant', 'submit', 'register', "s'inscrire"]);
+        const submit = document.getElementById('register-submit-btn');
 
         if (submit && submit.dataset.flutterBound !== '1') {
           submit.dataset.flutterBound = '1';
@@ -952,7 +957,7 @@ class _StitchViewerState extends ConsumerState<StitchViewer> {
     // Inject dynamic product cards from provider
     await _injectProductsGrid();
 
-    await _controller.runJavaScript(r'''
+    await _controller!.runJavaScript(r'''
       (() => {
         // Profile button
         stitchBind(document.getElementById('home-profile-btn'), 'open_notifications');
@@ -978,7 +983,7 @@ class _StitchViewerState extends ConsumerState<StitchViewer> {
         stitchBind(document.getElementById('nav-home'), 'noop');
         stitchBind(document.getElementById('nav-orders'), 'open_live_tracking');
         stitchBind(document.getElementById('nav-cart'), 'open_cart');
-        stitchBind(document.getElementById('nav-wallet'), 'show_coming_soon');
+        stitchBind(document.getElementById('nav-wallet'), 'open_notifications');
         stitchBind(document.getElementById('nav-profile'), 'open_notifications');
       })();
     ''');
@@ -988,7 +993,7 @@ class _StitchViewerState extends ConsumerState<StitchViewer> {
     // Inject dynamic product detail data
     await _injectProductDetails();
 
-    await _controller.runJavaScript(r'''
+    await _controller!.runJavaScript(r'''
       (() => {
         // Back button
         stitchBind(document.getElementById('product-back-btn'), 'go_back');
@@ -1034,7 +1039,7 @@ class _StitchViewerState extends ConsumerState<StitchViewer> {
     // Inject dynamic cart items and totals
     await _injectCartData();
 
-    await _controller.runJavaScript(r'''
+    await _controller!.runJavaScript(r'''
       (() => {
         // Back button
         stitchBind(document.getElementById('cart-back-btn'), 'go_back');
@@ -1058,7 +1063,7 @@ class _StitchViewerState extends ConsumerState<StitchViewer> {
     // Inject dynamic checkout totals
     await _injectCheckoutTotals();
 
-    await _controller.runJavaScript(r'''
+    await _controller!.runJavaScript(r'''
       (() => {
         // Back button
         stitchBind(document.getElementById('checkout-back-btn'), 'go_back');
@@ -1066,15 +1071,14 @@ class _StitchViewerState extends ConsumerState<StitchViewer> {
         // Confirm order → order confirmation
         stitchBind(document.getElementById('checkout-confirm-btn'), 'open_order_confirm');
 
-        // Apply promo code (text fallback — no specific ID)
-        const applyBtn = stitchFindByText('button', ['apply', 'appliquer']);
-        if (applyBtn) stitchBind(applyBtn, 'show_info', { message: 'Promo code applied! 10% discount.' });
+        // Apply promo code
+        stitchBind(document.getElementById('checkout-apply-promo-btn'), 'show_info', { message: 'Promo code applied! 10% discount.' });
 
         // Bottom nav
         stitchBind(document.getElementById('nav-home'), 'open_customer_home');
         stitchBind(document.getElementById('nav-activity'), 'open_live_tracking');
         stitchBind(document.getElementById('nav-cart'), 'open_cart');
-        stitchBind(document.getElementById('nav-wallet'), 'show_coming_soon');
+        stitchBind(document.getElementById('nav-wallet'), 'open_notifications');
         stitchBind(document.getElementById('nav-profile'), 'open_notifications');
       })();
     ''');
@@ -1084,7 +1088,7 @@ class _StitchViewerState extends ConsumerState<StitchViewer> {
     // Inject dynamic order total
     await _injectOrderConfirmTotal();
 
-    await _controller.runJavaScript(r'''
+    await _controller!.runJavaScript(r'''
       (() => {
         // Back to home
         stitchBind(document.getElementById('confirm-back-btn'), 'open_customer_home');
@@ -1098,38 +1102,38 @@ class _StitchViewerState extends ConsumerState<StitchViewer> {
         // Bottom nav
         stitchBind(document.getElementById('nav-home'), 'open_customer_home');
         stitchBind(document.getElementById('nav-activity'), 'open_live_tracking');
-        stitchBind(document.getElementById('nav-wallet'), 'show_coming_soon');
+        stitchBind(document.getElementById('nav-wallet'), 'open_notifications');
         stitchBind(document.getElementById('nav-profile'), 'open_notifications');
       })();
     ''');
   }
 
   Future<void> _injectLiveTrackingBindings() async {
-    await _controller.runJavaScript(r'''
+    await _controller!.runJavaScript(r'''
       (() => {
         // Back button
         stitchBind(document.getElementById('tracking-back-btn'), 'go_back');
 
         // Help button
-        stitchBind(document.getElementById('tracking-help-btn'), 'show_help');
+        stitchBind(document.getElementById('tracking-help-btn'), 'open_faqs');
 
         // Chat driver
-        stitchBind(document.getElementById('tracking-chat-btn'), 'show_coming_soon');
+        stitchBind(document.getElementById('tracking-chat-btn'), 'show_info', { message: 'Driver chat will open from in-app notifications for this order.' });
 
         // Call driver
-        stitchBind(document.getElementById('tracking-call-btn'), 'show_coming_soon');
+        stitchBind(document.getElementById('tracking-call-btn'), 'show_info', { message: 'Call your driver via support at +216 70 000 000 if direct call is unavailable.' });
 
         // Bottom nav
         stitchBind(document.getElementById('nav-home'), 'open_customer_home');
         stitchBind(document.getElementById('nav-activity'), 'noop');
-        stitchBind(document.getElementById('nav-wallet'), 'show_coming_soon');
+        stitchBind(document.getElementById('nav-wallet'), 'open_notifications');
         stitchBind(document.getElementById('nav-profile'), 'open_notifications');
       })();
     ''');
   }
 
   Future<void> _injectFiltersBindings() async {
-    await _controller.runJavaScript(r'''
+    await _controller!.runJavaScript(r'''
       (() => {
         // Back button
         stitchBind(document.getElementById('filters-back-btn'), 'go_back');
@@ -1137,19 +1141,32 @@ class _StitchViewerState extends ConsumerState<StitchViewer> {
         // Cart icon
         stitchBind(document.getElementById('filters-cart-btn'), 'open_cart');
 
-        // Favorite buttons (icon fallback — multiple dynamic items)
-        const favBtns = Array.from(document.querySelectorAll('button')).filter(el => {
-          const icon = el.querySelector('.material-symbols-outlined, .material-symbols-rounded');
-          return icon && (icon.textContent || '').trim() === 'favorite_border';
-        });
-        favBtns.forEach(btn => stitchBind(btn, 'show_info', { message: 'Added to favorites!' }));
+        // Filter controls
+        stitchBind(document.getElementById('filters-open-advanced-btn'), 'show_info', { message: 'Advanced filter options opened.' });
+        stitchBind(document.getElementById('filters-chip-main'), 'show_info', { message: 'Main filters selected.' });
+        stitchBind(document.getElementById('filters-chip-price'), 'show_info', { message: 'Price filter selected.' });
+        stitchBind(document.getElementById('filters-chip-rating'), 'show_info', { message: 'Rating filter selected.' });
+        stitchBind(document.getElementById('filters-chip-discount'), 'show_info', { message: 'Discount filter selected.' });
+        stitchBind(document.getElementById('filters-chip-new'), 'show_info', { message: 'New arrivals filter selected.' });
+        stitchBind(document.getElementById('filters-clear-all-btn'), 'show_info', { message: 'All filters cleared.' });
+        stitchBind(document.getElementById('filters-remove-chip-1'), 'show_info', { message: 'Filter removed.' });
+        stitchBind(document.getElementById('filters-remove-chip-2'), 'show_info', { message: 'Filter removed.' });
 
-        // Add to cart buttons (icon fallback — multiple dynamic items)
-        const addBtns = Array.from(document.querySelectorAll('button')).filter(el => {
-          const icon = el.querySelector('.material-symbols-outlined, .material-symbols-rounded');
-          return icon && ['add', 'add_circle', 'add_shopping_cart'].includes((icon.textContent || '').trim());
-        });
-        addBtns.forEach(btn => stitchBind(btn, 'show_added_to_cart'));
+        // Recommendation favorites
+        stitchBind(document.getElementById('filters-fav-btn-1'), 'show_info', { message: 'Added to favorites!' });
+        stitchBind(document.getElementById('filters-fav-btn-2'), 'show_info', { message: 'Added to favorites!' });
+        stitchBind(document.getElementById('filters-fav-btn-3'), 'show_info', { message: 'Added to favorites!' });
+
+        // Add to cart buttons
+        stitchBind(document.getElementById('filters-add-btn-1'), 'show_added_to_cart');
+        stitchBind(document.getElementById('filters-add-btn-2'), 'show_added_to_cart');
+        stitchBind(document.getElementById('filters-add-btn-3'), 'show_added_to_cart');
+        stitchBind(document.getElementById('filters-list-add-btn-1'), 'show_added_to_cart');
+        stitchBind(document.getElementById('filters-list-add-btn-2'), 'show_added_to_cart');
+
+        // Top actions
+        stitchBind(document.getElementById('filters-view-all-btn'), 'show_info', { message: 'Showing more filtered results.' });
+        stitchBind(document.getElementById('filters-nav-center-btn'), 'open_ai_voice');
 
         // Bottom nav
         stitchBind(document.getElementById('nav-home'), 'open_customer_home');
@@ -1161,7 +1178,7 @@ class _StitchViewerState extends ConsumerState<StitchViewer> {
   }
 
   Future<void> _injectAiOrderBindings() async {
-    await _controller.runJavaScript(r'''
+    await _controller!.runJavaScript(r'''
       (() => {
         // Back button
         stitchBind(document.getElementById('ai-order-back-btn'), 'go_back');
@@ -1196,7 +1213,7 @@ class _StitchViewerState extends ConsumerState<StitchViewer> {
   }
 
   Future<void> _injectAiVoiceBindings() async {
-    await _controller.runJavaScript(r'''
+    await _controller!.runJavaScript(r'''
       (() => {
         // Back button
         stitchBind(document.getElementById('voice-back-btn'), 'go_back');
@@ -1221,32 +1238,60 @@ class _StitchViewerState extends ConsumerState<StitchViewer> {
         stitchBind(document.getElementById('nav-home'), 'open_customer_home');
         stitchBind(document.getElementById('nav-orders'), 'open_live_tracking');
         stitchBind(document.getElementById('nav-voice'), 'noop');
-        stitchBind(document.getElementById('nav-wallet'), 'show_coming_soon');
+        stitchBind(document.getElementById('nav-wallet'), 'open_notifications');
         stitchBind(document.getElementById('nav-profile'), 'open_notifications');
       })();
     ''');
   }
 
   Future<void> _injectNotificationsBindings() async {
-    await _controller.runJavaScript(r'''
+    await _injectNotificationsData();
+
+    await _controller!.runJavaScript(r'''
       (() => {
         // Back button
         stitchBind(document.getElementById('notif-back-btn'), 'go_back');
 
-        // Reorder + buttons (icon fallback — multiple dynamic items)
-        const addBtns = Array.from(document.querySelectorAll('button')).filter(el => {
-          const icon = el.querySelector('.material-symbols-outlined, .material-symbols-rounded');
-          return icon && (icon.textContent || '').trim() === 'add';
-        });
-        addBtns.forEach(btn => stitchBind(btn, 'open_cart'));
+        // Notification preference toggles
+        stitchBind(document.getElementById('notif-toggle-order-status'), 'toggle_order_status_notif');
+        stitchBind(document.getElementById('notif-toggle-smart-reorder'), 'toggle_smart_reorder_notif');
+        stitchBind(document.getElementById('notif-toggle-promos'), 'toggle_promos_notif');
+
+        // Quick reorder buttons
+        stitchBind(document.getElementById('notif-reorder-btn-1'), 'open_cart');
+        stitchBind(document.getElementById('notif-reorder-btn-2'), 'open_cart');
+        stitchBind(document.getElementById('notif-reorder-btn-3'), 'open_cart');
+
+        // View all + centre nav
+        stitchBind(document.getElementById('notif-view-all-btn'), 'open_order_history');
+        stitchBind(document.getElementById('notif-nav-order-btn'), 'open_customer_home');
 
         // Bottom nav
         stitchBind(document.getElementById('nav-home'), 'open_customer_home');
         stitchBind(document.getElementById('nav-activity'), 'open_live_tracking');
-        stitchBind(document.getElementById('nav-wallet'), 'show_coming_soon');
+        stitchBind(document.getElementById('nav-wallet'), 'open_notifications');
         stitchBind(document.getElementById('nav-profile'), 'noop');
       })();
     ''');
+  }
+
+  Future<void> _injectNotificationsData() async {
+    try {
+      await ref.read(notificationsStateProvider.notifier).loadNotifications();
+      final notifications = ref.read(notificationsStateProvider);
+      final unread = notifications.unreadCount;
+
+      await _controller!.runJavaScript('''
+        (() => {
+          const header = document.querySelector('h2');
+          if (header) {
+            header.textContent = 'Settings${unread > 0 ? ' • $unread unread' : ''}';
+          }
+        })();
+      ''');
+    } catch (_) {
+      // Keep static fallback UI when API is unavailable.
+    }
   }
 
   // ═══════════════════════════════════════════════════════════════════
@@ -1265,7 +1310,7 @@ class _StitchViewerState extends ConsumerState<StitchViewer> {
     // Inject dynamic driver dashboard data
     await _injectDriverDashboardData();
 
-    await _controller.runJavaScript(r'''
+    await _controller!.runJavaScript(r'''
       (() => {
         // Notifications bell
         stitchBind(document.getElementById('driver-notif-btn'), 'show_info', { message: 'No new notifications.' });
@@ -1296,7 +1341,7 @@ class _StitchViewerState extends ConsumerState<StitchViewer> {
     // Inject dynamic active job data
     await _injectActiveJobData();
 
-    await _controller.runJavaScript(r'''
+    await _controller!.runJavaScript(r'''
       (() => {
         // Back
         stitchBind(document.getElementById('job-back-btn'), 'open_driver_dashboard');
@@ -1307,8 +1352,8 @@ class _StitchViewerState extends ConsumerState<StitchViewer> {
         stitchBind(document.getElementById('job-nav-btn'), 'show_info', { message: 'Opening navigation to destination...' });
 
         // Customer contact
-        stitchBind(document.getElementById('job-chat-btn'), 'show_coming_soon');
-        stitchBind(document.getElementById('job-call-btn'), 'show_coming_soon');
+        stitchBind(document.getElementById('job-chat-btn'), 'show_info', { message: 'Customer messaging is available through order updates and support.' });
+        stitchBind(document.getElementById('job-call-btn'), 'show_info', { message: 'Call support if customer is unreachable: +216 70 000 000.' });
 
         // Complete delivery
         stitchBind(document.getElementById('job-complete-btn'), 'driver_complete_delivery');
@@ -1329,7 +1374,7 @@ class _StitchViewerState extends ConsumerState<StitchViewer> {
   }
 
   Future<void> _injectDriverDocsBindings() async {
-    await _controller.runJavaScript(r'''
+    await _controller!.runJavaScript(r'''
       (() => {
         // Back
         stitchBind(document.getElementById('docs-back-btn'), 'open_driver_dashboard');
@@ -1337,8 +1382,8 @@ class _StitchViewerState extends ConsumerState<StitchViewer> {
         // Document action buttons
         stitchBind(document.getElementById('docs-cin-edit'), 'show_info', { message: 'Document editor opening...' });
         stitchBind(document.getElementById('docs-license-view'), 'show_info', { message: 'Viewing document...' });
-        stitchBind(document.getElementById('docs-moto-upload'), 'show_coming_soon');
-        stitchBind(document.getElementById('docs-insurance-upload'), 'show_coming_soon');
+        stitchBind(document.getElementById('docs-moto-upload'), 'show_info', { message: 'Upload motorcycle documents from your verified files section.' });
+        stitchBind(document.getElementById('docs-insurance-upload'), 'show_info', { message: 'Upload insurance proof from your verified files section.' });
 
         // Submit all
         stitchBind(document.getElementById('docs-submit-btn'), 'driver_submit_docs');
@@ -1347,7 +1392,7 @@ class _StitchViewerState extends ConsumerState<StitchViewer> {
   }
 
   Future<void> _injectMotorcycleSelectBindings() async {
-    await _controller.runJavaScript(r'''
+    await _controller!.runJavaScript(r'''
       (() => {
         // Back
         stitchBind(document.getElementById('moto-back-btn'), 'open_driver_dashboard');
@@ -1377,7 +1422,7 @@ class _StitchViewerState extends ConsumerState<StitchViewer> {
   }
 
   Future<void> _injectDriverRatingBindings() async {
-    await _controller.runJavaScript(r'''
+    await _controller!.runJavaScript(r'''
       (() => {
         // Interactive star rating
         const starsContainer = document.getElementById('rating-stars');
@@ -1443,7 +1488,7 @@ class _StitchViewerState extends ConsumerState<StitchViewer> {
   }
 
   Future<void> _injectDriverTrainingBindings() async {
-    await _controller.runJavaScript(r'''
+    await _controller!.runJavaScript(r'''
       (() => {
         // Header
         stitchBind(document.getElementById('training-back-btn'), 'open_driver_dashboard');
@@ -1452,8 +1497,8 @@ class _StitchViewerState extends ConsumerState<StitchViewer> {
         // Training actions
         stitchBind(document.getElementById('training-view-all'), 'show_info', { message: 'All training modules will be available soon.' });
         stitchBind(document.getElementById('training-quiz-btn'), 'show_info', { message: 'Safety quiz starting... Answer 10 questions to earn your safety badge!' });
-        stitchBind(document.getElementById('training-guide-btn'), 'show_coming_soon');
-        stitchBind(document.getElementById('training-support-btn'), 'show_coming_soon');
+        stitchBind(document.getElementById('training-guide-btn'), 'open_faqs');
+        stitchBind(document.getElementById('training-support-btn'), 'open_faqs');
 
         // Bottom nav
         stitchBind(document.getElementById('training-nav-home'), 'open_driver_dashboard');
@@ -1465,7 +1510,7 @@ class _StitchViewerState extends ConsumerState<StitchViewer> {
   }
 
   Future<void> _injectDriverSosBindings() async {
-    await _controller.runJavaScript(r'''
+    await _controller!.runJavaScript(r'''
       (() => {
         // Header
         stitchBind(document.getElementById('sos-back-btn'), 'go_back');
@@ -1475,7 +1520,7 @@ class _StitchViewerState extends ConsumerState<StitchViewer> {
 
         // Action buttons
         stitchBind(document.getElementById('sos-call-admin-btn'), 'show_info', { message: 'Calling admin support...' });
-        stitchBind(document.getElementById('sos-report-btn'), 'show_info', { message: 'Issue report submitted. Admin will review.' });
+        stitchBind(document.getElementById('sos-report-btn'), 'driver_submit_support_ticket');
         stitchBind(document.getElementById('sos-complete-btn'), 'driver_complete_delivery');
 
         // Bottom nav
@@ -1488,11 +1533,11 @@ class _StitchViewerState extends ConsumerState<StitchViewer> {
   }
 
   Future<void> _injectDriverEarningsBindings() async {
-    await _controller.runJavaScript(r'''
+    await _controller!.runJavaScript(r'''
       (() => {
         // Header
         stitchBind(document.getElementById('earnings-back-btn'), 'open_driver_dashboard');
-        stitchBind(document.getElementById('earnings-help-btn'), 'show_help');
+        stitchBind(document.getElementById('earnings-help-btn'), 'open_support_tickets');
 
         // Payout
         stitchBind(document.getElementById('earnings-payout-btn'), 'show_info', { message: 'Payout request submitted! Processing in 24-48 hours.' });
@@ -1532,14 +1577,14 @@ class _StitchViewerState extends ConsumerState<StitchViewer> {
     // Inject dynamic profile data
     await _injectDriverProfileData();
 
-    await _controller.runJavaScript(r'''
+    await _controller!.runJavaScript(r'''
       (() => {
         // Header
         stitchBind(document.getElementById('profile-back-btn'), 'open_driver_dashboard');
         stitchBind(document.getElementById('profile-edit-btn'), 'show_info', { message: 'Profile editing coming soon.' });
 
         // Camera avatar
-        stitchBind(document.getElementById('profile-camera-btn'), 'show_coming_soon');
+        stitchBind(document.getElementById('profile-camera-btn'), 'show_info', { message: 'Profile photo updates are handled by support verification.' });
 
         // Quick-access cards
         stitchBind(document.getElementById('profile-vehicle-btn'), 'open_motorcycle_select');
@@ -1548,7 +1593,7 @@ class _StitchViewerState extends ConsumerState<StitchViewer> {
 
         // Settings menu
         stitchBind(document.getElementById('profile-language-btn'), 'show_info', { message: 'Language settings: Change from app settings.' });
-        stitchBind(document.getElementById('profile-help-btn'), 'show_help');
+        stitchBind(document.getElementById('profile-help-btn'), 'open_support_tickets');
         stitchBind(document.getElementById('profile-about-btn'), 'show_info', { message: 'Nassib v1.0.2 — Motorcycle delivery, Tunisia.' });
         stitchBind(document.getElementById('profile-logout-btn'), 'logout');
 
@@ -1569,7 +1614,7 @@ class _StitchViewerState extends ConsumerState<StitchViewer> {
     // Inject dynamic admin dashboard data
     await _injectAdminDashboardData();
 
-    await _controller.runJavaScript(r'''
+    await _controller!.runJavaScript(r'''
       (() => {
         // Header
         stitchBind(document.getElementById('admin-menu-btn'), 'show_info', { message: 'Admin Menu: Console, Catalog, Analytics, Settings.' });
@@ -1619,7 +1664,7 @@ class _StitchViewerState extends ConsumerState<StitchViewer> {
     // Inject dynamic catalog data
     await _injectAdminCatalogData();
 
-    await _controller.runJavaScript(r'''
+    await _controller!.runJavaScript(r'''
       (() => {
         // Header
         stitchBind(document.getElementById('catalog-back-btn'), 'open_admin_console');
@@ -1671,15 +1716,15 @@ class _StitchViewerState extends ConsumerState<StitchViewer> {
     // Inject dynamic analytics data
     await _injectAdminAnalyticsData();
 
-    await _controller.runJavaScript(r'''
+    await _controller!.runJavaScript(r'''
       (() => {
         // Header
         stitchBind(document.getElementById('analytics-back-btn'), 'open_admin_console');
         stitchBind(document.getElementById('analytics-notif-btn'), 'show_info', { message: '2 fraud alerts require attention.' });
 
         // Action buttons
-        stitchBind(document.getElementById('analytics-view-report'), 'show_info', { message: 'Sales report: +12% this week. Top sellers: Harissa, Dates, Olive Oil.' });
-        stitchBind(document.getElementById('analytics-view-all-drivers'), 'show_info', { message: 'All active drivers list with real-time locations.' });
+        stitchBind(document.getElementById('analytics-view-report'), 'admin_view_delivery_report');
+        stitchBind(document.getElementById('analytics-view-all-drivers'), 'admin_view_driver_report');
 
         // Bottom nav
         stitchBind(document.getElementById('analytics-nav-dashboard'), 'open_admin_console');
@@ -1699,7 +1744,7 @@ class _StitchViewerState extends ConsumerState<StitchViewer> {
     final driverState = ref.read(driverAvailabilityProvider);
     final isOnline = driverState.isAvailable;
 
-    await _controller.runJavaScript('''
+    await _controller!.runJavaScript('''
       (() => {
         const set = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val; };
 
@@ -1729,14 +1774,12 @@ class _StitchViewerState extends ConsumerState<StitchViewer> {
       final orderId = delivery.id.length > 8
           ? delivery.id.substring(delivery.id.length - 8).toUpperCase()
           : delivery.id.toUpperCase();
-      final escapedPickup =
-          delivery.pickupLocation.replaceAll("'", "\\'");
-      final escapedDropoff =
-          delivery.deliveryAddress.replaceAll("'", "\\'");
+      final escapedPickup = delivery.pickupLocation.replaceAll("'", "\\'");
+      final escapedDropoff = delivery.deliveryAddress.replaceAll("'", "\\'");
       final amount = delivery.estimatedCost?.toStringAsFixed(2) ?? '0.00';
       final status = delivery.status.name;
 
-      await _controller.runJavaScript('''
+      await _controller!.runJavaScript('''
         (() => {
           const set = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val; };
           set('job-order-number', '#$orderId');
@@ -1760,7 +1803,7 @@ class _StitchViewerState extends ConsumerState<StitchViewer> {
     final escapedName = user.name.replaceAll("'", "\\'");
     final escapedEmail = user.email.replaceAll("'", "\\'");
 
-    await _controller.runJavaScript('''
+    await _controller!.runJavaScript('''
       (() => {
         const set = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val; };
         set('profile-name', '$escapedName');
@@ -1779,7 +1822,7 @@ class _StitchViewerState extends ConsumerState<StitchViewer> {
     final stats = adminState.stats;
     final drivers = adminState.pendingDrivers;
 
-    await _controller.runJavaScript('''
+    await _controller!.runJavaScript('''
       (() => {
         const set = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val; };
         set('admin-daily-orders', '${stats.dailyOrders}');
@@ -1813,7 +1856,7 @@ class _StitchViewerState extends ConsumerState<StitchViewer> {
           .replaceAll('\\', '\\\\')
           .replaceAll('`', '\\`');
 
-      await _controller.runJavaScript('''
+      await _controller!.runJavaScript('''
         (() => {
           // Find the pending section container — look for the element after admin-pending-count
           const pendingEl = document.getElementById('admin-pending-count');
@@ -1871,12 +1914,10 @@ class _StitchViewerState extends ConsumerState<StitchViewer> {
 ''');
     }
 
-    final escapedProducts = productsHtml
-        .toString()
-        .replaceAll('\\', '\\\\')
-        .replaceAll('`', '\\`');
+    final escapedProducts =
+        productsHtml.toString().replaceAll('\\', '\\\\').replaceAll('`', '\\`');
 
-    await _controller.runJavaScript('''
+    await _controller!.runJavaScript('''
       (() => {
         const container = document.getElementById('catalog-products-list');
         if (container) {
@@ -1899,10 +1940,11 @@ class _StitchViewerState extends ConsumerState<StitchViewer> {
 
   /// Injects admin analytics stats.
   Future<void> _injectAdminAnalyticsData() async {
+    await ref.read(adminStateProvider.notifier).refreshAnalyticsOverview();
     final adminState = ref.read(adminStateProvider);
     final stats = adminState.stats;
 
-    await _controller.runJavaScript('''
+    await _controller!.runJavaScript('''
       (() => {
         const set = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val; };
         set('analytics-revenue', '${stats.totalRevenue.toStringAsFixed(0)} TND');
@@ -1912,24 +1954,142 @@ class _StitchViewerState extends ConsumerState<StitchViewer> {
     ''');
   }
 
+  Future<void> _showAdminDeliveryReport() async {
+    try {
+      final report = await ref
+          .read(adminStateProvider.notifier)
+          .fetchDeliveriesReport(period: 'weekly');
+      final rows = (report['rows'] as List?) ?? const [];
+
+      if (rows.isEmpty) {
+        _showMessage('No delivery report data available yet.');
+        return;
+      }
+
+      final latest = rows.last as Map<String, dynamic>;
+      final completed = (latest['completed'] as num?)?.toInt() ?? 0;
+      final cancelled = (latest['cancelled'] as num?)?.toInt() ?? 0;
+      final revenue = (latest['revenue'] as num?)?.toDouble() ?? 0;
+
+      _showMessage(
+        '📊 Weekly deliveries: $completed completed, $cancelled cancelled, ${revenue.toStringAsFixed(2)} TND revenue.',
+      );
+    } catch (e) {
+      _showMessage('Failed to load delivery report.');
+    }
+  }
+
+  Future<void> _showAdminDriverReport() async {
+    try {
+      final report =
+          await ref.read(adminStateProvider.notifier).fetchDriversReport();
+      final totalDrivers = (report['totalDrivers'] as num?)?.toInt() ?? 0;
+      final verifiedDrivers = (report['verifiedDrivers'] as num?)?.toInt() ?? 0;
+      final availableDrivers =
+          (report['availableDrivers'] as num?)?.toInt() ?? 0;
+
+      _showMessage(
+        '🛵 Drivers: $totalDrivers total, $verifiedDrivers verified, $availableDrivers currently available.',
+      );
+    } catch (e) {
+      _showMessage('Failed to load driver report.');
+    }
+  }
+
+  Future<void> _showHelpAndSupport() async {
+    try {
+      final supportNotifier = ref.read(supportStateProvider.notifier);
+      await supportNotifier.loadFaqs();
+      final version = await supportNotifier.getSystemVersion();
+
+      final faqCount = ref.read(supportStateProvider).faqs.length;
+      final appVersion = version['version']?.toString() ?? 'unknown';
+      _showMessage(
+        '📞 Help & Support: +216 70 000 000 • support@nassib.tn • $faqCount FAQs • Backend v$appVersion',
+      );
+    } catch (_) {
+      _showMessage(
+          '📞 Help & Support: Call +216 70 000 000 or email support@nassib.tn');
+    }
+  }
+
+  Future<void> _openSupportTickets() async {
+    try {
+      final supportNotifier = ref.read(supportStateProvider.notifier);
+      await supportNotifier.loadMyTickets();
+      final tickets = ref.read(supportStateProvider).tickets;
+
+      if (tickets.isEmpty) {
+        _showMessage(
+            '🎫 No support tickets yet. You can submit one from the SOS screen.');
+        return;
+      }
+
+      final latest = tickets.first;
+      final subject = latest['subject']?.toString() ?? 'Support ticket';
+      final status = latest['status']?.toString() ?? 'open';
+      _showMessage(
+          '🎫 You have ${tickets.length} ticket(s). Latest: "$subject" ($status).');
+    } catch (_) {
+      _showMessage('Failed to load support tickets. Please try again.');
+    }
+  }
+
+  Future<void> _openFaqs() async {
+    try {
+      final supportNotifier = ref.read(supportStateProvider.notifier);
+      await supportNotifier.loadFaqs();
+      final faqs = ref.read(supportStateProvider).faqs;
+
+      if (faqs.isEmpty) {
+        _showMessage('📚 No FAQs available right now.');
+        return;
+      }
+
+      final topTitles = faqs
+          .take(3)
+          .map((f) => (f['question']?.toString() ?? '').trim())
+          .where((q) => q.isNotEmpty)
+          .toList();
+
+      final preview = topTitles.isEmpty
+          ? 'FAQs loaded successfully.'
+          : topTitles.join(' • ');
+      _showMessage('📚 FAQs: $preview');
+    } catch (_) {
+      _showMessage('Failed to load FAQs. Please try again.');
+    }
+  }
+
+  Future<void> _submitDriverSupportTicket() async {
+    if (_isActionLoading) return;
+    _isActionLoading = true;
+    try {
+      await ref.read(supportStateProvider.notifier).createTicket(
+            subject: 'Driver issue report',
+            description: 'Reported from SOS screen during active delivery.',
+            priority: 'high',
+          );
+      _showMessage(
+          '✅ Issue report submitted. Our admin team will review it shortly.');
+    } catch (_) {
+      _showMessage('Failed to submit report. Please try again.');
+    } finally {
+      _isActionLoading = false;
+    }
+  }
+
   // ═══════════════════════════════════════════════════════════════════
   // BIOMETRIC / OTP
   // ═══════════════════════════════════════════════════════════════════
 
   Future<void> _injectBiometricOtpBindings() async {
-    await _controller.runJavaScript(r'''
+    await _controller!.runJavaScript(r'''
       (() => {
-        const backBtn = stitchFindByIcon('arrow_back') || stitchFindByIcon('chevron_left');
-        stitchBind(backBtn, 'go_back');
-
-        const continueBtn = stitchFindByText('button', ['continuer', 'continue', 'verify']);
-        stitchBind(continueBtn, 'biometric_verify_otp');
-
-        const biometricBtn = stitchFindByText('button', ['biom', 'fingerprint', 'empreinte']);
-        stitchBind(biometricBtn, 'show_info', { message: 'Biometric authentication — Place your finger on the sensor.' });
-
-        const resendBtn = stitchFindByText('button,a', ['renvoyer', 'resend']);
-        stitchBind(resendBtn, 'show_info', { message: 'New SMS code sent! Check your phone.' });
+        stitchBind(document.getElementById('biometric-back-btn'), 'go_back');
+        stitchBind(document.getElementById('biometric-continue-btn'), 'biometric_verify_otp');
+        stitchBind(document.getElementById('biometric-login-btn'), 'show_info', { message: 'Biometric authentication — Place your finger on the sensor.' });
+        stitchBind(document.getElementById('biometric-resend-btn'), 'show_info', { message: 'New SMS code sent! Check your phone.' });
       })();
     ''');
   }
@@ -1937,6 +2097,128 @@ class _StitchViewerState extends ConsumerState<StitchViewer> {
   // ═══════════════════════════════════════════════════════════════════
   // BRIDGE MESSAGE HANDLER
   // ═══════════════════════════════════════════════════════════════════
+
+  static const Set<String> _allowedBridgeActions = {
+    // Navigation: Auth
+    'open_register',
+    'open_login',
+    'save_language_and_login',
+
+    // Navigation: Splash
+    'open_splash2',
+    'open_splash3',
+    'open_splash4',
+
+    // Navigation: Customer
+    'open_product',
+    'select_and_open_product',
+    'toggle_favorite',
+    'quick_add_to_cart',
+    'update_cart_qty',
+    'open_filters',
+    'open_cart',
+    'open_checkout_promos',
+    'open_order_confirm',
+    'open_live_tracking',
+    'open_order_history',
+    'open_notifications',
+    'open_customer_home',
+    'open_ai_order',
+    'open_ai_voice',
+
+    // Navigation: Driver
+    'open_driver_dashboard',
+    'open_active_job',
+    'open_driver_docs',
+    'open_motorcycle_select',
+    'open_driver_rating',
+    'open_driver_training',
+    'open_driver_sos',
+    'open_driver_earnings',
+    'open_driver_profile',
+
+    // Navigation: Admin
+    'open_admin_console',
+    'open_admin_catalog',
+    'open_admin_analytics',
+
+    // Utility
+    'open_biometric_otp',
+    'go_back',
+
+    // Driver actions
+    'driver_toggle_availability',
+    'driver_accept_delivery',
+    'driver_start_delivery',
+    'driver_complete_delivery',
+    'driver_decline_delivery',
+    'driver_submit_docs',
+    'driver_confirm_motorcycle',
+    'driver_submit_rating',
+    'driver_sos_activated',
+    'driver_submit_support_ticket',
+
+    // Admin actions
+    'admin_verify_driver',
+    'admin_reject_driver',
+    'admin_add_product',
+    'admin_edit_product',
+    'admin_delete_product',
+    'admin_view_delivery_report',
+    'admin_view_driver_report',
+
+    // Auth + OTP actions
+    'biometric_verify_otp',
+    'login_submit',
+    'register_submit',
+    'logout',
+
+    // Cart/UI/support
+    'add_to_cart_and_go',
+    'show_added_to_cart',
+    'show_info',
+    'show_help',
+    'show_coming_soon',
+    'open_support_tickets',
+    'open_faqs',
+
+    // Notification toggles/no-op
+    'toggle_order_status_notif',
+    'toggle_smart_reorder_notif',
+    'toggle_promos_notif',
+    'noop',
+  };
+
+  bool _isValidBridgePayload(String action, Map<String, dynamic> payload) {
+    switch (action) {
+      case 'save_language_and_login':
+        final language = payload['language']?.toString() ?? '';
+        return language.isNotEmpty;
+      case 'select_and_open_product':
+      case 'toggle_favorite':
+      case 'quick_add_to_cart':
+        final productId = payload['productId']?.toString() ?? '';
+        return productId.isNotEmpty;
+      case 'update_cart_qty':
+        final productId = payload['productId']?.toString() ?? '';
+        final direction = payload['direction']?.toString() ?? '';
+        return productId.isNotEmpty &&
+            (direction == 'plus' || direction == 'minus');
+      case 'admin_verify_driver':
+      case 'admin_reject_driver':
+        final driverId = payload['driverId']?.toString() ?? '';
+        return driverId.isNotEmpty;
+      case 'admin_edit_product':
+      case 'admin_delete_product':
+        final productId = payload['productId']?.toString() ?? '';
+        return productId.isNotEmpty;
+      case 'show_info':
+        final message = payload['message']?.toString() ?? '';
+        return message.isNotEmpty;
+      default:
+        return true;
+    }
+  }
 
   Future<void> _handleBridgeMessage(String rawMessage) async {
     dynamic decoded;
@@ -1950,52 +2232,74 @@ class _StitchViewerState extends ConsumerState<StitchViewer> {
         ? decoded
         : <String, dynamic>{'action': decoded.toString()};
 
-    final action = message['action']?.toString();
+    final action = message['action']?.toString().trim();
     final payload = (message['payload'] as Map?)?.cast<String, dynamic>() ??
         <String, dynamic>{};
+
+    if (action == null ||
+        action.isEmpty ||
+        !_allowedBridgeActions.contains(action)) {
+      _showMessage('Unsupported action blocked for safety.');
+      return;
+    }
+
+    if (!_isValidBridgePayload(action, payload)) {
+      _showMessage('Invalid action payload blocked.');
+      return;
+    }
 
     switch (action) {
       // ── Navigation: Auth ──
       case 'open_register':
         _navigateTo('/register1');
+        return;
       case 'open_login':
         _navigateTo('/login1');
+        return;
 
       // ── Language + Login (from splash Get Started) ──
       case 'save_language_and_login':
         final lang = payload['language']?.toString() ?? 'en';
         ref.read(languageProvider.notifier).setFromString(lang);
         _navigateTo('/login1');
+        return;
 
       // ── Navigation: Splash ──
       case 'open_splash2':
         _navigateTo('/splash2');
+        return;
       case 'open_splash3':
         _navigateTo('/splash3');
+        return;
       case 'open_splash4':
         _navigateTo('/splash4');
+        return;
 
       // ── Navigation: Customer ──
       case 'open_product':
         _navigateTo('/customer/product');
+        return;
       case 'select_and_open_product':
         final productId = payload['productId']?.toString();
         if (productId != null) {
           ref.read(productCatalogProvider.notifier).selectProduct(productId);
         }
         _navigateTo('/customer/product');
+        return;
       case 'toggle_favorite':
         final favId = payload['productId']?.toString();
         if (favId != null) {
           ref.read(productCatalogProvider.notifier).toggleFavorite(favId);
           _showMessage('❤️ Favorite updated!');
         }
+        return;
       case 'quick_add_to_cart':
         final addId = payload['productId']?.toString();
         if (addId != null) {
           ref.read(productCatalogProvider.notifier).addToCart(addId);
           _showMessage('✅ Added to cart!');
         }
+        return;
       case 'update_cart_qty':
         final qtyPid = payload['productId']?.toString();
         final direction = payload['direction']?.toString();
@@ -2014,92 +2318,128 @@ class _StitchViewerState extends ConsumerState<StitchViewer> {
           // Refresh the cart screen with updated data
           await _injectCartData();
         }
+        return;
       case 'open_filters':
         _navigateTo('/customer/filters');
+        return;
       case 'open_cart':
         _navigateTo('/customer/cart');
+        return;
       case 'open_checkout_promos':
         _navigateTo('/customer/checkout-promos');
+        return;
       case 'open_order_confirm':
         _navigateTo('/customer/order-confirm');
+        return;
       case 'open_live_tracking':
         _navigateTo('/customer/live-tracking');
+        return;
+      case 'open_order_history':
+        _navigateTo('/customer/live-tracking');
+        return;
       case 'open_notifications':
         _navigateTo('/customer/notifications');
+        return;
       case 'open_customer_home':
         _navigateTo('/customer/home');
+        return;
       case 'open_ai_order':
         _navigateTo('/customer/ai-order');
+        return;
       case 'open_ai_voice':
         _navigateTo('/customer/ai-voice');
+        return;
 
       // ── Navigation: Driver ──
       case 'open_driver_dashboard':
         _navigateTo('/driver/dashboard');
+        return;
       case 'open_active_job':
         _navigateTo('/driver/active-job');
+        return;
       case 'open_driver_docs':
         _navigateTo('/driver/docs');
+        return;
       case 'open_motorcycle_select':
         _navigateTo('/driver/motorcycle-select');
+        return;
       case 'open_driver_rating':
         _navigateTo('/driver/rating');
+        return;
       case 'open_driver_training':
         _navigateTo('/driver/training');
+        return;
       case 'open_driver_sos':
         _navigateTo('/driver/sos');
+        return;
       case 'open_driver_earnings':
         _navigateTo('/driver/earnings');
+        return;
       case 'open_driver_profile':
         _navigateTo('/driver/profile');
+        return;
 
       // ── Navigation: Admin ──
       case 'open_admin_console':
         _navigateTo('/admin/console');
+        return;
       case 'open_admin_catalog':
         _navigateTo('/admin/catalog');
+        return;
       case 'open_admin_analytics':
         _navigateTo('/admin/analytics');
+        return;
 
       // ── Navigation: Utility ──
       case 'open_biometric_otp':
         _navigateTo('/biometric-otp');
+        return;
 
       // ── Go Back (browser-like) ──
       case 'go_back':
         if (mounted) Navigator.of(context).maybePop();
+        return;
 
       // ── Driver Actions (API calls) ──
       case 'driver_toggle_availability':
         await _driverToggleAvailability();
+        return;
       case 'driver_accept_delivery':
         await _driverAcceptDelivery();
+        return;
       case 'driver_start_delivery':
         await _driverStartDelivery();
+        return;
       case 'driver_complete_delivery':
         await _driverCompleteDelivery();
+        return;
       case 'driver_decline_delivery':
         _showMessage('Delivery declined. Waiting for next request...');
         // Hide the incoming request card
-        await _controller.runJavaScript('''
+        await _controller!.runJavaScript('''
           (() => {
             const section = document.getElementById('driver-incoming-section');
             if (section) section.style.display = 'none';
           })();
         ''');
+        return;
       case 'driver_submit_docs':
         _showMessage(
             '📄 Documents submitted for review. Please wait for admin approval.');
         _navigateTo('/driver/dashboard');
+        return;
       case 'driver_confirm_motorcycle':
         _showMessage('🏍️ Motorcycle selection confirmed!');
         _navigateTo('/driver/dashboard');
+        return;
       case 'driver_submit_rating':
         _showMessage('⭐ Thank you for your feedback!');
         _navigateTo('/driver/dashboard');
+        return;
       case 'driver_sos_activated':
         _showMessage(
             '🚨 SOS ACTIVATED! Emergency services and admin have been notified. Stay safe.');
+        return;
 
       // ── Admin Actions ──
       case 'admin_verify_driver':
@@ -2109,25 +2449,36 @@ class _StitchViewerState extends ConsumerState<StitchViewer> {
         }
         _showMessage(
             '✅ Driver verified and approved! They can now accept deliveries.');
+        return;
       case 'admin_reject_driver':
         final rejectId = payload['driverId']?.toString() ?? '';
         if (rejectId.isNotEmpty) {
           ref.read(adminStateProvider.notifier).rejectDriver(rejectId);
         }
         _showMessage('❌ Driver application rejected.');
+        return;
       case 'admin_add_product':
         _showMessage(
             '📦 New product form: Name, SKU, Price, Category, Image upload.');
+        return;
       case 'admin_edit_product':
         final editProdId = payload['productId']?.toString() ?? '';
         _showMessage(
             'Product editor: Update name, price, stock, category, and images. (ID: $editProdId)');
+        return;
       case 'admin_delete_product':
         final deleteProdId = payload['productId']?.toString() ?? '';
         if (deleteProdId.isNotEmpty) {
           ref.read(adminStateProvider.notifier).deleteProduct(deleteProdId);
           _showMessage('🗑️ Product removed from catalog.');
         }
+        return;
+      case 'admin_view_delivery_report':
+        await _showAdminDeliveryReport();
+        return;
+      case 'admin_view_driver_report':
+        await _showAdminDriverReport();
+        return;
 
       // ── Biometric/OTP ──
       case 'biometric_verify_otp':
@@ -2137,6 +2488,7 @@ class _StitchViewerState extends ConsumerState<StitchViewer> {
           final destination = _routeForRole(authState.user?.role);
           if (destination != null) _navigateTo(destination);
         }
+        return;
 
       // ── Cart Actions ──
       case 'add_to_cart_and_go':
@@ -2145,7 +2497,7 @@ class _StitchViewerState extends ConsumerState<StitchViewer> {
         if (selectedProd != null) {
           int qty = 1;
           try {
-            final qtyResult = await _controller.runJavaScriptReturningResult(
+            final qtyResult = await _controller!.runJavaScriptReturningResult(
               "document.getElementById('product-qty')?.textContent || '1'",
             );
             qty = int.tryParse(qtyResult.toString().replaceAll('"', '')) ?? 1;
@@ -2156,30 +2508,55 @@ class _StitchViewerState extends ConsumerState<StitchViewer> {
         }
         _showMessage('✅ Added to cart!');
         _navigateTo('/customer/cart');
+        return;
       case 'show_added_to_cart':
         _showMessage('✅ Item added to cart!');
+        return;
 
       // ── Auth Actions ──
       case 'logout':
         await ref.read(authStateProvider.notifier).logout();
         if (mounted) _navigateTo('/login1');
+        return;
       case 'login_submit':
         await _submitLogin(payload);
+        return;
       case 'register_submit':
         await _submitRegistration(payload);
+        return;
 
       // ── UI Feedback (no navigation) ──
       case 'show_info':
         _showMessage(payload['message']?.toString() ?? 'Information');
+        return;
       case 'show_help':
-        _showMessage(
-            '📞 Help & Support: Call +216 70 000 000 or email support@nassib.tn');
+        await _showHelpAndSupport();
+        return;
       case 'show_coming_soon':
         _showMessage('🚀 This feature is coming soon!');
+        return;
+      case 'open_support_tickets':
+        await _openSupportTickets();
+        return;
+      case 'open_faqs':
+        await _openFaqs();
+        return;
+
+      // ── Support Ticket (Driver SOS) ──
+      case 'driver_submit_support_ticket':
+        await _submitDriverSupportTicket();
+        return;
+
+      // ── Notification preference toggles (client-side state, no backend call) ──
+      case 'toggle_order_status_notif':
+      case 'toggle_smart_reorder_notif':
+      case 'toggle_promos_notif':
+        // Toggles update HTML state natively; bridge action is a no-op for now
+        return;
 
       // ── No-op (intentional) ──
       case 'noop':
-        break;
+        return;
 
       default:
         break;
@@ -2357,7 +2734,7 @@ class _StitchViewerState extends ConsumerState<StitchViewer> {
       if (!mounted) return;
       _showMessage('🚀 Delivery started! Navigate to drop-off.');
       // Hide start button, keep complete button visible
-      await _controller.runJavaScript('''
+      await _controller!.runJavaScript('''
         (() => {
           const startBtn = document.getElementById('job-start-delivery-btn');
           if (startBtn) startBtn.style.display = 'none';

@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../providers/motorcycle_provider.dart';
-import '../../../models/motorcycle_model.dart';
 import 'motorcycle_register_screen.dart';
 
 class MotorcycleListScreen extends ConsumerWidget {

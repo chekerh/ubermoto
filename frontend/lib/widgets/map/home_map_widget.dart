@@ -33,7 +33,8 @@ class _HomeMapWidgetState extends ConsumerState<HomeMapWidget> {
   final fm.MapController _mapController = fm.MapController();
   MapPoint? _userLocation;
   bool _isLoadingLocation = true;
-  final DriverInterpolationService _interpolationService = DriverInterpolationService();
+  final DriverInterpolationService _interpolationService =
+      DriverInterpolationService();
   final Map<String, MapPoint> _previousDriverPositions = {};
 
   @override
@@ -46,7 +47,8 @@ class _HomeMapWidgetState extends ConsumerState<HomeMapWidget> {
     try {
       final position = await GeolocationService.getCurrentPosition();
       setState(() {
-        _userLocation = MapPoint(lat: position.latitude, lng: position.longitude);
+        _userLocation =
+            MapPoint(lat: position.latitude, lng: position.longitude);
         _isLoadingLocation = false;
       });
       _updateMapCamera();
@@ -96,28 +98,33 @@ class _HomeMapWidgetState extends ConsumerState<HomeMapWidget> {
     if (widget.drivers != null) {
       for (final driver in widget.drivers!) {
         final previousPosition = _previousDriverPositions[driver.driverId];
-        
-        _interpolationService.updateDriverPosition(driver.driverId, driver.position);
-        
+
+        _interpolationService.updateDriverPosition(
+            driver.driverId, driver.position);
+
         double? bearing;
         if (previousPosition != null) {
-          bearing = MapUtils.calculateBearing(previousPosition, driver.position);
+          bearing =
+              MapUtils.calculateBearing(previousPosition, driver.position);
         } else if (driver.bearing != null) {
           bearing = driver.bearing;
         }
-        
-        final interpolatedPosition = _interpolationService.getCurrentPosition(driver.driverId) ?? driver.position;
-        
-        _interpolationService.onPositionUpdate(driver.driverId, (updatedPosition) {
+
+        final interpolatedPosition =
+            _interpolationService.getCurrentPosition(driver.driverId) ??
+                driver.position;
+
+        _interpolationService.onPositionUpdate(driver.driverId,
+            (updatedPosition) {
           if (mounted) {
             setState(() {
               // Trigger rebuild to update marker position
             });
           }
         });
-        
+
         _previousDriverPositions[driver.driverId] = driver.position;
-        
+
         markers.add(
           fm.Marker(
             point: LatLng(interpolatedPosition.lat, interpolatedPosition.lng),
@@ -136,7 +143,7 @@ class _HomeMapWidgetState extends ConsumerState<HomeMapWidget> {
                     border: Border.all(color: Colors.white, width: 2),
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.black.withValues(alpha:0.3),
+                        color: Colors.black.withValues(alpha: 0.3),
                         blurRadius: 4,
                         offset: const Offset(0, 2),
                       ),
@@ -181,8 +188,8 @@ class _HomeMapWidgetState extends ConsumerState<HomeMapWidget> {
       );
     }
 
-    final initialLocation = _userLocation ?? 
-        widget.initialLocation ?? 
+    final initialLocation = _userLocation ??
+        widget.initialLocation ??
         const MapPoint(lat: 36.8065, lng: 10.1815);
 
     return fm.FlutterMap(

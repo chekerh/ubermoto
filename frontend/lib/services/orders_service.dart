@@ -13,13 +13,16 @@ class OrdersService {
     String? paymentMethod, // COD etc
   }) async {
     try {
-      final res = await ApiService.post('/orders', {
-        'items': items,
-        if (address != null) 'address': address,
-        if (region != null) 'region': region,
-        if (type != null) 'type': type,
-        if (paymentMethod != null) 'paymentMethod': paymentMethod,
-      }, requiresAuth: true);
+      final res = await ApiService.post(
+          '/orders',
+          {
+            'items': items,
+            if (address != null) 'address': address,
+            if (region != null) 'region': region,
+            if (type != null) 'type': type,
+            if (paymentMethod != null) 'paymentMethod': paymentMethod,
+          },
+          requiresAuth: true);
       return OrderModel.fromJson(jsonDecode(res.body) as Map<String, dynamic>);
     } on AppException {
       rethrow;
@@ -30,7 +33,9 @@ class OrdersService {
     try {
       final res = await ApiService.get('/orders', requiresAuth: true);
       final data = jsonDecode(res.body) as List<dynamic>;
-      return data.map((e) => OrderModel.fromJson(e as Map<String, dynamic>)).toList();
+      return data
+          .map((e) => OrderModel.fromJson(e as Map<String, dynamic>))
+          .toList();
     } on AppException {
       rethrow;
     }

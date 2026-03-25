@@ -38,14 +38,14 @@ class OSRMService {
 
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body) as Map<String, dynamic>;
-        
+
         if (data['code'] == 'Ok' && data['routes'] != null) {
           final routes = data['routes'] as List;
           if (routes.isNotEmpty) {
             final route = routes[0] as Map<String, dynamic>;
             final geometry = route['geometry'] as Map<String, dynamic>;
             final coordinates = geometry['coordinates'] as List;
-            
+
             // Parse GeoJSON LineString coordinates
             final points = coordinates
                 .map((coord) => MapPoint(
@@ -79,7 +79,7 @@ class OSRMService {
   static RouteResult _fallbackRoute(MapPoint start, MapPoint end) {
     // Calculate straight-line distance
     final distance = _calculateDistance(start, end);
-    
+
     // Estimate duration (assuming average speed of 30 km/h for motorcycles)
     const averageSpeedKmh = 30.0;
     final duration = (distance / averageSpeedKmh) * 3600; // seconds

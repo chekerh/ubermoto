@@ -1,5 +1,4 @@
 import 'geolocation_service.dart';
-import '../map/types.dart';
 
 class DistanceCalculator {
   static Future<double?> calculateDistanceBetweenAddresses(

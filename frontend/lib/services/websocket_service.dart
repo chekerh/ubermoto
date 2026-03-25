@@ -1,4 +1,5 @@
 import 'package:socket_io_client/socket_io_client.dart' as io;
+import 'package:flutter/foundation.dart';
 import '../config/app_config.dart';
 import '../core/utils/storage_service.dart';
 
@@ -22,15 +23,15 @@ class WebSocketService {
     });
 
     _socket!.onConnect((_) {
-      print('WebSocket connected');
+      debugPrint('WebSocket connected');
     });
 
     _socket!.onDisconnect((_) {
-      print('WebSocket disconnected');
+      debugPrint('WebSocket disconnected');
     });
 
     _socket!.onConnectError((error) {
-      print('WebSocket connection error: $error');
+      debugPrint('WebSocket connection error: $error');
     });
 
     // Listen for delivery status updates

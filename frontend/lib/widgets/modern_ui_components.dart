@@ -147,7 +147,8 @@ class NeumorphicButton extends StatelessWidget {
           borderRadius: BorderRadius.circular(borderRadius),
           child: Center(
             child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
+              padding:
+                  const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
               child: child,
             ),
           ),
@@ -205,7 +206,7 @@ class _AnimatedCounterState extends State<AnimatedCounter>
       duration: widget.duration,
       vsync: this,
     );
-    
+
     _animation = IntTween(
       begin: 0,
       end: widget.value,
@@ -213,7 +214,7 @@ class _AnimatedCounterState extends State<AnimatedCounter>
       parent: _controller,
       curve: Curves.easeOutCubic,
     ));
-    
+
     _controller.forward();
   }
 

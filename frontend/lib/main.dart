@@ -13,9 +13,9 @@ void main() async {
   try {
     // Initialize Firebase
     await Firebase.initializeApp();
-    print('Firebase initialized successfully');
+    debugPrint('Firebase initialized successfully');
   } catch (e) {
-    print('Firebase initialization failed: $e');
+    debugPrint('Firebase initialization failed: $e');
     // Continue without Firebase for demo purposes
   }
 
@@ -26,7 +26,7 @@ void main() async {
   try {
     await MonitoringService.initialize();
   } catch (e) {
-    print('Monitoring service initialization failed: $e');
+    debugPrint('Monitoring service initialization failed: $e');
   }
 
   runApp(
@@ -213,6 +213,7 @@ class _AuthGate extends ConsumerWidget {
       return const StitchViewer(
         assetPath: 'stitch/ubermoto_splash_and_language_select_1/code.html',
         title: 'Nassib',
+        nextRoute: '/login1',
         routeName: '/splash1',
       );
     }

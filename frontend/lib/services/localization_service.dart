@@ -32,9 +32,7 @@ class LocalizationService {
   }
 
   static AlignmentGeometry getAlignment(BuildContext context) {
-    return isRTL(context) 
-        ? Alignment.centerRight 
-        : Alignment.centerLeft;
+    return isRTL(context) ? Alignment.centerRight : Alignment.centerLeft;
   }
 
   static EdgeInsetsDirectional getPadding(BuildContext context) {
@@ -67,13 +65,14 @@ class LocalizationService {
     );
   }
 
-  static TextStyle getLocalizedTextStyle(BuildContext context, {
+  static TextStyle getLocalizedTextStyle(
+    BuildContext context, {
     double? fontSize,
     FontWeight? fontWeight,
     Color? color,
   }) {
     final isArabic = context.locale.languageCode == 'ar';
-    
+
     if (isArabic) {
       return getArabicTextStyle(
         fontSize: fontSize,
@@ -107,7 +106,7 @@ class LocalizationService {
   static String formatCurrency(BuildContext context, double amount) {
     final locale = context.locale;
     final formattedAmount = amount.toStringAsFixed(2);
-    
+
     if (locale.languageCode == 'ar') {
       // Arabic currency format
       return '$formattedAmount ر.س';
@@ -119,25 +118,46 @@ class LocalizationService {
 
   static String formatDate(BuildContext context, DateTime date) {
     final locale = context.locale;
-    
+
     if (locale.languageCode == 'ar') {
       // Arabic date format
       final months = [
-        'يناير', 'فبراير', 'مارس', 'أبريل', 'مايو', 'يونيو',
-        'يوليو', 'أغسطس', 'سبتمبر', 'أكتوبر', 'نوفمبر', 'ديسمبر'
+        'يناير',
+        'فبراير',
+        'مارس',
+        'أبريل',
+        'مايو',
+        'يونيو',
+        'يوليو',
+        'أغسطس',
+        'سبتمبر',
+        'أكتوبر',
+        'نوفمبر',
+        'ديسمبر'
       ];
       return '${date.day} ${months[date.month - 1]} ${date.year}';
     } else {
       // English date format
       final months = [
-        'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
-        'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'
+        'Jan',
+        'Feb',
+        'Mar',
+        'Apr',
+        'May',
+        'Jun',
+        'Jul',
+        'Aug',
+        'Sep',
+        'Oct',
+        'Nov',
+        'Dec'
       ];
       return '${months[date.month - 1]} ${date.day}, ${date.year}';
     }
   }
 
-  static Future<void> changeLanguage(BuildContext context, Locale locale) async {
+  static Future<void> changeLanguage(
+      BuildContext context, Locale locale) async {
     await context.setLocale(locale);
   }
 

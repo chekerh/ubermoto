@@ -1,5 +1,4 @@
 import 'dart:convert';
-import '../config/app_config.dart';
 import '../core/errors/app_exception.dart';
 import '../models/motorcycle_model.dart';
 import 'api_service.dart';
@@ -14,8 +13,7 @@ class MotorcycleService {
 
       final json = jsonDecode(response.body) as List<dynamic>;
       return json
-          .map((item) =>
-              MotorcycleModel.fromJson(item as Map<String, dynamic>))
+          .map((item) => MotorcycleModel.fromJson(item as Map<String, dynamic>))
           .toList();
     } on AppException {
       rethrow;

@@ -1,23 +1,30 @@
 import 'dart:io';
 
 class AppConfig {
-  // Backend port configuration
-  // Change this port to match your backend PORT in .env
-  // Available ports: 3001, 3002, 3003, 3004
-  static const int backendPort = 3003;
-  
-  // Update this URL based on your backend location
-  // For Android emulator: http://10.0.2.2:PORT
-  // For iOS simulator: http://localhost:PORT
-  // For physical device: http://<your-ip>:PORT
+  /// Override host port when backend is not on 3001, e.g.:
+  /// `flutter run --dart-define=BACKEND_PORT=3010`
+  static const int backendPort =
+      int.fromEnvironment('BACKEND_PORT', defaultValue: 3001);
+
+  /// Full API origin (scheme + host + port). When non-empty, overrides [baseUrl]
+  /// built from [backendPort]. Example:
+  /// `flutter run --dart-define=API_BASE_URL=http://10.0.0.5:3010`
+  static const String _apiBaseUrlFromDefine =
+      String.fromEnvironment('API_BASE_URL', defaultValue: '');
+
+  // Default URL by platform when API_BASE_URL is not set.
+  // Android emulator: http://10.0.2.2:PORT — iOS simulator / desktop: localhost
   static String get baseUrl {
-    if (Platform.isAndroid) {
-      // Android emulator uses 10.0.2.2 to access host machine's localhost
-      return 'http://10.0.2.2:$backendPort';
-    } else {
-      // iOS simulator and other platforms use localhost
-      return 'http://localhost:$backendPort';
+    final fromDefine = _apiBaseUrlFromDefine.trim();
+    if (fromDefine.isNotEmpty) {
+      return fromDefine.endsWith('/')
+          ? fromDefine.substring(0, fromDefine.length - 1)
+          : fromDefine;
     }
+    if (Platform.isAndroid) {
+      return 'http://10.0.2.2:$backendPort';
+    }
+    return 'http://localhost:$backendPort';
   }
   
   // API Endpoints (no /api prefix - backend routes are directly on /auth, /deliveries, etc.)

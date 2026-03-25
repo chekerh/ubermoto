@@ -1,7 +1,13 @@
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../core/errors/app_exception.dart';
+import '../../../services/documents_service.dart';
+import 'document_path_io.dart' if (dart.library.html) 'document_path_stub.dart'
+    as doc_path;
+
 final documentStateProvider = StateNotifierProvider<DocumentNotifier, DocumentState>(
-  (ref) => DocumentNotifier(),
+  (ref) => DocumentNotifier(DocumentsService()),
 );
 
 class DocumentState {
@@ -20,12 +26,13 @@ class DocumentState {
   DocumentState copyWith({
     bool? isLoading,
     String? error,
+    bool clearError = false,
     DocumentStats? stats,
     dynamic user,
   }) {
     return DocumentState(
       isLoading: isLoading ?? this.isLoading,
-      error: error ?? this.error,
+      error: clearError ? null : (error ?? this.error),
       stats: stats ?? this.stats,
       user: user ?? this.user,
     );
@@ -65,50 +72,65 @@ class DocumentStats {
 }
 
 class DocumentNotifier extends StateNotifier<DocumentState> {
-  DocumentNotifier() : super(const DocumentState());
+  DocumentNotifier(this._documentsService) : super(const DocumentState());
+
+  final DocumentsService _documentsService;
 
   Future<void> loadDocumentStats() async {
-    state = state.copyWith(isLoading: true, error: null);
+    state = state.copyWith(isLoading: true, clearError: true);
 
     try {
-      // TODO: Implement API call to get document stats
-      // For now, simulate with mock data
-      await Future.delayed(const Duration(seconds: 1));
-
-      const mockStats = DocumentStats(
-        total: 4,
-        approved: 3,
-        pending: 1,
-        rejected: 0,
-        isComplete: false,
+      final raw = await _documentsService.getDocumentStats();
+      final stats = DocumentStats(
+        total: (raw['total'] as num?)?.toInt() ?? 0,
+        approved: (raw['approved'] as num?)?.toInt() ?? 0,
+        pending: (raw['pending'] as num?)?.toInt() ?? 0,
+        rejected: (raw['rejected'] as num?)?.toInt() ?? 0,
+        isComplete: raw['isComplete'] as bool? ?? false,
       );
 
       state = state.copyWith(
         isLoading: false,
-        stats: mockStats,
-        user: {'isVerified': false},
+        clearError: true,
+        stats: stats,
+        user: null,
       );
+    } on AppException catch (e) {
+      state = state.copyWith(isLoading: false, error: e.message);
     } catch (e) {
       state = state.copyWith(
         isLoading: false,
-        error: 'Failed to load document stats',
+        error: 'Failed to load document stats: $e',
       );
     }
   }
 
   Future<void> uploadDocument(String documentType, String filePath) async {
-    state = state.copyWith(isLoading: true, error: null);
+    if (kIsWeb) {
+      state = state.copyWith(
+        error: 'Document upload from a file path is not supported on web — use iOS/Android.',
+      );
+      return;
+    }
+
+    state = state.copyWith(isLoading: true, clearError: true);
 
     try {
-      // TODO: Implement document upload API call
-      await Future.delayed(const Duration(seconds: 2));
+      final read = await doc_path.readLocalDocumentPath(filePath);
 
-      // Simulate successful upload
-      state = state.copyWith(isLoading: false);
+      await _documentsService.uploadDocument(
+        documentType: documentType,
+        fileBytes: read.bytes,
+        fileName: read.fileName,
+      );
+
+      await loadDocumentStats();
+    } on AppException catch (e) {
+      state = state.copyWith(isLoading: false, error: e.message);
     } catch (e) {
       state = state.copyWith(
         isLoading: false,
-        error: 'Failed to upload document',
+        error: 'Failed to upload document: $e',
       );
     }
   }
